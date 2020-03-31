@@ -156,8 +156,12 @@ def player_join(json: Dict[Any, Any]):
     if "player_id" not in json:
         emit_error(json["name"], "Invalid data for this endpoint. Missing 'player_id'")
 
-    game.join_game(json["player_id"])
-    emit_board(game_name, f"Added player {json['player_id']} to game.")
+    try:
+        game.join_game(json["player_id"])
+        emit_board(game_name, game, f"Added player {json['player_id']} to game.")
+    except GameException as e:
+        logging.error("Exception occurred", exc_info=True)
+        emit_error(game_name, str(e))
 
 
 @socketio.on("start_game")
@@ -315,7 +319,6 @@ def continue_game(json: Dict[Any, Any]):
     Args:
         json (Dict[Any, Any]): {
             "game": (Any) The name of the game.
-            "points": (int) The number of points stolen during STEAL phase.
         }
     """
     if "name" not in json:
@@ -328,10 +331,6 @@ def continue_game(json: Dict[Any, Any]):
     except KeyError:
         logger.warning(f"Could not find the game named {game_name}.")
         emit_error(game_name, f"Could not find the game named {game_name}.")
-        return
-
-    if "points" not in json:
-        emit_error(game_name, "'points' not in request")
         return
 
     try:

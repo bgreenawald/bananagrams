@@ -28,10 +28,17 @@ h1 {
   font-family: "Luckiest Guy", cursive;
   font-size: 3em;
   letter-spacing: 0.15em;
+  -webkit-text-stroke: 0.5px black;
+  text-shadow: 1px 1px black;
 }
 
 p {
-  font-family: "Noto Sans", arial, sans-serif;
+  font-family: "Luckiest Guy", cursive;
+  font-size: 1.5em;
+  letter-spacing: 0.15em;
+  -webkit-text-stroke: 1px black;
+  text-align: center;
+  text-shadow: 1px 1px black;
 }
 
 .home-container {
@@ -41,13 +48,13 @@ p {
   height: 100%;
   margin: 0 auto;
   -webkit-box-shadow: 0 0 25px 0 #fff;
-  background: #FFD754;
-  background: -moz-linear-gradient(-45deg, #FFD754 0%, #FFD754 24%, #555555 25%, #FFD754 26%, #FFD754 50%, #FFD754 74%, #555555 75%, #FFD754 76%, #FFD754 100%);
-  background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #FFD754), color-stop(24%, #FFD754), color-stop(25%, #555555), color-stop(26%, #FFD754), color-stop(50%, #FFD754), color-stop(74%, #FFD754), color-stop(75%, #555555), color-stop(76%, #FFD754), color-stop(100%, #FFD754));
-  background: -webkit-linear-gradient(-45deg, #FFD754 0%, #FFD754 24%, #555555 25%, #FFD754 26%, #FFD754 50%, #FFD754 74%, #555555 75%, #FFD754 76%, #FFD754 100%);
-  background: -o-linear-gradient(-45deg, #FFD754 0%, #FFD754 24%, #555555 25%, #FFD754 26%, #FFD754 50%, #FFD754 74%, #555555 75%, #FFD754 76%, #FFD754 100%);
-  background: -ms-linear-gradient(-45deg, #FFD754 0%, #FFD754 24%, #555555 25%, #FFD754 26%, #FFD754 50%, #FFD754 74%, #555555 75%, #FFD754 76%, #FFD754 100%);
-  background: linear-gradient(135deg, #FFD754 0%, #FFD754 -10%, #FFD754 -24%, #FFD754 54%, #FFD754 97%, #FFD754 136%, #FFD754 195%, #FFD754 4.8%, #FFD754 70%);
+  background: #FAD96E;
+  background: -moz-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%, #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
+  background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #FAD96E), color-stop(24%, #FAD96E), color-stop(25%, #555555), color-stop(26%, #FAD96E), color-stop(50%, #FAD96E), color-stop(74%, #FAD96E), color-stop(75%, #555555), color-stop(76%, #FAD96E), color-stop(100%, #FAD96E));
+  background: -webkit-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%, #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
+  background: -o-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%, #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
+  background: -ms-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%, #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
+  background: linear-gradient(135deg, #FAD96E 0%, #FAD96E -10%, #FAD96E -24%, #FAD96E 54%, #FAD96E 97%, #FAD96E 136%, #FAD96E 195%, #FAD96E 4.8%, #FAD96E 70%);
   background-size: 70px 70px;
   position: relative;
   display: flex;
@@ -64,12 +71,12 @@ p {
   position: absolute;
   width: inherit;
   height: inherit;
-  background: -moz-radial-gradient(center, ellipse cover, rgba(255, 239, 186, 0.25) 0%, rgba(255, 255, 255, 0) 100%);
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(255, 239, 186, 0.55)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background: -webkit-radial-gradient(center, ellipse cover, rgba(255, 239, 186, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
-  background: -o-radial-gradient(center, ellipse cover, rgba(255, 239, 186, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
-  background: -ms-radial-gradient(center, ellipse cover, rgba(255, 239, 186, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
-  background: radial-gradient(ellipse at center, rgba(255, 239, 186, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -moz-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.25) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(253, 243, 209, 0.55)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -o-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -ms-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
+  background: radial-gradient(ellipse at center, rgba(253, 243, 209, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
 }
 
 .home-content {
@@ -83,7 +90,7 @@ p {
   transform: rotate(-90deg);
   top: 40px;
   left: 0%;
-  box-shadow: 0px 3px 10px #ffcb21;
+  box-shadow: 0px 3px 10px #f8cc3d;
 }
 
 /*# sourceMappingURL=styles.css.map */

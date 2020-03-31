@@ -1,106 +1,38 @@
+
 <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Bananagrams</title>
 
-<html lang="en">
-
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>Rad Gab</title>
-</head>
-
-<style>
-    .border {
-        border: solid;
-    }
-</style>
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/game.css') }}" />
+    </head>
 
 <body>
-    <div class="container" style="margin: 50px">
-        <h1>Welcome to Rad Gab!</h1>
-        <strong>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</strong>
-        <div class="row" style="width: max-content; margin: 50px auto">
-            <button onclick="reset_game()">Reset game</button>
+    <div class="main">
+        <div class="gradient"></div>
+        <div>
+            <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
+        </div>
+        <div id="join_game">
+            <p>First things first, enter your username to join the game.</p>
+            <input id="player_id" type="text">
+            <button type="submit" onclick="player_join()">Join the Game</button>
+        </div>
+        <div id="buttons">
+            <button type="submit" onclick="start_game()">Deal the Tiles</button>
+            <button type="submit" onclick="split()">Split</button>
+            <button type="submit" onclick="peel()">Peel</button>
+            <button type="submit" onclick="swap()">Swap</button>
+            <button type="submit" onclick="bananagrams()">Bananagrams</button>
+            <button type="submit" onclick="continue_game()">Continue Game</button>
+            <button type="submit" onclick="reset()">Reset Game</button>
         </div>
         <div>
-            <div class="row">
-                <div class="col-sm border">
-                    <h4>Score</h4>
-                    <p>Team 1 scored: <span id="team_1_score"></span></p>
-                    <p>Team 2 scored: <span id="team_2_score"></span></p>
-                </div>
-                <div class="col-sm border">
-                    <h4>Current Turn: <span id="team_1_turn"></span></h4>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm border">
-                    <h4>Current view: <span id="user_view"></span></h4>
-                    <button onclick="toggle_view()">Toggle View</button>
-                </div>
-                <div class="col-sm border">
-                    <h4>Difficulty: <span id="difficulty"></span></h4>
-                    <button onclick="toggle_difficulty()">Toggle Difficulty</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Idle State Div -->
-        <div style="width: max-content; margin: 100px auto" class="border">
-            <div id="idle">
-                <div id="idle-guess" style="display: none">
-                    <button onclick="start_turn()">Start turn</button>
-                </div>
-                <div id="idle-check" style="display: none">
-                    <p>Awaiting a guesser to start the turn</p>
-                </div>
-            </div>
-
-            <!-- Div -->
-            <div id="active" style="display: none">
-                <button onclick="end_turn(fasle)" style="display: none">End turn early</button>
-                <div id="active-guess" style="display: none">
-                    <p>Turn timer: <p id="timer"></p>
-                        <p>Current turn counter: <span id="current_turn_counter"></span></p>
-                        <p>Current turn correct: <span id="current_turn_correct"></span></p>
-                        <p>Current phrase category: <span id="current_category"></span></p>
-                        <h3>Current madgab: <span id="current_madgab"></span></h3>
-                        <button onclick="new_phrase(false)" id="pass_word" style="display: none">Pass word</button>
-                        <button onclick="end_turn(false)" id="pass_word_last" style="display: none">End turn</button>
-                </div>
-                <div id="active-check" style="display: none">
-                    <p>Current phrase: <span id="current_phrase"></span></p>
-                    <button onclick="new_phrase(true)" id="got_word" style="display: none">Got word</button>
-                    <button onclick="end_turn(true)" id="got_word_last" style="display: none">Got word - End Turn</button>
-                </div>
-            </div>
-
-            <div id="steal" style="display: none">
-                <div id="steal-guess" style="display: none">
-                    <p>The other team is stealing ...</p>
-                </div>
-                <div id="steal-check" style="display: none">
-                    <p>Current turn clues: <span id="current_turn_clues"></span></p>
-                    <h4>Select the amount the other team stole</h4>
-                    <select id="steal_amount">
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                    </select>
-                    <button onclick="steal()">Confirm steal</button>
-                </div>
-            </div>
-
-            <div id="over" style="display: none">
-                <p>The winning team is: <span id="winning_team"></span></p>
-            </div>
 
         </div>
-
     </div>
 </body>
 
@@ -123,14 +55,8 @@
     var socket = io();
     var href_parts = window.location.href.split("/");
     var game_name = href_parts[href_parts.length - 1];
-    var game_state = null;
-    var turn_timer = null;
-    var timer = null;
-
-    var cur_view = "guesser";
-
-    var turn_counter = null;
-    var words_per_turn = null;
+    var player_id = null;
+    var tiles = [];
 
     // --------------------------------------
     // Actions taken on connect
@@ -159,91 +85,8 @@
 
     function render_board(resp) {
         // Game state
-        turn_counter = parseInt(resp["current_turn_counter"]);
-        words_per_turn = parseInt(resp["words_per_turn"]);
-        var state = String(resp["state"]);
-
-        // Populate the board
-        document.getElementById("team_1_score").textContent = String(resp["team_1_score"]);
-        document.getElementById("team_2_score").textContent = String(resp["team_2_score"]);
-        document.getElementById("winning_team").textContent = String(resp["winning_team"]);
-        document.getElementById("difficulty").textContent = String(resp["difficulty"]);
-
-        document.getElementById("team_1_turn").textContent = String(resp["team_1_turn"]);
-        document.getElementById("current_phrase").textContent = String(resp["current_phrase"]);
-        document.getElementById("current_category").textContent = String(resp["current_category"]);
-        document.getElementById("current_madgab").textContent = String(resp["current_madgab"]);
-        document.getElementById("current_turn_clues").textContent = String(resp["current_turn_clues"]);
-        document.getElementById("current_turn_counter").textContent = String(resp["current_turn_counter"]);
-        document.getElementById("current_turn_correct").textContent = String(resp["current_turn_correct"]);
-        document.getElementById("user_view").textContent = cur_view;
-
-        // Decide what should be shown based on state
-        if (state === "IDLE") {
-            document.getElementById("idle").style.display = "initial";
-            document.getElementById("active").style.display = "none";
-            document.getElementById("steal").style.display = "none";
-            document.getElementById("over").style.display = "none";
-
-            if (cur_view === "guesser") {
-                document.getElementById("idle-guess").style.display = "initial";
-                document.getElementById("idle-check").style.display = "none";
-            } else {
-                document.getElementById("idle-guess").style.display = "none";
-                document.getElementById("idle-check").style.display = "initial";
-            }
-        }
-
-        if (state === "ACTIVE") {
-            document.getElementById("idle").style.display = "none";
-            document.getElementById("active").style.display = "initial";
-            document.getElementById("steal").style.display = "none";
-            document.getElementById("over").style.display = "none";
-
-            if (cur_view === "guesser") {
-                document.getElementById("active-guess").style.display = "initial";
-                document.getElementById("active-check").style.display = "none";
-                if (turn_counter === words_per_turn) {
-                    document.getElementById("pass_word").style.display = "none";
-                    document.getElementById("pass_word_last").style.display = "initial";
-                } else {
-                    document.getElementById("pass_word").style.display = "initial";
-                    document.getElementById("pass_word_last").style.display = "none";
-                }
-            } else {
-                document.getElementById("active-guess").style.display = "none";
-                document.getElementById("active-check").style.display = "initial";
-                if (turn_counter === words_per_turn) {
-                    document.getElementById("got_word").style.display = "none";
-                    document.getElementById("got_word_last").style.display = "initial";
-                } else {
-                    document.getElementById("got_word").style.display = "initial";
-                    document.getElementById("got_word_last").style.display = "none";
-                }
-            }
-        }
-
-        if (state === "STEALING") {
-            document.getElementById("idle").style.display = "none";
-            document.getElementById("active").style.display = "none";
-            document.getElementById("steal").style.display = "initial";
-            document.getElementById("over").style.display = "none";
-
-            if (cur_view === "guesser") {
-                document.getElementById("steal-guess").style.display = "initial";
-                document.getElementById("steal-check").style.display = "none";
-            } else {
-                document.getElementById("steal-guess").style.display = "none";
-                document.getElementById("steal-check").style.display = "initial";
-            }
-        }
-
-        if (state === "OVER") {
-            document.getElementById("idle").style.display = "none";
-            document.getElementById("active").style.display = "none";
-            document.getElementById("steal").style.display = "none";
-            document.getElementById("over").style.display = "initial";
-        }
+        console.log(resp);
+        tiles = resp["players"][player_id];
     }
 
     // --------------------------------------
@@ -256,80 +99,64 @@
         })
     }
 
-    // Start the turn
-    function start_turn() {
-        timer = game_state["seconds_per_turn"]
-        turn_timer = setInterval(start_timer, 1000)
-        socket.emit("start_turn", {
-            "name": game_name
-        })
-    }
-
-    function start_timer() {
-        var minutes = parseInt(timer / 60, 10);
-        var seconds = parseInt(timer % 60, 10);
-
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        document.getElementById("timer").textContent = minutes + ":" + seconds;
-
-        if (--timer < 0) {
-            socket.emit("end_turn", {
-                "name": game_name,
-                "correct": false,
-                "time_left": 0
-            })
-        }
-    }
-
-    function new_phrase(correct) {
-        socket.emit("new_phrase", {
+    // Join the game
+    function player_join() {
+        player_id = document.getElementById("player_id").value;
+        socket.emit("player_join", {
             "name": game_name,
-            "correct": correct
+            "player_id": player_id
         })
     }
 
-    function steal() {
-        socket.emit("steal", {
+    // Start the game
+    function start_game() {
+        socket.emit("start_game", {
             "name": game_name,
-            "points": parseInt(document.getElementById("steal_amount").value)
         })
-
-        clearInterval(turn_timer);
     }
 
-    function end_turn(correct) {
-        socket.emit("end_turn", {
+    // Perform the split action
+   function split() {
+       socket.emit("split", {
             "name": game_name,
-            "correct": correct,
-            "time_left": timer
         })
+   }
 
-        clearInterval(turn_timer);
-    }
+    // Perform the peel action
+   function peel() {
+       socket.emit("peel", {
+            "name": game_name,
+        })
+   }
 
-    function toggle_difficulty() {
-        socket.emit("toggle_difficulty", {
-            "name": game_name
+    // Perform a swap
+    function swap() {
+        var letter = tiles.pop();
+        socket.emit("swap", {
+            "name": game_name,
+            "letter": letter,
+            "player_id": player_id
         })
     }
 
-    function toggle_view() {
-        if (cur_view === "guesser") {
-            cur_view = "checker";
-        } else {
-            cur_view = "guesser";
-        }
-
-        render_board(game_state);
+    // Bananagrams
+    function bananagrams() {
+        socket.emit("bananagrams", {
+            "name": game_name,
+        })
     }
-    // Reset the game
-    function reset_game() {
-        socket.emit("reset_game", {
+
+    // Continue the game
+    function continue_game() {
+        socket.emit("continue_game", {
+            "name": game_name,
+        })
+    }
+
+   // Reset the game
+    function reset() {
+        socket.emit("reset", {
             "name": game_name
         });
-
-        clearInterval(turn_timer);
     }
 </script>

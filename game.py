@@ -33,6 +33,7 @@ class Game(object):
         is_over (bool): Whether a game is in a over state.
         can_draw_tile (bool): Whether there are enough tiles to draw one for each player.
         tiles_remaining (int): The number of tiles left in the game.
+        tiles_hidden (bool): Whether the tiles should be hidden on the front end.
         num_players (int): The number of players.
         player_tiles (Dict[str, List[str]]): A dictionary mapping each player to their tiles.
 
@@ -55,6 +56,7 @@ class Game(object):
         self.num_players = None
         self.is_active = False
         self.tiles_remaining = len(self.tiles)
+        self.tiles_hidden = True
 
         # Date created.
         self.date_created = datetime.datetime.now()
@@ -85,7 +87,6 @@ class Game(object):
         for player in self.players:
             self.players[player] = []
 
-        self.divy_out_tiles()
 
     def __str__(self) -> str:  # pragma: no cover
         return (
@@ -95,6 +96,7 @@ class Game(object):
             f"Is Over?: {self.is_over}\n"
             f"Tiles Remaining: {self.tiles_remaining}\n"
             f"Can draw tile: {self.can_draw_tile}\n"
+            f"Show tiles: {self.tiles_hidden}\n"
         )
 
     def __json__(self) -> Dict[str, Any]:  # pragma: no cover
@@ -105,6 +107,8 @@ class Game(object):
             "can_draw_tile": self.can_draw_tile,
             "num_players": self.num_players,
             "tiles_remaining": self.tiles_remaining,
+            "is_active": self.is_active,
+            "tiles_hidden": self.tiles_hidden,
             # Players
             "players": self.players,
         }
@@ -117,6 +121,8 @@ class Game(object):
         Args:
             player_id (str): The ID of the player to add.
         """
+        if self.is_active:
+            raise GameException("Game already playing, cannot add new player.")
         if player_id not in self.players:
             self.players[player_id] = []
 
@@ -124,6 +130,7 @@ class Game(object):
         """Starts the game by setting the number of players and divvying out tiles.
         """
         self.num_players = len(self.players)
+        self.is_active = True
         self.divy_out_tiles()
 
     def divy_out_tiles(self):
@@ -152,11 +159,14 @@ class Game(object):
     def split(self):
         """Start the game action.
         """
-        self.is_active = True
+        self.tiles_hidden = False
 
     def peel(self):
         """Give a new tile to each player.
         """
+        if self.num_players > self.tiles_remaining:
+            raise GameException("Not enough tiles to deal.")
+
         # Give a new tile to each player.
         for player in self.players:
             self.players[player].append(self.tiles.pop())
@@ -189,6 +199,9 @@ class Game(object):
         # Add the letter back to the tile pile and shuffle
         self.tiles.append(letter)
         random.shuffle(self.tiles)
+
+        # Update number of tiles
+        self.tiles_remaining = len(self.tiles)
 
     def bananagrams(self):
         """End the game (someone has bananagrams)

@@ -15,12 +15,6 @@ venv/
 # Ignore OS specific files
 .DS_Store
 
-# Ignore modules
-node_modules/
-
-# Ignore temporary files and directories
-clues_temp/
-
 # Ignore logs and output
 profile.txt
 logs/
@@ -28,3 +22,6 @@ logs/
 # Ignore test files
 .coverage
 htmlcov/
+
+# Ignore style files
+*.map

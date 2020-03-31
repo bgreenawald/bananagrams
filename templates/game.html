@@ -58,6 +58,11 @@
     var player_id = null;
     var tiles = [];
 
+    // Warn user before leaving
+    window.onbeforeunload = function(){
+        return 'Are you sure you want to leave, this will clear your board?';
+    };
+
     // --------------------------------------
     // Actions taken on connect
 

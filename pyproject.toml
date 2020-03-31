@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "bananagrams"
+version = "0.1.0"
+description = ""
+authors = ["Benjamin Greenawald <bgreenawald@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+simplejson = "^3.17.0"
+flask = "^1.1.1"
+flask_socketio = "^4.2.1"
+
+
+[tool.poetry.dev-dependencies]
+black = "^19.10b0"
+mypy = "^0.761"
+flake8 = "^3.7.9"
+flake8-black = "^0.1.1"
+flake8-import-order = "^0.18.1"
+flake8-bugbear = "^20.1.2"
+flake8-bandit = "^2.1.2"
+
+[tool.black]
+max-line-length=100
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

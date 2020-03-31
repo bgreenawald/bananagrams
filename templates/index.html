@@ -1,0 +1,81 @@
+
+
+
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Mad Gab Online</title>
+
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/styles.css') }}" />
+
+        
+    </head>
+
+<body>
+
+    <div class="home-container" id="css3-background-texture">
+        <div class="gradient"></div>
+        <div class="rules-container">
+            <button>rules</button>
+        </div>
+        <div class="home-content flex">
+            <h1>Welcome to MadGab</h1>
+            <p>
+                Enter a game ID, or accept the default. Once you start, you will
+                recieve a URL to share with your friends so they can join.
+            </p>
+            <input id="game_id" type="text">
+            <button type="submit" onclick="createGame()">Create New Game</button>
+            <div id="error"></div>
+        </div>
+    </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+
+    $.ajax({
+            url: "/api/get_names",
+    }).done(function(res) {
+        var used_ids = res["ids"];
+        var rand_id = generate_id();
+
+        while(used_ids.includes(rand_id)) {
+            rand_id = generate_id()
+        }
+
+        document.getElementById("game_id").value = rand_id;
+    });
+
+
+    function generate_id() {
+        var min=0;
+        var max=999999;
+        var random =Math.floor(Math.random() * (+max - +min)) + +min;
+        return random;
+    }
+
+    function createGame() {
+        $.ajax({
+            url: "/api/get_names",
+            async: false,
+        }).done(function(res) {
+            var used_ids = res["ids"];
+            console.log(used_ids);
+            var input_name = document.getElementById("game_id").value;
+            console.log(input_name);
+            if (used_ids.includes(input_name)) {
+                document.getElementById("error").innerHTML = "ID already in use, choose another"
+            }
+            else {
+                console.log("Success")
+                window.location.href = "/" + input_name;
+            }
+        });
+    }
+</script>
+</body>
+
+</html>

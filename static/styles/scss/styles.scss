@@ -68,15 +68,15 @@ $primary-yellow: #FFD754;
 
 
     -webkit-box-shadow: 0 0 25px 0 #fff;
-    background: $primary-blue;
+    background: $primary-yellow;
 
-    background: -moz-linear-gradient(-45deg, $primary-blue 0%, $primary-blue 24%, #555555 25%, $primary-blue 26%, $primary-blue 50%, $primary-blue 74%, #555555 75%, $primary-blue 76%, $primary-blue 100%);
+    background: -moz-linear-gradient(-45deg, $primary-yellow 0%, $primary-yellow 24%, #555555 25%, $primary-yellow 26%, $primary-yellow 50%, $primary-yellow 74%, #555555 75%, $primary-yellow 76%, $primary-yellow 100%);
 
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, $primary-blue), color-stop(24%, $primary-blue), color-stop(25%, #555555), color-stop(26%, $primary-blue), color-stop(50%, $primary-blue), color-stop(74%, $primary-blue), color-stop(75%, #555555), color-stop(76%, $primary-blue), color-stop(100%, $primary-blue));
-    background: -webkit-linear-gradient(-45deg, $primary-blue 0%, $primary-blue 24%, #555555 25%, $primary-blue 26%, $primary-blue 50%, $primary-blue 74%, #555555 75%, $primary-blue 76%, $primary-blue 100%);
-    background: -o-linear-gradient(-45deg, $primary-blue 0%, $primary-blue 24%, #555555 25%, $primary-blue 26%, $primary-blue 50%, $primary-blue 74%, #555555 75%, $primary-blue 76%, $primary-blue 100%);
-    background: -ms-linear-gradient(-45deg, $primary-blue 0%, $primary-blue 24%, #555555 25%, $primary-blue 26%, $primary-blue 50%, $primary-blue 74%, #555555 75%, $primary-blue 76%, $primary-blue 100%);
-    background: linear-gradient(135deg, #0057F9 0%, #0057F9 -10%, #0068F9 -24%, #0057F9 54%, #0057F9 97%, #0057FA 136%, #0068F9 195%, #0057F9 4.8%, #0057F9 70%);
+    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, $primary-yellow), color-stop(24%, $primary-yellow), color-stop(25%, #555555), color-stop(26%, $primary-yellow), color-stop(50%, $primary-yellow), color-stop(74%, $primary-yellow), color-stop(75%, #555555), color-stop(76%, $primary-yellow), color-stop(100%, $primary-yellow));
+    background: -webkit-linear-gradient(-45deg, $primary-yellow 0%, $primary-yellow 24%, #555555 25%, $primary-yellow 26%, $primary-yellow 50%, $primary-yellow 74%, #555555 75%, $primary-yellow 76%, $primary-yellow 100%);
+    background: -o-linear-gradient(-45deg, $primary-yellow 0%, $primary-yellow 24%, #555555 25%, $primary-yellow 26%, $primary-yellow 50%, $primary-yellow 74%, #555555 75%, $primary-yellow 76%, $primary-yellow 100%);
+    background: -ms-linear-gradient(-45deg, $primary-yellow 0%, $primary-yellow 24%, #555555 25%, $primary-yellow 26%, $primary-yellow 50%, $primary-yellow 74%, #555555 75%, $primary-yellow 76%, $primary-yellow 100%);
+    background: linear-gradient(135deg, $primary-yellow 0%, $primary-yellow -10%, $primary-yellow -24%, $primary-yellow 54%, $primary-yellow 97%, $primary-yellow 136%, $primary-yellow 195%, $primary-yellow 4.8%, $primary-yellow 70%);
 
     background-size: 70px 70px;
     position: relative;
@@ -87,12 +87,12 @@ $primary-yellow: #FFD754;
     position: absolute;
     width: inherit;
     height: inherit;
-    background: -moz-radial-gradient(center, ellipse cover, rgba(lighten($primary-blue, 20%), 0.25) 0%, rgba(lighten($primary-blue, 40%), 0) 100%);
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(lighten($primary-blue, 20%), 0.55)), color-stop(100%, rgba(lighten($primary-blue, 40%), 0)));
-    background: -webkit-radial-gradient(center, ellipse cover, rgba(lighten($primary-blue, 20%), 0.55) 0%, rgba(lighten($primary-blue, 40%), 0) 100%);
-    background: -o-radial-gradient(center, ellipse cover, rgba(lighten($primary-blue, 20%), 0.55) 0%, rgba(lighten($primary-blue, 40%), 0) 100%);
-    background: -ms-radial-gradient(center, ellipse cover, rgba(lighten($primary-blue, 20%), 0.55) 0%, rgba(lighten($primary-blue, 40%), 0) 100%);
-    background: radial-gradient(ellipse at center, rgba(lighten($primary-blue, 20%), 0.55) 0%, rgba(lighten($primary-blue, 40%), 0) 100%);
+    background: -moz-radial-gradient(center, ellipse cover, rgba(lighten($primary-yellow, 20%), 0.25) 0%, rgba(lighten($primary-yellow, 40%), 0) 100%);
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(lighten($primary-yellow, 20%), 0.55)), color-stop(100%, rgba(lighten($primary-yellow, 40%), 0)));
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(lighten($primary-yellow, 20%), 0.55) 0%, rgba(lighten($primary-yellow, 40%), 0) 100%);
+    background: -o-radial-gradient(center, ellipse cover, rgba(lighten($primary-yellow, 20%), 0.55) 0%, rgba(lighten($primary-yellow, 40%), 0) 100%);
+    background: -ms-radial-gradient(center, ellipse cover, rgba(lighten($primary-yellow, 20%), 0.55) 0%, rgba(lighten($primary-yellow, 40%), 0) 100%);
+    background: radial-gradient(ellipse at center, rgba(lighten($primary-yellow, 20%), 0.55) 0%, rgba(lighten($primary-yellow, 40%), 0) 100%);
 }
 
 .home-content {
@@ -106,5 +106,5 @@ $primary-yellow: #FFD754;
     transform: rotate(-90deg);
     top: 40px;
     left: 0%;
-    box-shadow: 0px 3px 10px darken($primary-blue, 10%);
+    box-shadow: 0px 3px 10px darken($primary-yellow, 10%);
 }

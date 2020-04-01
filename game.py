@@ -29,7 +29,7 @@ class Game(object):
     Attributes:
         id (str): Id of a game.
         tiles (List[str]): The list of tiles for a game.
-        is_active (bool): Whether the current game is active (whether to show tiles).
+        is_active (bool): Whether the current game is active (whether tiles have been given out).
         is_over (bool): Whether a game is in a over state.
         can_draw_tile (bool): Whether there are enough tiles to draw one for each player.
         tiles_remaining (int): The number of tiles left in the game.
@@ -130,8 +130,8 @@ class Game(object):
         """Starts the game by setting the number of players and divvying out tiles.
         """
         self.num_players = len(self.players)
-        self.is_active = True
         self.divy_out_tiles()
+        self.is_active = True
 
     def divy_out_tiles(self):
         """Divy out the correct number of tiles to each player.
@@ -202,6 +202,10 @@ class Game(object):
 
         # Update number of tiles
         self.tiles_remaining = len(self.tiles)
+
+        # Check if peels can still occur
+        if self.tiles_remaining < self.num_players:
+            self.can_draw_tile = False
 
     def bananagrams(self):
         """End the game (someone has bananagrams)

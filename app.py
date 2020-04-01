@@ -121,14 +121,9 @@ def load_game(json: Dict[Any, Any]):
     """
     game_name = json["name"]
 
-    logger.info(f"Loading board {game_name}")
-    if game_name in all_games:
-        cur_game = all_games[game_name]
-        emit_board(game_name, cur_game, "Game retrieved")
-    else:
+    if game_name not in all_games:
         cur_game = Game(game_name)
         all_games[game_name] = cur_game
-        emit_board(game_name, cur_game, "New game created")
 
 
 @socketio.on("player_join")
@@ -156,6 +151,10 @@ def player_join(json: Dict[Any, Any]):
     if "player_id" not in json:
         emit_error(json["name"], "Invalid data for this endpoint. Missing 'player_id'")
 
+    # See if the player has already joined
+    if json["player_id"] in game.players:
+        emit_board(game_name, game, f"Player {json['player_id']} already joined, returning board.")
+        return
     try:
         game.join_game(json["player_id"])
         emit_board(game_name, game, f"Added player {json['player_id']} to game.")
@@ -185,8 +184,12 @@ def start_game(json: Dict[Any, Any]):
         emit_error(game_name, f"Could not find the game named {game_name}.")
         return
 
-    game.start_game()
-    emit_board(game_name, game, "Game started")
+    try:
+        game.start_game()
+        emit_board(game_name, game, "Game started")
+    except GameException as e:
+        logging.error("Exception occurred", exc_info=True)
+        emit_error(game_name, str(e))
 
 
 @socketio.on("split")

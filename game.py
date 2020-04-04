@@ -30,7 +30,7 @@ class State(Enum):
     HIDDEN = "HIDDEN"
 
     # The main game state, where peels are allowed
-    MAIN = "MAIN"
+    ACTIVE = "ACTIVE"
 
     # Peels are no longer allowed but the game continues
     ENDGAME = "ENDGAME"
@@ -112,7 +112,7 @@ class Game(object):
         return {
             "id": self.id,
             # General game configuration
-            "state": self.state,
+            "state": self.state.value,
             "num_players": self.num_players,
             "tiles_remaining": self.tiles_remaining,
             # Players
@@ -177,14 +177,14 @@ class Game(object):
                 f"Cannot split, game state is {self.state} when it should be 'HIDDEN'"
             )
         else:
-            self.state = State.MAIN
+            self.state = State.ACTIVE
 
     def peel(self):
         """Give a new tile to each player.
         """
-        if self.state != State.MAIN:
+        if self.state != State.ACTIVE:
             raise GameException(
-                f"Cannot peel, game state is {self.state} when it should be 'MAIN'"
+                f"Cannot peel, game state is {self.state} when it should be 'ACTIVE'"
             )
         else:
             if self.num_players > self.tiles_remaining:
@@ -209,9 +209,9 @@ class Game(object):
         Raises:
             GameException: The player does not have an instance of that tile.
         """
-        if self.state not in [State.MAIN, State.ENDGAME]:
+        if self.state not in [State.ACTIVE, State.ENDGAME]:
             raise GameException(
-                f"Cannot swap, game state is {self.state} when it should be 'MAIN' or 'ENDGAME'"
+                f"Cannot swap, game state is {self.state} when it should be 'ACTIVE' or 'ENDGAME'"
             )
         else:
             if letter not in self.players[player]:
@@ -248,7 +248,7 @@ class Game(object):
     def continue_game(self):
         """Continue the game (false alarm on banagrams)
         """
-        if self.state != State.ENDGAME:
+        if self.state != State.OVER:
             raise GameException(
                 f"Cannot continue game, game state is {self.state} when it should be 'OVER'"
             )

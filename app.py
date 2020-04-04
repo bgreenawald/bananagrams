@@ -221,8 +221,12 @@ def split(json: Dict[Any, Any]):
         emit_error(game_name, f"Could not find the game named {game_name}.")
         return
 
-    game.split()
-    emit_board(game_name, game, "Split.")
+    try:
+        game.split()
+        emit_board(game_name, game, "Split.")
+    except GameException as e:
+        logging.error("Exception occurred", exc_info=True)
+        emit_error(game_name, str(e))
 
 
 @socketio.on("peel")

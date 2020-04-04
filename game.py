@@ -1,5 +1,6 @@
 import datetime
 import random
+from enum import Enum
 from typing import Any, Dict
 
 
@@ -18,6 +19,26 @@ TILE_FREQUENCIES = {
 }
 
 
+class State(Enum):
+    """Defines the current state of a turn.
+    """
+
+    # Waiting for players to join the game
+    IDLE = "IDLE"
+
+    # The tiles have been given out but are hidden
+    HIDDEN = "HIDDEN"
+
+    # The main game state, where peels are allowed
+    MAIN = "MAIN"
+
+    # Peels are no longer allowed but the game continues
+    ENDGAME = "ENDGAME"
+
+    # The game is over
+    OVER = "OVER"
+
+
 class GameException(Exception):
     pass
 
@@ -29,11 +50,7 @@ class Game(object):
     Attributes:
         id (str): Id of a game.
         tiles (List[str]): The list of tiles for a game.
-        is_active (bool): Whether the current game is active (whether tiles have been given out).
-        is_over (bool): Whether a game is in a over state.
-        can_draw_tile (bool): Whether there are enough tiles to draw one for each player.
         tiles_remaining (int): The number of tiles left in the game.
-        tiles_hidden (bool): Whether the tiles should be hidden on the front end.
         num_players (int): The number of players.
         player_tiles (Dict[str, List[str]]): A dictionary mapping each player to their tiles.
 
@@ -51,12 +68,9 @@ class Game(object):
         random.shuffle(self.tiles)
 
         # General game fields
-        self.is_over = False
-        self.can_draw_tile = True
+        self.state = State.IDLE
         self.num_players = None
-        self.is_active = False
         self.tiles_remaining = len(self.tiles)
-        self.tiles_hidden = True
 
         # Date created.
         self.date_created = datetime.datetime.now()
@@ -74,10 +88,8 @@ class Game(object):
         random.shuffle(self.tiles)
 
         # General game fields
-        self.is_over = False
-        self.can_draw_tile = True
+        self.state = State.IDLE
         self.num_players = len(self.players)
-        self.is_active = False
         self.tiles_remaining = len(self.tiles)
 
         # Date created
@@ -87,28 +99,22 @@ class Game(object):
         for player in self.players:
             self.players[player] = []
 
-
     def __str__(self) -> str:  # pragma: no cover
         return (
             f"ID: {self.id}\n"
             f"Players: {[player for player in self.players]}\n"
             f"Number of Players: {self.num_players}\n"
-            f"Is Over?: {self.is_over}\n"
             f"Tiles Remaining: {self.tiles_remaining}\n"
-            f"Can draw tile: {self.can_draw_tile}\n"
-            f"Show tiles: {self.tiles_hidden}\n"
+            f"State: {self.state}"
         )
 
     def __json__(self) -> Dict[str, Any]:  # pragma: no cover
         return {
             "id": self.id,
             # General game configuration
-            "is_over": self.is_over,
-            "can_draw_tile": self.can_draw_tile,
+            "state": self.state,
             "num_players": self.num_players,
             "tiles_remaining": self.tiles_remaining,
-            "is_active": self.is_active,
-            "tiles_hidden": self.tiles_hidden,
             # Players
             "players": self.players,
         }
@@ -121,19 +127,26 @@ class Game(object):
         Args:
             player_id (str): The ID of the player to add.
         """
-        if self.is_active:
-            raise GameException("Game already playing, cannot add new player.")
+        if self.state != State.IDLE:
+            raise GameException(
+                f"Cannot add players, game state is {self.state} when it should be 'IDLE'"
+            )
         if player_id not in self.players:
             self.players[player_id] = []
 
     def start_game(self):
         """Starts the game by setting the number of players and divvying out tiles.
         """
-        self.num_players = len(self.players)
-        self.divy_out_tiles()
-        self.is_active = True
+        if self.state != State.IDLE:
+            raise GameException(
+                f"Cannot start game, game state is {self.state} when it shoudl be 'IDLE'"
+            )
+        else:
+            self.num_players = len(self.players)
+            self._divy_out_tiles()
+            self.state = State.HIDDEN
 
-    def divy_out_tiles(self):
+    def _divy_out_tiles(self):
         """Divy out the correct number of tiles to each player.
 
         Raises:
@@ -159,22 +172,32 @@ class Game(object):
     def split(self):
         """Start the game action.
         """
-        self.tiles_hidden = False
+        if self.state != State.HIDDEN:
+            raise GameException(
+                f"Cannot split, game state is {self.state} when it should be 'HIDDEN'"
+            )
+        else:
+            self.state = State.MAIN
 
     def peel(self):
         """Give a new tile to each player.
         """
-        if self.num_players > self.tiles_remaining:
-            raise GameException("Not enough tiles to deal.")
+        if self.state != State.MAIN:
+            raise GameException(
+                f"Cannot peel, game state is {self.state} when it should be 'MAIN'"
+            )
+        else:
+            if self.num_players > self.tiles_remaining:
+                raise GameException("Not enough tiles to deal.")
 
-        # Give a new tile to each player.
-        for player in self.players:
-            self.players[player].append(self.tiles.pop())
-        self.tiles_remaining = len(self.tiles)
+            # Give a new tile to each player.
+            for player in self.players:
+                self.players[player].append(self.tiles.pop())
+            self.tiles_remaining = len(self.tiles)
 
-        # See if we there are enough tiles left for another peel
-        if self.tiles_remaining < self.num_players:
-            self.can_draw_tile = False
+            # See if we there are enough tiles left for another peel
+            if self.tiles_remaining < self.num_players:
+                self.state = State.ENDGAME
 
     def swap(self, letter, player):
         """Swap a given tile for three tiles for a player.
@@ -186,33 +209,48 @@ class Game(object):
         Raises:
             GameException: The player does not have an instance of that tile.
         """
-        if letter not in self.players[player]:
-            raise GameException("Player does not have this letter to remove.")
+        if self.state not in [State.MAIN, State.ENDGAME]:
+            raise GameException(
+                f"Cannot swap, game state is {self.state} when it should be 'MAIN' or 'ENDGAME'"
+            )
+        else:
+            if letter not in self.players[player]:
+                raise GameException("Player does not have this letter to remove.")
 
-        # Add three new tiles to the player, or all remaining tiles if less than 3 remain.
-        for _ in range(min(3, self.tiles_remaining)):
-            self.players[player].append(self.tiles.pop())
+            # Add three new tiles to the player, or all remaining tiles if less than 3 remain.
+            for _ in range(min(3, self.tiles_remaining)):
+                self.players[player].append(self.tiles.pop())
 
-        # Remove one instance of the given letter from the player
-        self.players[player].remove(letter)
+            # Remove one instance of the given letter from the player
+            self.players[player].remove(letter)
 
-        # Add the letter back to the tile pile and shuffle
-        self.tiles.append(letter)
-        random.shuffle(self.tiles)
+            # Add the letter back to the tile pile and shuffle
+            self.tiles.append(letter)
+            random.shuffle(self.tiles)
 
-        # Update number of tiles
-        self.tiles_remaining = len(self.tiles)
+            # Update number of tiles
+            self.tiles_remaining = len(self.tiles)
 
-        # Check if peels can still occur
-        if self.tiles_remaining < self.num_players:
-            self.can_draw_tile = False
+            # Check if peels can still occur
+            if self.tiles_remaining < self.num_players:
+                self.state = State.ENDGAME
 
     def bananagrams(self):
         """End the game (someone has bananagrams)
         """
-        self.is_over = True
+        if self.state != State.ENDGAME:
+            raise GameException(
+                f"Cannot call bananagrams, game state is {self.state} when it should be 'ENDGAME'"
+            )
+        else:
+            self.state = State.OVER
 
     def continue_game(self):
         """Continue the game (false alarm on banagrams)
         """
-        self.is_over = False
+        if self.state != State.ENDGAME:
+            raise GameException(
+                f"Cannot continue game, game state is {self.state} when it should be 'OVER'"
+            )
+        else:
+            self.state = State.ENDGAME

@@ -9,6 +9,8 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Bananagrams</title>
 
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
         <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/styles.css') }}" />
     </head>
 
@@ -22,7 +24,7 @@
                 recieve a URL to share with your friends so they can join.
             </p>
             <input id="game_id" type="text">
-            <button type="submit" onclick="createGame()">Create New Game</button>
+            <button id="game_id_submit" class="btn btn-primary" type="submit" onclick="createGame()">Create New Game</button>
             <div id="error"></div>
         </div>
     </div>
@@ -70,6 +72,23 @@
             }
         });
     }
+
+    // --------------------------------------
+    // Keybindings
+
+    // Game ID enter
+    var input = document.getElementById("game_id");
+
+    // Execute a function when the user releases a key on the keyboard
+    input.addEventListener("keyup", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            $("game_id_submit").click();
+        }
+    });
 </script>
 
 </html>

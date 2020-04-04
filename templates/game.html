@@ -7,12 +7,15 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Bananagrams</title>
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/game.css') }}" />
 </head>
 
 <body>
-    <div class="main">
-        <div class="gradient"></div>
+    <div class="home-container" id="css3-background-texture">
+        <div class="home-content"></div>
         <div>
             <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
         </div>
@@ -20,20 +23,20 @@
         <div id="join_game">
             <p>First things first, enter your username to join the game.</p>
             <input id="player_id" type="text">
-            <button type="submit" onclick="player_join()">Join the Game</button>
+            <button id="player_id_submit" class="btn btn-primary" type="submit" onclick="player_join()">Join the Game</button>
         </div>
         <div id="message"></div>
         <div id="game_info"></div>
         <div id="options" style="display: none;">
-            <button id="start_game_button" type="submit" onclick="start_game()">Deal the Tiles</button>
-            <button id="split_button" type="submit" onclick="split()">Split</button>
-            <button id="peel_button" type="submit" onclick="peel()">Peel</button>
-            <button id="swap_button" type="submit" onclick="swap()">Swap</button>
-            <button id="bananagrams_button" type="submit" onclick="bananagrams()">Bananagrams</button>
-            <button id="continue_game_button" type="submit" onclick="continue_game()">Continue Game</button>
+            <button class="btn btn-primary" id="start_game_button" type="submit" onclick="start_game()">Deal the Tiles</button>
+            <button class="btn btn-primary" id="split_button" type="submit" onclick="split()">Split</button>
+            <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
+            <button class="btn btn-primary" id="swap_button" type="submit" onclick="swap()">Swap</button>
+            <button class="btn btn-primary" id="bananagrams_button" type="submit" onclick="bananagrams()">Bananagrams</button>
+            <button class="btn btn-primary" id="continue_game_button" type="submit" onclick="continue_game()">Continue Game</button>
         </div>
         <div id="reset">
-            <button id="reset_button" type="submit" onclick="reset()">Reset Game</button>
+            <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()">Reset Game</button>
         </div>
     </div>
 </body>
@@ -211,6 +214,7 @@
         });
     }
 
+    // --------------------------------------
     // Non-socket functions
     function showError(msg) {
         $("#error").html(msg);
@@ -224,5 +228,53 @@
         $("#bananagrams_button").hide();
         $("#continue_game_button").hide();
     }
+
+    // --------------------------------------
+    // Keybindings
+
+    // Player ID enter
+    var input = document.getElementById("player_id");
+
+    // Execute a function when the user releases a key on the keyboard
+    input.addEventListener("keyup", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            $("#player_id_submit").click();
+        }
+    });
+
+    // Peel
+    document.addEventListener("keyup", function(event) {
+        if (event.keyCode === 80) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            $("#peel_button").click();
+        }
+    });
+
+    // Swap
+    document.addEventListener("keyup", function(event) {
+        if (event.keyCode === 83) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            $("#swap_button").click();
+        }
+    });
+
+    // Document
+    document.addEventListener("keyup", function(event) {
+        if (event.keyCode === 66) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            $("#bananagrams_button").click();
+        }
+    });
+
 
 </script>

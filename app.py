@@ -8,6 +8,7 @@ from typing import Any, Dict
 import simplejson
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, json, render_template, request, Response
+from flask_cors import CORS
 from flask_socketio import emit, join_room, SocketIO
 
 from game import Game, GameException
@@ -17,6 +18,9 @@ app = Flask(__name__)
 app.debug = True
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app)
+
+# Initialize CORS
+CORS(app)
 
 # Setup logging
 if not os.path.isdir("logs"):
@@ -153,7 +157,11 @@ def player_join(json: Dict[Any, Any]):
 
     # See if the player has already joined
     if json["player_id"] in game.players:
-        emit_board(game_name, game, f"Player {json['player_id']} already joined, returning board.")
+        emit_board(
+            game_name,
+            game,
+            f"Player {json['player_id']} already joined, returning board.",
+        )
         return
     try:
         game.join_game(json["player_id"])

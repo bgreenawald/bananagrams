@@ -107,37 +107,40 @@
         // Render the board based on the various game states
 
         // Waiting to give out tiles
-        if(!resp["is_active"]) {
+        if(resp["state"] == "IDLE") {
             hideButtons();
             $("#message").innerHTML = "<p>Waiting for other players to join. When everyone is in, click 'Deal the Tiles'</p>"
             $("#options").show();
             $("#start_game_button").show();
-        }// Game over
-        else if(resp["is_over"]) {
-            hideButtons();
-            $("#message").innerHTML = "<p>Game over? Check the winning board. If it's a false alarm, click 'Continue Game,' otherwise, click 'Reset Game' to play again.</p>"
-            $("#options").show();
-            $("#continue_game_button").show();
         }// Tiles dealt, waiting to start
-        else if(resp["is_active"] && resp["tiles_hidden"]){
+        else if(resp["state"] == "HIDDEN"){
             hideButtons();
             $("#message").innerHTML = "<p>Get ready! Click 'Split' when everyone is good to go.</p>"
             $("#options").show();
             $("#split_button").show();
         } // The main gamplay state
-        else if(resp["is_active"] && !resp["tiles_hidden"] && resp["can_draw_tile"]) {
+        else if(resp["state"] == "ACTIVE") {
             hideButtons();
             $("#message").innerHTML = "<p>Game on! Build a valid scrabble board with your words.</p>"
             $("#options").show();
             $("#peel_button").show();
             $("#swap_button").show();
         } // Can no longer swap
-        else if(resp["is_active"] && !resp["tiles_hidden"] && !resp["can_draw_tile"]) {
+        else if(resp["state"] == "ENDGAME") {
             hideButtons();
             $("#message").innerHTML = "<p>Almost done! Be the first to complete your board.</p>"
             $("#options").show();
             $("#bananagrams_button").show();
             $("#swap_button").show();
+        } // Game over
+        else if(resp["state"] == "OVER") {
+            hideButtons();
+            $("#message").innerHTML = "<p>Game over? Check the winning board. If it's a false alarm, click 'Continue Game,' otherwise, click 'Reset Game' to play again.</p>"
+            $("#options").show();
+            $("#continue_game_button").show();
+        } // Unknown state
+        else {
+            showError(`An error occurred: Unknown client state.`)
         }
 
     }

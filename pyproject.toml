@@ -10,6 +10,7 @@ simplejson = "^3.17.0"
 flask = "^1.1.1"
 flask_socketio = "^4.2.1"
 apscheduler = "^3.6.3"
+flask_cors = "^3.0.8"
 
 
 [tool.poetry.dev-dependencies]

@@ -63,6 +63,9 @@
     var player_id = null;
     var tiles = [];
 
+    // Whether the current client has already joined the game
+    var hasJoined = false;
+
     // Warn user before leaving
     window.onbeforeunload = function () {
         return 'Are you sure you want to leave, this will clear your board?';
@@ -81,12 +84,16 @@
     // --------------------------------------
     // Render board action
     socket.on("render_board", function (resp) {
+        // Do not render the board if the client has not joined the game
+        if (!hasJoined) {
+            return;
+        }
         if (!resp.hasOwnProperty("status_code")) {
             showError("Did not recieve a response from the server.")
         } else {
             if (resp["status_code"] == 200) {
-                game_state = JSON.parse(resp.payload)
-                render_board(game_state)
+                game_state = JSON.parse(resp.payload);
+                render_board(game_state);
             } else {
                 if(!resp.hasOwnProperty("message")) {
                     showError("An error occurred, but no message was given.")
@@ -107,12 +114,12 @@
         // Render the board based on the various game states
 
         // Waiting to give out tiles
-        if(resp["state"] == "IDLE") {
+        if(game_state["state"] == "IDLE") {
             hideButtons();
             $("#message").innerHTML = "<p>Waiting for other players to join. When everyone is in, click 'Deal the Tiles'</p>"
             $("#options").show();
             $("#start_game_button").show();
-        }// Tiles dealt, waiting to start
+        } // Tiles dealt, waiting to start
         else if(resp["state"] == "HIDDEN"){
             hideButtons();
             $("#message").innerHTML = "<p>Get ready! Click 'Split' when everyone is good to go.</p>"
@@ -163,6 +170,7 @@
             "name": game_name,
             "player_id": player_id
         })
+        hasJoined = true;
     }
 
     // Start the game

@@ -19,7 +19,12 @@ app.debug = True
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app)
 
-# Initialize CORS
+# Add Sass
+from flask_scss import Scss
+Scss(app, static_dir='static/styles/css', asset_dir='static/styles/scss')
+app._static_folder = './static'
+
+# Initialize CORS 
 CORS(app)
 
 # Setup logging

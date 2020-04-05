@@ -11,6 +11,7 @@ flask = "^1.1.1"
 flask_socketio = "^4.2.1"
 apscheduler = "^3.6.3"
 flask_cors = "^3.0.8"
+Flask-Scss = "^0.5"
 
 
 [tool.poetry.dev-dependencies]
@@ -23,6 +24,7 @@ flake8-bugbear = "^20.1.2"
 flake8-bandit = "^2.1.2"
 pytest = "^5.4.1"
 coverage = "^5.0.4"
+pylint = "^2.4.4"
 
 [tool.black]
 max-line-length=100

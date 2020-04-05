@@ -1,50 +1,57 @@
-@import url("https://fonts.googleapis.com/css?family=Luckiest+Guy|Noto+Sans|Sigmar+One&display=swap");
-h1 {
-  font-family: "Luckiest Guy", cursive;
-  font-size: 3em;
-  letter-spacing: 0.15em;
-  -webkit-text-stroke: 0.5px black;
-  text-shadow: 1px 1px black;
-}
+@import url('https://fonts.googleapis.com/css?family=Luckiest+Guy|Noto+Sans|Sigmar+One&display=swap'); 
+  h1 {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 3em;
+    letter-spacing: 0.15em;
+    -webkit-text-stroke: 0.5px black;
+    text-shadow: 1px 1px black; }
 
-p {
-  font-family: "Luckiest Guy", cursive;
-  font-size: 1.5em;
-  letter-spacing: 0.15em;
-  -webkit-text-stroke: 1px black;
-  text-align: center;
-  text-shadow: 1px 1px black;
-}
+    p {
+      font-family: 'Luckiest Guy', cursive;
+      font-size: 1.5em;
+      letter-spacing: 0.15em;
+      -webkit-text-stroke: 1px black;
+      text-align: center;
+      text-shadow: 1px 1px black; }
 
-.home-container {
-  color: white;
-  width: 100%;
-  height: 100%;
-  -webkit-box-shadow: 0 0 25px 0 #fff;
-  background: #FAD96E;
-  background: -moz-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%, #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
-  background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #FAD96E), color-stop(24%, #FAD96E), color-stop(25%, #555555), color-stop(26%, #FAD96E), color-stop(50%, #FAD96E), color-stop(74%, #FAD96E), color-stop(75%, #555555), color-stop(76%, #FAD96E), color-stop(100%, #FAD96E));
-  background: -webkit-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%, #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
-  background: -o-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%, #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
-  background: -ms-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%, #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
-  background: linear-gradient(135deg, #FAD96E 0%, #FAD96E -10%, #FAD96E -24%, #FAD96E 54%, #FAD96E 97%, #FAD96E 136%, #FAD96E 195%, #FAD96E 4.8%, #FAD96E 70%);
-}
+      .home-container {
+        color: white;
+        width: 100%;
+        height: 100%;
+        -webkit-box-shadow: 0 0 25px 0 #fff;
+        background: #FAD96E;
+        background: -moz-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%,
+                #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
+        background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #FAD96E),
+                color-stop(24%, #FAD96E), color-stop(25%, #555555), color-stop(26%, #FAD96E),
+                color-stop(50%, #FAD96E), color-stop(74%, #FAD96E), color-stop(75%, #555555),
+                color-stop(76%, #FAD96E), color-stop(100%, #FAD96E));
+        background: -webkit-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%,
+                #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
+        background: -o-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%,
+                #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
+        background: -ms-linear-gradient(-45deg, #FAD96E 0%, #FAD96E 24%, #555555 25%, #FAD96E 26%,
+                #FAD96E 50%, #FAD96E 74%, #555555 75%, #FAD96E 76%, #FAD96E 100%);
+        background: linear-gradient(135deg, #FAD96E 0%, #FAD96E -10%, #FAD96E -24%, #FAD96E 54%,
+                #FAD96E 97%, #FAD96E 136%, #FAD96E 195%, #FAD96E 4.8%, #FAD96E 70%); }
 
-.gradient {
-  position: absolute;
-  width: inherit;
-  height: inherit;
-  background: -moz-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.25) 0%, rgba(255, 255, 255, 0) 100%);
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(253, 243, 209, 0.55)), color-stop(100%, rgba(255, 255, 255, 0)));
-  background: -webkit-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
-  background: -o-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
-  background: -ms-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
-  background: radial-gradient(ellipse at center, rgba(253, 243, 209, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
-}
+        .gradient {
+          position: absolute;
+          width: inherit;
+          height: inherit;
+          background: -moz-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.25) 0%,
+                    rgba(255, 255, 255, 0) 100%);
+          background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,
+                    rgba(253, 243, 209, 0.55)), color-stop(100%, rgba(255, 255, 255, 0)));
+          background: -webkit-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.55) 0%,
+                    rgba(255, 255, 255, 0) 100%);
+          background: -o-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.55) 0%,
+                    rgba(255, 255, 255, 0) 100%);
+          background: -ms-radial-gradient(center, ellipse cover, rgba(253, 243, 209, 0.55) 0%,
+                    rgba(255, 255, 255, 0) 100%);
+          background: radial-gradient(ellipse at center, rgba(253, 243, 209, 0.55) 0%, rgba(255,
+                    255, 255, 0) 100%); }
 
-#reset {
-  position: absolute;
-  bottom: 10px;
-}
-
-/*# sourceMappingURL=game.css.map */
+          #reset {
+            position: absolute;
+            bottom: 10px; }

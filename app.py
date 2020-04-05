@@ -45,12 +45,11 @@ all_games: Dict[str, Game] = {}
 
 @app.route("/")
 def return_index() -> str:
-    return render_template("index.html")
-
+    return render_template("lobby.html")
 
 @app.route("/<id>")
 def return_game(id: str) -> str:
-    return render_template("game.html", id=id)
+    return render_template("board.html", id=id)
 
 
 @app.route("/test/<id>")
@@ -62,7 +61,6 @@ def return_game_test(id: str) -> str:
 def get_names() -> Response:
     ids = [x for x in all_games]
     return json.jsonify({"ids": ids})
-
 
 # ---------------------------------------
 # Socket functions

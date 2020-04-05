@@ -53,6 +53,7 @@ class Game(object):
         tiles_remaining (int): The number of tiles left in the game.
         num_players (int): The number of players.
         player_tiles (Dict[str, List[str]]): A dictionary mapping each player to their tiles.
+        last_peel (datetime): The time of the last peel, used to prevent overlapping peels.
 
     """
 
@@ -71,6 +72,7 @@ class Game(object):
         self.state = State.IDLE
         self.num_players = None
         self.tiles_remaining = len(self.tiles)
+        self.last_peel = datetime.datetime.now()
 
         # Date created.
         self.date_created = datetime.datetime.now()
@@ -187,6 +189,10 @@ class Game(object):
                 f"Cannot peel, game state is {self.state} when it should be 'ACTIVE'"
             )
         else:
+            # Make sure a peel hasn't happened within a second to prevent overlap
+            if (datetime.datetime.now() - self.last_peel).seconds <= 1:
+                raise GameException("Peel occuring too frequently.")
+            # Make sure there are enough tiles to make a peel.
             if self.num_players > self.tiles_remaining:
                 raise GameException("Not enough tiles to deal.")
 
@@ -198,6 +204,9 @@ class Game(object):
             # See if we there are enough tiles left for another peel
             if self.tiles_remaining < self.num_players:
                 self.state = State.ENDGAME
+
+            # Update the time of the last peel
+            self.last_peel = datetime.datetime.now()
 
     def swap(self, letter, player):
         """Swap a given tile for three tiles for a player.

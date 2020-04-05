@@ -106,9 +106,6 @@ class Game(object):
         for player in self.players:
             self.players[player] = []
 
-        # Lock for synchronization
-        self.lock = Lock()
-
     def __str__(self) -> str:  # pragma: no cover
         return (
             f"ID: {self.id}\n"
@@ -147,7 +144,7 @@ class Game(object):
     def start_game(self):
         """Starts the game by setting the number of players and divvying out tiles.
         """
-        self.lock.acquire()
+        self.lock.acquire(timeout=2)
         try:
             if self.state != State.IDLE:
                 raise GameException(
@@ -186,7 +183,7 @@ class Game(object):
     def split(self):
         """Start the game action.
         """
-        self.lock.acquire()
+        self.lock.acquire(timeout=2)
         try:
             if self.state != State.HIDDEN:
                 raise GameException(
@@ -200,7 +197,7 @@ class Game(object):
     def peel(self):
         """Give a new tile to each player.
         """
-        self.lock.acquire()
+        self.lock.acquire(timeout=2)
         try:
             if self.state != State.ACTIVE:
                 raise GameException(
@@ -240,7 +237,7 @@ class Game(object):
         Raises:
             GameException: The player does not have an instance of that tile.
         """
-        self.lock.acquire()
+        self.lock.acquire(timeout=2)
         try:
             if self.state not in [State.ACTIVE, State.ENDGAME]:
                 raise GameException(
@@ -273,7 +270,7 @@ class Game(object):
     def bananagrams(self):
         """End the game (someone has bananagrams)
         """
-        self.lock.acquire()
+        self.lock.acquire(timeout=2)
         try:
             if self.state != State.ENDGAME:
                 raise GameException(
@@ -287,7 +284,7 @@ class Game(object):
     def continue_game(self):
         """Continue the game (false alarm on banagrams)
         """
-        self.lock.acquire()
+        self.lock.acquire(timeout=2)
         try:
             if self.state != State.OVER:
                 raise GameException(

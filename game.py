@@ -134,12 +134,20 @@ class Game(object):
         Args:
             player_id (str): The ID of the player to add.
         """
-        if self.state != State.IDLE:
-            raise GameException(
-                f"Cannot add players, game state is {self.state} when it should be 'IDLE'"
-            )
-        if player_id not in self.players:
-            self.players[player_id] = []
+        self.lock.acquire(timeout=2)
+        try:
+            num_players = len(self.players)
+            if num_players == 8:
+                raise GameException("Maximum number of player reached.")
+
+            if self.state != State.IDLE:
+                raise GameException(
+                    f"Cannot add players, game state is {self.state}. Should be 'IDLE'"
+                )
+            if player_id not in self.players:
+                self.players[player_id] = []
+        finally:
+            self.lock.release()
 
     def start_game(self):
         """Starts the game by setting the number of players and divvying out tiles.
@@ -148,7 +156,7 @@ class Game(object):
         try:
             if self.state != State.IDLE:
                 raise GameException(
-                    f"Cannot start game, game state is {self.state} when it shoudl be 'IDLE'"
+                    f"Cannot start game, game state is {self.state}. Should be 'IDLE'"
                 )
             else:
                 self.num_players = len(self.players)
@@ -163,9 +171,6 @@ class Game(object):
         Raises:
             GameException: Invalid number of players.
         """
-        if self.num_players < 2 or self.num_players > 8 or self.num_players is None:
-            raise GameException("Invalid Number of Players")
-
         # Give out number of tiles based on number of players
         if 2 <= self.num_players <= 4:
             num_tiles = 21
@@ -173,6 +178,8 @@ class Game(object):
             num_tiles = 15
         elif 7 <= self.num_players <= 8:
             num_tiles = 11
+        else:
+            raise GameException("Invalid number of players.")
 
         for player in self.players:
             for _ in range(num_tiles):
@@ -187,25 +194,31 @@ class Game(object):
         try:
             if self.state != State.HIDDEN:
                 raise GameException(
-                    f"Cannot split, game state is {self.state} when it should be 'HIDDEN'"
+                    f"Cannot split, game state is {self.state}. Should be 'HIDDEN'"
                 )
             else:
                 self.state = State.ACTIVE
         finally:
             self.lock.release()
 
-    def peel(self):
-        """Give a new tile to each player.
+    def peel(self, test: bool = False):
+        """
+        Give a new tile to each player.
+
+        Args:
+            test (bool): Bypasses the time restriction for testing, defaults to False.
         """
         self.lock.acquire(timeout=2)
         try:
             if self.state != State.ACTIVE:
                 raise GameException(
-                    f"Cannot peel, game state is {self.state} when it should be 'ACTIVE'"
+                    f"Cannot peel, game state is {self.state}. Should be 'ACTIVE'"
                 )
             else:
                 # Make sure a peel hasn't happened within a fraction of a second to prevent overlap
-                if (datetime.datetime.now() - self.last_peel).seconds <= 1:
+                if (
+                    datetime.datetime.now() - self.last_peel
+                ).seconds <= 0.75 and not test:
                     raise GameException("Peel occuring too frequently.")
 
                 # Update the time of the last peel
@@ -241,7 +254,7 @@ class Game(object):
         try:
             if self.state not in [State.ACTIVE, State.ENDGAME]:
                 raise GameException(
-                    f"Cannot swap, game state is {self.state} when it should be 'ACTIVE' or 'ENDGAME'"
+                    f"Cannot swap, game state is {self.state}. Should be 'ACTIVE' or 'ENDGAME'"
                 )
             else:
                 if letter not in self.players[player]:
@@ -274,7 +287,7 @@ class Game(object):
         try:
             if self.state != State.ENDGAME:
                 raise GameException(
-                    f"Cannot call bananagrams, game state is {self.state} when it should be 'ENDGAME'"
+                    f"Cannot call bananagrams, game state is {self.state}. Should be 'ENDGAME'"
                 )
             else:
                 self.state = State.OVER
@@ -288,7 +301,7 @@ class Game(object):
         try:
             if self.state != State.OVER:
                 raise GameException(
-                    f"Cannot continue game, game state is {self.state} when it should be 'OVER'"
+                    f"Cannot continue game, game state is {self.state}. Should be 'OVER'"
                 )
             else:
                 self.state = State.ENDGAME

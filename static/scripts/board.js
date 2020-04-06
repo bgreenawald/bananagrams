@@ -22,7 +22,7 @@ const renderBoard = () => {
 const createTiles = () => {
   const lettersArray = getLetters();
   const tilesArray =  lettersArray.map((letter, index) => {
-    return `<span class="tile" data-tile-id="${index}" draggable="true">${letter}</span>`;
+    return `<div class="cell"><span class="tile" data-tile-id="${index}" draggable="true">${letter}</span></div>`;
   });
   
   return tilesArray;
@@ -44,7 +44,7 @@ const fillCells = (parentId, childrenArrayOrCellNumber) => {
     }
   }
   else if (Array.isArray(childrenArrayOrCellNumber))
-  
+
   children.forEach(child => {
     parent.innerHTML += child;
   })

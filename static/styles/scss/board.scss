@@ -27,6 +27,15 @@
   position: absolute;
   top: 10px;
   left: 10px;
+
+  .cell {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 3px;
+    margin: 1px;
+    border-radius: 10px;
+    background-color: darken(antiquewhite, 13%);
+  }
 }
 
 .cell {
@@ -39,7 +48,6 @@
 }
 
 .tile {
-  padding: 5px;
   background-color: darken(burlywood, 7%);
   z-index: 1;
   color: white;
@@ -48,6 +56,7 @@
   border-radius: 10px;
   width: 20px;
   height: 20px;
+  padding: 5px;
   text-align: center;
   border: 3px solid darken(burlywood, 30%);
   margin: 1px;

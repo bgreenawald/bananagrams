@@ -2,7 +2,7 @@
   position: relative;
   height: 500px;
   font-family: arial;
-  font-style: bold;
+  width: 100%;
 }
 
 #board {
@@ -10,21 +10,23 @@
   grid-template-columns: repeat(20, 1fr);
   grid-template-rows: repeat(20, 1fr);
   box-sizing: border-box;
-  top: 0;
-  right: 0;
-  position: absolute;
-}
-
-#board {
-  background-color: lightgray;
+  background-color: antiquewhite  ;
+  width: 100%;
+  height: 100%;
 }
 
 #bench {
-  background-color: paleturquoise;
+  background-color: darken(antiquewhite, 10%);
   border-radius: 20px;
   display: flex;
+  flex-flow: column nowrap; 
   padding: 20px;
-  width: 100px;
+  align-items: center;
+  width: 40px;
+  z-index: 200;
+  position: absolute;
+  top: 10px;
+  left: 10px;
 }
 
 .cell {
@@ -33,6 +35,7 @@
   align-items: center;
   justify-content: center;
   display: flex;
+  border: 1px solid rgba(200,200,200,0.2);
 }
 
 .tile {
@@ -42,12 +45,10 @@
   color: white;
   cursor: pointer;
   background-color: burlywood;
-  // padding: 20px;
   border-radius: 10px;
   width: 20px;
   height: 20px;
   text-align: center;
-  // box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
   border: 3px solid darken(burlywood, 30%);
   margin: 1px;
   z-index: 999;

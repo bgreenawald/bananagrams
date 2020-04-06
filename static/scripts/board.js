@@ -1,4 +1,4 @@
-console.log('hello world')
+console.log('hello world 2');
 
 let lettersArray = [];
 let grabbedTile = null;
@@ -15,8 +15,8 @@ const getLetters = () =>  {
 
 const renderBoard = () => {
   const tilesArray = createTiles();
-  populateBoardCells(200);
-  populate("bench", tilesArray)
+  populateBoard(400);
+  populate("bench", tilesArray);
 }
 
 const createTiles = () => {
@@ -28,15 +28,30 @@ const createTiles = () => {
   return tilesArray;
 };
 
-const populateBoardCells = (num) => {
+const populateBoard = (num) => {
   let board = document.getElementById("board");
   for (let i = 0; i < num; i++) {
     board.innerHTML += `<div class="cell"></div>`;
   }
 };
 
+const fillCells = (parentId, childrenArrayOrCellNumber) => {
+  const parent = document.getElementById(parentId);
+  if (typeof(childrenArrayOrCellNumber) === "number") {
+    let num = childrenArrayOrCellNumber;
+    for (let i = 0; i < num; i++) {
+      parent.innerHTML += `<div class="cell"></div>`;
+    }
+  }
+  else if (Array.isArray(childrenArrayOrCellNumber))
+  
+  children.forEach(child => {
+    parent.innerHTML += child;
+  })
+}
+
 const populate = (parentid, childrenArray) => {
-  const parent=document.getElementById(parentid);
+  const parent = document.getElementById(parentid);
   childrenArray.forEach(child => {
     parent.innerHTML += child;
   })

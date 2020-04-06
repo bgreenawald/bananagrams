@@ -1,13 +1,13 @@
 #parent {
   position: relative;
-  height: 500px;
+  height: 100%;
   font-family: arial;
   width: 100%; }
 
   #board {
     display: grid;
-    grid-template-columns: repeat(20, 1fr);
-    grid-template-rows: repeat(20, 1fr);
+    grid-template-columns: repeat(40, 40px);
+    grid-template-rows: repeat(20, 40px);
     box-sizing: border-box;
     background-color: antiquewhite;
     width: 100%;
@@ -26,9 +26,9 @@
       top: 10px;
       left: 10px; }
       #bench .cell {
-        min-width: 30px;
-        min-height: 30px;
-        padding: 3px;
+        min-width: 27px;
+        min-height: 27px;
+        padding: 1px;
         margin: 1px;
         border-radius: 10px;
         background-color: #f3ce9c; }
@@ -39,7 +39,9 @@
   align-items: center;
   justify-content: center;
   display: flex;
-  border: 1px solid rgba(200, 200, 200, 0.2); }
+  border-radius: 10px;
+  height: 50px;
+  width: 55px; }
 
   .tile {
     background-color: #d6a76b;
@@ -58,4 +60,4 @@
 
     .cell.over {
       opacity: 0.2;
-      background-color: black; }
+      background-color: #e9a74f; }

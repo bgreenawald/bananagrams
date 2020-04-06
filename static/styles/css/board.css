@@ -1,0 +1,59 @@
+#parent {
+  position: relative;
+  height: 500px;
+  font-family: arial;
+  font-style: bold;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-rows: repeat(20, 1fr);
+  box-sizing: border-box;
+  top: 0;
+  right: 0;
+  position: absolute;
+}
+
+#board {
+  background-color: lightgray;
+}
+
+#bench {
+  background-color: paleturquoise;
+  border-radius: 20px;
+  display: flex;
+  padding: 20px;
+  width: 100px;
+}
+
+.cell {
+  z-index: 50;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.tile {
+  padding: 5px;
+  background-color: #d6a76b;
+  z-index: 1;
+  color: white;
+  cursor: pointer;
+  background-color: burlywood;
+  border-radius: 10px;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  border: 3px solid #a06d2c;
+  margin: 1px;
+  z-index: 999;
+}
+
+.cell.over {
+  opacity: 0.2;
+  background-color: black;
+}
+
+/*# sourceMappingURL=board.css.map */

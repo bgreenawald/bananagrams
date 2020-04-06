@@ -9,6 +9,7 @@ import simplejson
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, json, render_template, request, Response
 from flask_cors import CORS
+from flask_scss import Scss
 from flask_socketio import emit, join_room, SocketIO
 
 from game import Game, GameException
@@ -20,11 +21,9 @@ app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app)
 
 # Add Sass
-from flask_scss import Scss
 Scss(app, static_dir='static/styles/css', asset_dir='static/styles/scss')
-app._static_folder = './static'
 
-# Initialize CORS 
+# Initialize CORS
 CORS(app)
 
 # Setup logging

@@ -9,8 +9,6 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Bananagrams</title>
 
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
         <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/styles.css') }}" />
     </head>
 
@@ -68,7 +66,7 @@
             }
             else {
                 console.log("Success")
-                window.location.href = "/" + input_name;
+                window.location.href = "/game/" + input_name;
             }
         });
     }

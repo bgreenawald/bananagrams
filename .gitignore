@@ -25,3 +25,6 @@ htmlcov/
 
 # Ignore style files
 *.map
+
+# Ignore compiled CSS
+static/styles/css/*

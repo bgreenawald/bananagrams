@@ -7,37 +7,46 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Bananagrams</title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/game.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/board.css') }}" />
 </head>
 
 <body>
     <div class="home-container" id="css3-background-texture">
-        <div class="home-content"></div>
-        <div>
-            <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
+        <div class="home-content">
+            <div>
+                <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
+            </div>
+            <div id="error"></div>
+            <div id="join_game">
+                <p>First things first, enter your username to join the game.</p>
+                <input id="player_id" type="text">
+                <button id="player_id_submit" class="btn btn-primary" type="submit" onclick="player_join()">Join the
+                    Game</button>
+            </div>
+            <div id="message"></div>
+            <div id="game_info"></div>
+            <div id="options" style="display: none;">
+                <button class="btn btn-primary" id="start_game_button" type="submit" onclick="start_game()">Deal the
+                    Tiles</button>
+                <button class="btn btn-primary" id="split_button" type="submit" onclick="split()">Split</button>
+                <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
+                <button class="btn btn-primary" id="swap_button" type="submit" onclick="swap()">Swap</button>
+                <button class="btn btn-primary" id="bananagrams_button" type="submit"
+                    onclick="bananagrams()">Bananagrams</button>
+                <button class="btn btn-primary" id="continue_game_button" type="submit"
+                    onclick="continue_game()">Continue Game</button>
+            </div>
+            <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()"
+                style="position: absolute; right: 10px;">Reset Game</button>
+
         </div>
-        <div id="error"></div>
-        <div id="join_game">
-            <p>First things first, enter your username to join the game.</p>
-            <input id="player_id" type="text">
-            <button id="player_id_submit" class="btn btn-primary" type="submit" onclick="player_join()">Join the Game</button>
+        <div id="parent">
+            <div id="board"></div>
+
+            <div id="bench"></div>
         </div>
-        <div id="message"></div>
-        <div id="game_info"></div>
-        <div id="options" style="display: none;">
-            <button class="btn btn-primary" id="start_game_button" type="submit" onclick="start_game()">Deal the Tiles</button>
-            <button class="btn btn-primary" id="split_button" type="submit" onclick="split()">Split</button>
-            <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
-            <button class="btn btn-primary" id="swap_button" type="submit" onclick="swap()">Swap</button>
-            <button class="btn btn-primary" id="bananagrams_button" type="submit" onclick="bananagrams()">Bananagrams</button>
-            <button class="btn btn-primary" id="continue_game_button" type="submit" onclick="continue_game()">Continue Game</button>
-        </div>
-        <div id="reset">
-            <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()">Reset Game</button>
-        </div>
+        <script src="{{url_for('static', filename='scripts/board.js')}}"></script>
     </div>
 </body>
 
@@ -82,9 +91,9 @@
     });
 
     // --------------------------------------
-    // Render board action
-    socket.on("render_board", function (resp) {
-        // Do not render the board if the client has not joined the game
+    // Render game action
+    socket.on("render_game", function (resp) {
+        // Do not render the game if the client has not joined the game
         if (!hasJoined) {
             return;
         }
@@ -93,9 +102,9 @@
         } else {
             if (resp["status_code"] == 200) {
                 game_state = JSON.parse(resp.payload);
-                render_board(game_state);
+                render_game(game_state);
             } else {
-                if(!resp.hasOwnProperty("message")) {
+                if (!resp.hasOwnProperty("message")) {
                     showError("An error occurred, but no message was given.")
                 } else {
                     showError(`An error occurred: ${resp["message"]}`)
@@ -104,45 +113,47 @@
         }
     });
 
-    function render_board(resp) {
+    function render_game(resp) {
         console.log(resp);
         tiles = resp["players"][player_id];
 
         // Hide the join game option
         $("#join_game").hide();
 
-        // Render the board based on the various game states
+        // Render the game based on the various game states
 
         // Waiting to give out tiles
-        if(game_state["state"] == "IDLE") {
+        if (game_state["state"] == "IDLE") {
             hideButtons();
-            $("#message").innerHTML = "<p>Waiting for other players to join. When everyone is in, click 'Deal the Tiles'</p>"
+            $("#message").innerHTML =
+                "<p>Waiting for other players to join. When everyone is in, click 'Deal the Tiles'</p>"
             $("#options").show();
             $("#start_game_button").show();
         } // Tiles dealt, waiting to start
-        else if(resp["state"] == "HIDDEN"){
+        else if (resp["state"] == "HIDDEN") {
             hideButtons();
             $("#message").innerHTML = "<p>Get ready! Click 'Split' when everyone is good to go.</p>"
             $("#options").show();
             $("#split_button").show();
         } // The main gamplay state
-        else if(resp["state"] == "ACTIVE") {
+        else if (resp["state"] == "ACTIVE") {
             hideButtons();
             $("#message").innerHTML = "<p>Game on! Build a valid scrabble board with your words.</p>"
             $("#options").show();
             $("#peel_button").show();
             $("#swap_button").show();
         } // Can no longer swap
-        else if(resp["state"] == "ENDGAME") {
+        else if (resp["state"] == "ENDGAME") {
             hideButtons();
             $("#message").innerHTML = "<p>Almost done! Be the first to complete your board.</p>"
             $("#options").show();
             $("#bananagrams_button").show();
             $("#swap_button").show();
         } // Game over
-        else if(resp["state"] == "OVER") {
+        else if (resp["state"] == "OVER") {
             hideButtons();
-            $("#message").innerHTML = "<p>Game over? Check the winning board. If it's a false alarm, click 'Continue Game,' otherwise, click 'Reset Game' to play again.</p>"
+            $("#message").innerHTML =
+                "<p>Game over? Check the winning board. If it's a false alarm, click 'Continue Game,' otherwise, click 'Reset Game' to play again.</p>"
             $("#options").show();
             $("#continue_game_button").show();
         } // Unknown state
@@ -155,16 +166,16 @@
     // --------------------------------------
     //Client functions
 
-    // Manually load the current board
-    function load_board() {
-        socket.emit("load_board", {
+    // Manually load the current game
+    function load_game() {
+        socket.emit("load_game", {
             "name": game_name
         })
     }
 
     // Join the game
     function player_join() {
-        load_board();
+        load_game();
         player_id = document.getElementById("player_id").value;
         socket.emit("player_join", {
             "name": game_name,
@@ -247,7 +258,7 @@
     var input = document.getElementById("player_id");
 
     // Execute a function when the user releases a key on the keyboard
-    input.addEventListener("keyup", function(event) {
+    input.addEventListener("keyup", function (event) {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
             // Cancel the default action, if needed
@@ -258,7 +269,7 @@
     });
 
     // Peel
-    document.addEventListener("keyup", function(event) {
+    document.addEventListener("keyup", function (event) {
         if (event.keyCode === 80) {
             // Cancel the default action, if needed
             event.preventDefault();
@@ -268,7 +279,7 @@
     });
 
     // Swap
-    document.addEventListener("keyup", function(event) {
+    document.addEventListener("keyup", function (event) {
         if (event.keyCode === 83) {
             // Cancel the default action, if needed
             event.preventDefault();
@@ -278,7 +289,7 @@
     });
 
     // Document
-    document.addEventListener("keyup", function(event) {
+    document.addEventListener("keyup", function (event) {
         if (event.keyCode === 66) {
             // Cancel the default action, if needed
             event.preventDefault();
@@ -286,6 +297,4 @@
             $("#bananagrams_button").click();
         }
     });
-
-
 </script>

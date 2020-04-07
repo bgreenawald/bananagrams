@@ -1,4 +1,3 @@
-console.log('hello world 2');
 
 let lettersArray = [];
 let grabbedTile = null;
@@ -7,24 +6,17 @@ let originCell = null;
 
 const options = false;
 
-const getLetters = () =>  {
-  const randomLettersStr = "HvOPidkQaB";
-
-  return randomLettersStr.toUpperCase().split("");
-}
-
-const renderBoard = () => {
-  const tilesArray = createTiles();
+const renderBoard = (arr) => {
+  const tilesArray = createTiles(arr);
   populateBoard(400);
   populate("bench", tilesArray);
 }
 
-const createTiles = () => {
-  const lettersArray = getLetters();
+const createTiles = (lettersArray) => {
   const tilesArray =  lettersArray.map((letter, index) => {
     return `<div class="cell"><span class="tile" data-tile-id="${index}" draggable="true">${letter}</span></div>`;
   });
-  
+
   return tilesArray;
 };
 
@@ -56,8 +48,6 @@ const populate = (parentid, childrenArray) => {
     parent.innerHTML += child;
   })
 }
-
-renderBoard();
 
 const handleDragStart = (e) => {
   console.log(`${e.type}`);

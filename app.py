@@ -21,7 +21,7 @@ app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app)
 
 # Add Sass
-Scss(app, static_dir='static/styles/css', asset_dir='static/styles/scss')
+Scss(app, static_dir="static/styles/css", asset_dir="static/styles/scss")
 
 # Initialize CORS
 CORS(app)
@@ -49,28 +49,19 @@ all_games: Dict[str, Game] = {}
 
 @app.route("/")
 def return_index() -> str:
-    return render_template("lobby.html")
+    return render_template("index.html")
+
 
 @app.route("/game/<int:id>")
 def return_game(id: str) -> str:
-    return render_template("board.html", id=id)
-
-@app.route("/old")
-def return_index_old() -> str:
-    return render_template("index.html")
-
-@app.route("/old/<int:id>")
-def return_game_old(id: str) -> str:
     return render_template("game.html", id=id)
 
-@app.route("/test/<int:id>")
-def return_game_test(id: str) -> str:
-    return render_template("game2.html", id=id)
 
 @app.route("/api/get_names")
 def get_names() -> Response:
     ids = [x for x in all_games]
     return json.jsonify({"ids": ids})
+
 
 # ---------------------------------------
 # Socket functions
@@ -105,15 +96,15 @@ def on_disconnect():
 def emit_error(game_name: str, msg: str):
     logging.error(msg)
     emit(
-        "render_board",
+        "render_game",
         {"status_code": 400, "message": msg, "payload": {}},
         room=game_name,
     )
 
 
-def emit_board(game_name: str, game: Game, msg: str):
+def emit_game(game_name: str, game: Game, msg: str):
     emit(
-        "render_board",
+        "render_game",
         {
             "status_code": 200,
             "message": msg,
@@ -123,9 +114,9 @@ def emit_board(game_name: str, game: Game, msg: str):
     )
 
 
-@socketio.on("load_board")
+@socketio.on("load_game")
 def load_game(json: Dict[Any, Any]):
-    """Loads the current game board, or creates on if none exists.
+    """Loads the current game game, or creates on if none exists.
     Args:
         json (Dict[Any, Any]): {
             "game": (Any) The name of the game.
@@ -149,7 +140,7 @@ def player_join(json: Dict[Any, Any]):
         }
     """
     if "name" not in json:
-        logger.warning("Could not find the given board.")
+        logger.warning("Could not find the given game.")
         return
 
     game_name = json["name"]
@@ -165,15 +156,15 @@ def player_join(json: Dict[Any, Any]):
 
     # See if the player has already joined
     if json["player_id"] in game.players:
-        emit_board(
+        emit_game(
             game_name,
             game,
-            f"Player {json['player_id']} already joined, returning board.",
+            f"Player {json['player_id']} already joined, returning game.",
         )
         return
     try:
         game.join_game(json["player_id"])
-        emit_board(game_name, game, f"Added player {json['player_id']} to game.")
+        emit_game(game_name, game, f"Added player {json['player_id']} to game.")
     except GameException as e:
         logging.error("Exception occurred", exc_info=True)
         emit_error(game_name, str(e))
@@ -189,7 +180,7 @@ def start_game(json: Dict[Any, Any]):
         }
     """
     if "name" not in json:
-        logger.warning("Could not find the given board.")
+        logger.warning("Could not find the given game.")
         return
 
     game_name = json["name"]
@@ -202,7 +193,7 @@ def start_game(json: Dict[Any, Any]):
 
     try:
         game.start_game()
-        emit_board(game_name, game, "Game started")
+        emit_game(game_name, game, "Game started")
     except GameException as e:
         logging.error("Exception occurred", exc_info=True)
         emit_error(game_name, str(e))
@@ -218,7 +209,7 @@ def split(json: Dict[Any, Any]):
         }
     """
     if "name" not in json:
-        logger.warning("Could not find the given board.")
+        logger.warning("Could not find the given game.")
         return
 
     game_name = json["name"]
@@ -231,7 +222,7 @@ def split(json: Dict[Any, Any]):
 
     try:
         game.split()
-        emit_board(game_name, game, "Split.")
+        emit_game(game_name, game, "Split.")
     except GameException as e:
         logging.error("Exception occurred", exc_info=True)
         emit_error(game_name, str(e))
@@ -247,7 +238,7 @@ def peel(json: Dict[Any, Any]):
         }
     """
     if "name" not in json:
-        logger.warning("Could not find the given board.")
+        logger.warning("Could not find the given game.")
         return
 
     game_name = json["name"]
@@ -260,7 +251,7 @@ def peel(json: Dict[Any, Any]):
 
     try:
         game.peel()
-        emit_board(game_name, game, "New tile given out.")
+        emit_game(game_name, game, "New tile given out.")
     except GameException as e:
         logging.error("Exception occurred", exc_info=True)
         emit_error(game_name, str(e))
@@ -279,7 +270,7 @@ def swap(json: Dict[Any, Any]):
         }
     """
     if "name" not in json:
-        logger.warning("Could not find the given board.")
+        logger.warning("Could not find the given game.")
         return
 
     game_name = json["name"]
@@ -298,7 +289,7 @@ def swap(json: Dict[Any, Any]):
 
     try:
         game.swap(json["letter"], json["player_id"])
-        emit_board(game_name, game, f"Performed swap for player {json['player_id']}")
+        emit_game(game_name, game, f"Performed swap for player {json['player_id']}")
     except GameException as e:
         logging.error("Exception occurred", exc_info=True)
         emit_error(game_name, str(e))
@@ -315,7 +306,7 @@ def bananagrams(json: Dict[Any, Any]):
         }
     """
     if "name" not in json:
-        logger.warning("Could not find the given board.")
+        logger.warning("Could not find the given game.")
         return
 
     game_name = json["name"]
@@ -328,7 +319,7 @@ def bananagrams(json: Dict[Any, Any]):
 
     try:
         game.bananagrams()
-        emit_board(game_name, game, "Bananagrams.")
+        emit_game(game_name, game, "Bananagrams.")
     except GameException as e:
         logging.error("Exception occurred", exc_info=True)
         emit_error(game_name, str(e))
@@ -345,7 +336,7 @@ def continue_game(json: Dict[Any, Any]):
         }
     """
     if "name" not in json:
-        logger.warning("Could not find the given board.")
+        logger.warning("Could not find the given game.")
         return
 
     game_name = json["name"]
@@ -358,7 +349,7 @@ def continue_game(json: Dict[Any, Any]):
 
     try:
         game.continue_game()
-        emit_board(game_name, game, "Game continued.")
+        emit_game(game_name, game, "Game continued.")
     except GameException as e:
         logging.error("Exception occurred", exc_info=True)
         emit_error(game_name, str(e))
@@ -374,7 +365,7 @@ def reset(json: Dict[Any, Any]):
         }
     """
     if "name" not in json:
-        logger.warning("Could not find the given board.")
+        logger.warning("Could not find the given game.")
         return
 
     game_name = json["name"]
@@ -386,7 +377,7 @@ def reset(json: Dict[Any, Any]):
         return
 
     game.reset()
-    emit_board(game_name, game, "Game reset.")
+    emit_game(game_name, game, "Game reset.")
 
 
 # ---------------------------------------

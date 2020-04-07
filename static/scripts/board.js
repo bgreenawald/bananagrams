@@ -6,6 +6,28 @@ let originCell = null;
 
 const options = false;
 
+const isHashMap = (item) => {
+    return (!Array.isArray(item) && typeof(item) === 'object')
+}
+
+const saveToLocalStorage = (key, rawData) => {
+    let data = rawData;
+    if (isHashMap(data)) {
+        data = JSON.stringify(data);
+    }
+    localStorage.setItem(key, data)
+}
+
+const getUserLetters = () => {
+    const username = localStorage.getItem("player_id");
+    const allTiles = JSON.parse(localStorage.getItem("players"));
+    for (player in allTiles) {
+        if (player === username) {
+            return allTiles[username];
+        }
+    }
+}
+
 const renderBoard = (arr) => {
   const tilesArray = createTiles(arr);
   populateBoard(400);
@@ -189,6 +211,7 @@ function render_game(resp) {
         $("#message").innerHTML = "<p>Get ready! Click 'Split' when everyone is good to go.</p>"
         $("#options").show();
         $("#split_button").show();
+        saveToLocalStorage("players", resp.players);
     } // The main gamplay state
     else if (resp["state"] == "ACTIVE") {
         hideButtons();
@@ -196,7 +219,7 @@ function render_game(resp) {
         $("#options").show();
         $("#peel_button").show();
         $("#swap_button").show();
-        renderBoard()
+        renderBoard(getUserLetters());
     } // Can no longer swap
     else if (resp["state"] == "ENDGAME") {
         hideButtons();
@@ -232,6 +255,7 @@ function load_game() {
 function player_join() {
     load_game();
     player_id = document.getElementById("player_id").value;
+    localStorage.setItem("player_id", player_id);
     socket.emit("player_join", {
         "name": game_name,
         "player_id": player_id

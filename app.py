@@ -199,35 +199,6 @@ def start_game(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@socketio.on("split")
-def split(json: Dict[Any, Any]):
-    """Reveals the tiles.
-
-    Args:
-        json (Dict[Any, Any]): {
-            "name": (Any) The name of the game.
-        }
-    """
-    if "name" not in json:
-        logger.warning("Could not find the given game.")
-        return
-
-    game_name = json["name"]
-    try:
-        game = all_games[game_name]
-    except KeyError:
-        logger.warning(f"Could not find the game named {game_name}.")
-        emit_error(game_name, f"Could not find the game named {game_name}.")
-        return
-
-    try:
-        game.split()
-        emit_game(game_name, game, "Split.")
-    except GameException as e:
-        logging.error("Exception occurred", exc_info=True)
-        emit_error(game_name, str(e))
-
-
 @socketio.on("peel")
 def peel(json: Dict[Any, Any]):
     """Gives every player a new tile.

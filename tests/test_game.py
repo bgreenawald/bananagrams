@@ -28,7 +28,7 @@ class testGameMethods(unittest.TestCase):
             else:
                 self.fail()
         with self.subTest("Test game state before reset."):
-            self.assertEqual(g.state, State.HIDDEN)
+            self.assertEqual(g.state, State.ACTIVE)
 
         g.reset()
         with self.subTest("Check players have no tiles after reset"):
@@ -134,37 +134,11 @@ class testGameMethods(unittest.TestCase):
 
         g.start_game()
         with self.subTest("Test state after starting game"):
-            self.assertEqual(g.state, State.HIDDEN)
+            self.assertEqual(g.state, State.ACTIVE)
 
         with self.subTest("Test cannot start game twice."):
             try:
                 g.start_game()
-            except GameException:
-                pass
-            else:
-                self.fail()
-
-    def test_split(self):
-        g = Game("")
-        with self.subTest("Test split invalid state 'IDLE'"):
-            try:
-                g.split()
-            except GameException:
-                pass
-            else:
-                self.fail()
-
-        ids = [f"id_{x}" for x in range(2)]
-        for id_ in ids:
-            g.join_game(id_)
-        g.start_game()
-        g.split()
-        with self.subTest("Test state after split."):
-            self.assertEqual(g.state, State.ACTIVE)
-
-        with self.subTest("Test cannot split in active state"):
-            try:
-                g.split()
             except GameException:
                 pass
             else:
@@ -175,8 +149,7 @@ class testGameMethods(unittest.TestCase):
         ids = [f"id_{x}" for x in range(2)]
         for id_ in ids:
             g.join_game(id_)
-        g.start_game()
-        with self.subTest("Test peel invalid state 'HIDDEN'"):
+        with self.subTest("Test peel invalid state 'IDLE'"):
             try:
                 g.peel(test=True)
             except GameException:
@@ -184,7 +157,7 @@ class testGameMethods(unittest.TestCase):
             else:
                 self.fail()
 
-        g.split()
+        g.start_game()
         with self.subTest("Test tile numbers before peel."):
             self.assertTrue(all(len(g.players[id_]) == 21 for id_ in ids))
         time.sleep(1)
@@ -220,7 +193,6 @@ class testGameMethods(unittest.TestCase):
         for id_ in ids:
             g.join_game(id_)
         g.start_game()
-        g.split()
         for _ in range((g.tiles_remaining // g.num_players) - 1):
             g.peel(test=True)
         g.players["id_3"] = []
@@ -238,8 +210,7 @@ class testGameMethods(unittest.TestCase):
         ids = [f"id_{x}" for x in range(2)]
         for id_ in ids:
             g.join_game(id_)
-        g.start_game()
-        with self.subTest("Test swap from invalid state 'HIDDEN'"):
+        with self.subTest("Test swap from invalid state 'IDLE'"):
             try:
                 g.swap("A", "id_0")
             except GameException:
@@ -247,7 +218,7 @@ class testGameMethods(unittest.TestCase):
             else:
                 self.fail()
 
-        g.split()
+        g.start_game()
         g.players["id_0"] = ["A", "B", "C"]
         with self.subTest("Remove an invalid letter."):
             try:
@@ -262,7 +233,6 @@ class testGameMethods(unittest.TestCase):
         for id_ in ids:
             g.join_game(id_)
         g.start_game()
-        g.split()
         g.swap(g.players["id_0"][0], "id_0")
         with self.subTest("See if the letter length is correct for swap player."):
             self.assertEqual(len(g.players["id_0"]), 23)
@@ -298,7 +268,6 @@ class testGameMethods(unittest.TestCase):
         for id_ in ids:
             g.join_game(id_)
         g.start_game()
-        g.split()
         for _ in range((g.tiles_remaining // g.num_players) - 1):
             g.peel(test=True)
 
@@ -322,7 +291,6 @@ class testGameMethods(unittest.TestCase):
         for id_ in ids:
             g.join_game(id_)
         g.start_game()
-        g.split()
         for _ in range((g.tiles_remaining // g.num_players) - 1):
             g.peel(test=True)
 

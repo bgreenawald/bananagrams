@@ -27,9 +27,6 @@ class State(Enum):
     # Waiting for players to join the game
     IDLE = "IDLE"
 
-    # The tiles have been given out but are hidden
-    HIDDEN = "HIDDEN"
-
     # The main game state, where peels are allowed
     ACTIVE = "ACTIVE"
 
@@ -161,7 +158,7 @@ class Game(object):
             else:
                 self.num_players = len(self.players)
                 self._divy_out_tiles()
-                self.state = State.HIDDEN
+                self.state = State.ACTIVE
         finally:
             self.lock.release()
 
@@ -186,20 +183,6 @@ class Game(object):
                 self.players[player].append(self.tiles.pop())
 
         self.tiles_remaining = len(self.tiles)
-
-    def split(self):
-        """Start the game action.
-        """
-        self.lock.acquire(timeout=2)
-        try:
-            if self.state != State.HIDDEN:
-                raise GameException(
-                    f"Cannot split, game state is {self.state}. Should be 'HIDDEN'"
-                )
-            else:
-                self.state = State.ACTIVE
-        finally:
-            self.lock.release()
 
     def peel(self, test: bool = False):
         """

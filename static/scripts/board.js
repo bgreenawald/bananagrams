@@ -183,12 +183,6 @@ function render_game(resp) {
             "<p>Waiting for other players to join. When everyone is in, click 'Deal the Tiles'</p>"
         $("#options").show();
         $("#start_game_button").show();
-    } // Tiles dealt, waiting to start
-    else if (resp["state"] == "HIDDEN") {
-        hideButtons();
-        $("#message").innerHTML = "<p>Get ready! Click 'Split' when everyone is good to go.</p>"
-        $("#options").show();
-        $("#split_button").show();
     } // The main gamplay state
     else if (resp["state"] == "ACTIVE") {
         hideButtons();
@@ -196,7 +190,7 @@ function render_game(resp) {
         $("#options").show();
         $("#peel_button").show();
         $("#swap_button").show();
-        renderBoard()
+        renderBoard(tiles);
     } // Can no longer swap
     else if (resp["state"] == "ENDGAME") {
         hideButtons();

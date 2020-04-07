@@ -194,7 +194,7 @@ socket.on("render_game", function (resp) {
 
 function render_game(resp) {
     console.log(resp);
-    tiles = resp["players"][player_id];
+    var cur_tiles = resp["players"][player_id];
 
     // Hide the join game option
     $("#join_game").hide();
@@ -217,7 +217,12 @@ function render_game(resp) {
         $("#swap_button").show();
         if (!hasRendered) {
           hasRendered = true;
-          renderBoard(tiles);
+          tiles = cur_tiles;
+          renderBoard(cur_tiles);
+        } else {
+          var diff = findDifference(cur_tiles, tiles);
+          tiles = cur_tiles;
+          populate("bench", createTiles(diff));
         }
     } // Can no longer swap
     else if (resp["state"] == "ENDGAME") {
@@ -327,6 +332,18 @@ function hideButtons() {
     $("#swap_button").hide();
     $("#bananagrams_button").hide();
     $("#continue_game_button").hide();
+}
+
+function findDifference(a, b) {
+  var ret = a.slice();
+  for (val of b) {
+    var index = ret.indexOf(val);
+    if (index > -1) {
+      ret.splice(index, 1);
+    }
+  }
+
+  return ret;
 }
 
 // --------------------------------------

@@ -7,11 +7,12 @@
   #board {
     display: grid;
     grid-template-columns: repeat(40, 40px);
-    grid-template-rows: repeat(20, 40px);
+    grid-template-rows: repeat(40, 40px);
     box-sizing: border-box;
     background-color: antiquewhite;
     width: 100%;
-    height: 100%; }
+    height: 100%;
+    overflow: scroll; }
 
     #bench {
       background-color: #f4d4aa;

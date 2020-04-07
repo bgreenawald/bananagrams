@@ -51,15 +51,21 @@ all_games: Dict[str, Game] = {}
 def return_index() -> str:
     return render_template("lobby.html")
 
-@app.route("/<id>")
+@app.route("/game/<int:id>")
 def return_game(id: str) -> str:
     return render_template("board.html", id=id)
 
+@app.route("/old")
+def return_index_old() -> str:
+    return render_template("index.html")
 
-@app.route("/test/<id>")
+@app.route("/old/<int:id>")
+def return_game_old(id: str) -> str:
+    return render_template("game.html", id=id)
+
+@app.route("/test/<int:id>")
 def return_game_test(id: str) -> str:
     return render_template("game2.html", id=id)
-
 
 @app.route("/api/get_names")
 def get_names() -> Response:

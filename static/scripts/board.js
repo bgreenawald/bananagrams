@@ -6,6 +6,28 @@ let originCell = null;
 
 const options = false;
 
+const isHashMap = (item) => {
+    return (!Array.isArray(item) && typeof(item) === 'object')
+}
+
+const saveToLocalStorage = (key, rawData) => {
+    let data = rawData;
+    if (isHashMap(data)) {
+        data = JSON.stringify(data);
+    }
+    localStorage.setItem(key, data)
+}
+
+const getUserLetters = () => {
+    const username = localStorage.getItem("player_id");
+    const allTiles = JSON.parse(localStorage.getItem("players"));
+    for (player in allTiles) {
+        if (player === username) {
+            return allTiles[username];
+        }
+    }
+}
+
 const renderBoard = (arr) => {
   const tilesArray = createTiles(arr);
   populateBoard(400);
@@ -129,6 +151,9 @@ var tiles = [];
 // Whether the current client has already joined the game
 var hasJoined = false;
 
+// Whether the board has rendered for the first time
+var hasRendered = false;
+
 // Warn user before leaving
 window.onbeforeunload = function () {
     return 'Are you sure you want to leave, this will clear your board?';
@@ -190,7 +215,10 @@ function render_game(resp) {
         $("#options").show();
         $("#peel_button").show();
         $("#swap_button").show();
-        renderBoard(tiles);
+        if (!hasRendered) {
+          hasRendered = true;
+          renderBoard(tiles);
+        }
     } // Can no longer swap
     else if (resp["state"] == "ENDGAME") {
         hideButtons();
@@ -226,6 +254,7 @@ function load_game() {
 function player_join() {
     load_game();
     player_id = document.getElementById("player_id").value;
+    localStorage.setItem("player_id", player_id);
     socket.emit("player_join", {
         "name": game_name,
         "player_id": player_id

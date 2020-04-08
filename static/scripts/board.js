@@ -129,19 +129,19 @@ const addTileListener = () => {
 }
 
 const cleanBench = () => {
-  var parent = document.querySelector("#bench");
+  var bench = document.querySelector("#bench");
 
   // Create a list of all empty children
-  var emptyChildren = [];
-  Array.prototype.forEach.call(parent.children, function(child, index){
-    if (child.children.length == 0) {
-      emptyChildren.push(child);
+  var emptyCells = [];
+  Array.prototype.forEach.call(bench.children, function(cell, index){
+    if (cell.children.length == 0) {
+      emptyCells.push(cell);
     }
   });
 
   // Remove each empty child from the bench
-  Array.prototype.forEach.call(emptyChildren, function(child, index){
-    parent.removeChild(child);
+  Array.prototype.forEach.call(emptyCells, function(cell, index){
+    bench.removeChild(cell);
   });
 
 }
@@ -225,9 +225,10 @@ function render_game(resp) {
         $("#peel_button").show();
         $("#swap_button").show();
 
-        var diff = findDifference(cur_tiles, tiles);
+        // Render only the new tiles
+        var newTiles = findDifference(cur_tiles, tiles);
         tiles = cur_tiles;
-        populate("bench", createTiles(diff));
+        populate("bench", createTiles(newTiles));
         addTileListener();
     } // Can no longer swap
     else if (resp["state"] == "ENDGAME") {

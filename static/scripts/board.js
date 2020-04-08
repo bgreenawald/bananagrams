@@ -123,12 +123,11 @@ const handleDragEnd = e => {
 }
 
 const addTileListener = () => {
-  document.querySelectorAll(".tile").forEach((tile) => {
+  document.querySelectorAll(".tile").forEach(tile => {
     tile.addEventListener("dragstart", handleDragStart, options);
   });
 }
 
-// Remove empty cells from the bench
 const cleanBench = () => {
   var parent = document.querySelector("#bench");
 

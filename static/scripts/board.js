@@ -346,6 +346,11 @@ function findDifference(a, b) {
   return ret;
 }
 
+// const findDifference = (newTiles, oldTiles) => {
+//     oldTiles.filter((oldTile, index) => {
+//         newTiles.contains(oldTile)
+//     } )
+// }
 // --------------------------------------
 // Keybindings
 

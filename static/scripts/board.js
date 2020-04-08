@@ -1,5 +1,4 @@
 
-let lettersArray = [];
 let grabbedTile = null;
 let targetCell = null;
 let originCell = null;
@@ -28,12 +27,6 @@ const getUserLetters = () => {
     }
 }
 
-const renderBoard = (arr) => {
-  const tilesArray = createTiles(arr);
-  populateBoard(400);
-  populate("bench", tilesArray);
-}
-
 const createTiles = (lettersArray) => {
   const tilesArray =  lettersArray.map((letter, index) => {
     return `<div class="cell"><span class="tile" data-tile-id="${index}" draggable="true">${letter}</span></div>`;
@@ -47,6 +40,16 @@ const populateBoard = (num) => {
   for (let i = 0; i < num; i++) {
     board.innerHTML += `<div class="cell"></div>`;
   }
+
+  // Attach the listeners to the grid cells
+  document.querySelectorAll(".cell").forEach((cell) => {
+    cell.addEventListener("dragenter", handleDragEnter, options);
+    cell.addEventListener("dragleave", handleDragLeave, options);
+    cell.addEventListener("dragover", handleDragOver, options);
+
+    cell.addEventListener("dragend", handleDragEnd, options);
+    cell.addEventListener("drop", handleDrop, options);
+  });
 };
 
 const fillCells = (parentId, childrenArrayOrCellNumber) => {
@@ -103,11 +106,13 @@ const handleDrop = e => {
   targetCell.classList.add("filled");
   console.log(`target cell: ${targetCell} grabbedTile: ${grabbedTile}`)
 
-  
   let id = e.dataTransfer.getData('text');
   let tileToAdd = document.querySelector(`.tile[data-tile-id="${id}"]`);
   e.target.appendChild(tileToAdd);
   tileToAdd.style.opacity = "";
+
+  // Clean out any empty bench slots
+  cleanBench();
 }
 
 const handleDragEnd = e => {
@@ -117,25 +122,33 @@ const handleDragEnd = e => {
    grabbedTile.style.opacity = 1;
 }
 
-
-const swapTileToNewCell = () => {
-  
+const addTileListener = () => {
+  document.querySelectorAll(".tile").forEach((tile) => {
+    tile.addEventListener("dragstart", handleDragStart, options);
+  });
 }
 
-document.querySelectorAll(".tile").forEach((tile) => {
-  tile.addEventListener("dragstart", handleDragStart, options);
-});
+// Remove empty cells from the bench
+const cleanBench = () => {
+  var parent = document.querySelector("#bench");
 
-document.querySelectorAll(".cell").forEach((cell) => {
-  cell.addEventListener("dragenter", handleDragEnter, options);
-  cell.addEventListener("dragleave", handleDragLeave, options);
-  cell.addEventListener("dragover", handleDragOver, options);
+  // Create a list of all empty children
+  var emptyChildren = [];
+  Array.prototype.forEach.call(parent.children, function(child, index){
+    if (child.children.length == 0) {
+      emptyChildren.push(child);
+    }
+  });
 
-  cell.addEventListener("dragend", handleDragEnd, options);
-  cell.addEventListener("drop", handleDrop, options);
-});
+  // Remove each empty child from the bench
+  Array.prototype.forEach.call(emptyChildren, function(child, index){
+    parent.removeChild(child);
+  });
 
-document.addEventListener("drop", handleDrop, options);
+}
+
+// Pre-populate the board
+populateBoard(400);
 
 /*
   Ben Code
@@ -150,9 +163,6 @@ var tiles = [];
 
 // Whether the current client has already joined the game
 var hasJoined = false;
-
-// Whether the board has rendered for the first time
-var hasRendered = false;
 
 // Warn user before leaving
 window.onbeforeunload = function () {
@@ -215,15 +225,11 @@ function render_game(resp) {
         $("#options").show();
         $("#peel_button").show();
         $("#swap_button").show();
-        if (!hasRendered) {
-          hasRendered = true;
-          tiles = cur_tiles;
-          renderBoard(cur_tiles);
-        } else {
-          var diff = findDifference(cur_tiles, tiles);
-          tiles = cur_tiles;
-          populate("bench", createTiles(diff));
-        }
+
+        var diff = findDifference(cur_tiles, tiles);
+        tiles = cur_tiles;
+        populate("bench", createTiles(diff));
+        addTileListener();
     } // Can no longer swap
     else if (resp["state"] == "ENDGAME") {
         hideButtons();

@@ -2,6 +2,7 @@
 let grabbedTile = null;
 let targetCell = null;
 let originCell = null;
+let numberOfTiles = 0;
 
 const options = false;
 
@@ -28,8 +29,10 @@ const getUserLetters = () => {
 }
 
 const createTiles = (lettersArray) => {
-  const tilesArray =  lettersArray.map((letter, index) => {
-    return `<div class="cell"><span class="tile" data-tile-id="${index}" draggable="true">${letter}</span></div>`;
+  let tilesArray = [];
+  Array.prototype.forEach.call(lettersArray, function(letter) {
+    tilesArray.push(`<div class="cell"><span class="tile" data-tile-id="${numberOfTiles}" draggable="true">${letter}</span></div>`);
+    numberOfTiles += 1;
   });
 
   return tilesArray;

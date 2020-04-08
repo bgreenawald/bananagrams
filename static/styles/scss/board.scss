@@ -1,8 +1,12 @@
-#parent {
+body {
+  font-family: arial;
+}
+
+#board-viewport {
   position: relative;
   height: 100%;
-  font-family: arial;
   width: 100%;
+  overflow: scroll;
 }
 
 #board {
@@ -13,7 +17,6 @@
   background-color: darken(antiquewhite, 13%);
   width: 100%;
   height: 100%;
-  overflow: scroll;
 
   .cell {
     border-radius: 2px;
@@ -32,8 +35,8 @@
   width: 40px;
   z-index: 200;
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 15vh;
+  left: 2vw;
 
   .cell {
     min-width: 27px;

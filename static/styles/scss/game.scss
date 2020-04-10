@@ -1,3 +1,7 @@
+$rows: 37;
+$columns: 20;
+$cell-dimension: 40px;
+
 body {
   font-family: arial;
 }
@@ -11,8 +15,8 @@ body {
 
 #board {
   display: grid;
-  grid-template-columns: repeat(40, 40px);
-  grid-template-rows: repeat(40, 40px);
+  grid-template-columns: repeat($columns, $cell-dimension);
+  grid-template-rows: repeat($rows, $cell-dimension);
   box-sizing: border-box;
   background-color: darken(antiquewhite, 13%);
   width: 100%;
@@ -39,8 +43,8 @@ body {
   left: 2vw;
 
   .cell {
-    min-width: 27px;
-    min-height: 27px;
+    min-width: $cell-dimension;
+    min-height: $cell-dimension;
     padding: 1px;
     margin: 1px;
   }

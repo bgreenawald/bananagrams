@@ -150,7 +150,7 @@ const cleanBench = () => {
 }
 
 // Pre-populate the board
-populateBoard(400);
+populateBoard(700);
 
 /*
   Ben Code

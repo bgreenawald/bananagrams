@@ -57,4 +57,6 @@ $gradient-color: $primary-yellow;
     background: radial-gradient(ellipse at center, rgba(lighten($gradient-color, 20%), 0.55) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
 }
 
-// testing
+.menu {
+  display: none;
+}

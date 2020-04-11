@@ -36,20 +36,20 @@
             <div id="options" style="display: none;">
                 <button class="btn btn-primary" id="start_game_button" type="submit" onclick="start_game()">Start</button>
                 <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
-                <button class="btn btn-primary" id="swap_button" type="submit" onclick="swap()">Swap</button>
                 <button class="btn btn-primary" id="bananagrams_button" type="submit"
                     onclick="bananagrams()">Bananagrams</button>
                 <button class="btn btn-primary" id="continue_game_button" type="submit"
                     onclick="continue_game()">Continue Game</button>
+                <button class="menu" onclick="swap()">Swap Tile</button>
             </div>
             <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()"
                 style="position: absolute; right: 10px;">Reset Game</button>
-
         </div>
         <div id="board-viewport">
             <div id="board"></div>
         </div>
         <div id="bench"></div>
+
         <script src="{{url_for('static', filename='scripts/board.js')}}"></script>
     </div>
 </body>

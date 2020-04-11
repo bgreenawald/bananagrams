@@ -4,6 +4,9 @@ let targetCell = null;
 let originCell = null;
 let numberOfTiles = 0;
 
+const menu = document.querySelector(".menu");
+let menuVisible = false;
+
 const options = false;
 
 const isHashMap = (item) => {
@@ -77,6 +80,17 @@ const populate = (parentid, childrenArray) => {
   })
 }
 
+const toggleMenu = command => {
+  menu.style.display = command === "show" ? "block" : "none";
+  menuVisible = !menuVisible;
+};
+
+const setPosition = ({ top, left }) => {
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+  toggleMenu('show');
+};
+
 const handleDragStart = (e) => {
   console.log(`${e.type}`);
   console.log('event', e)
@@ -125,9 +139,22 @@ const handleDragEnd = e => {
    grabbedTile.style.opacity = 1;
 }
 
+const handleDoubleClick = e => {
+  e.preventDefault();
+  menu.setAttribute("active-tile-id", tile.getAttribute("data-tile-id"))
+  // Set the position for the menu
+  const origin = {
+    left: e.pageX,
+    top: e.pageY
+  };
+  setPosition(origin);
+  return false;
+}
+
 const addTileListener = () => {
   document.querySelectorAll(".tile").forEach(tile => {
     tile.addEventListener("dragstart", handleDragStart, options);
+    tile.addEventListener("dblclick", handleDoubleClick);
   });
 }
 
@@ -148,6 +175,10 @@ const cleanBench = () => {
   });
 
 }
+
+window.addEventListener("click", e => {
+  if(menuVisible)toggleMenu("hide");
+});
 
 // Pre-populate the board
 populateBoard(400);
@@ -226,20 +257,18 @@ function render_game(resp) {
         $("#message").innerHTML = "<p>Game on! Build a valid scrabble board with your words.</p>"
         $("#options").show();
         $("#peel_button").show();
-        $("#swap_button").show();
 
         // Render only the new tiles
         var newTiles = findDifference(cur_tiles, tiles);
         tiles = cur_tiles;
         populate("bench", createTiles(newTiles));
         addTileListener();
-    } // Can no longer swap
+    } // Can no longer peel
     else if (resp["state"] == "ENDGAME") {
         hideButtons();
         $("#message").innerHTML = "<p>Almost done! Be the first to complete your board.</p>"
         $("#options").show();
         $("#bananagrams_button").show();
-        $("#swap_button").show();
     } // Game over
     else if (resp["state"] == "OVER") {
         hideButtons();
@@ -299,7 +328,10 @@ function peel() {
 
 // Perform a swap
 function swap() {
-    var letter = tiles.pop();
+    let active_tile_id = menu.getAttribute("active-tile-id")
+    let tileToRemove = document.querySelector(`.tile[data-tile-id="${active_tile_id}"]`);
+    let letter = tileToRemove.textContent;
+    tileToRemove.parentNode.removeChild(tileToRemove);
     socket.emit("swap", {
         "name": game_name,
         "letter": letter,
@@ -338,7 +370,6 @@ function hideButtons() {
     $("#start_game_button").hide();
     $("#split_button").hide();
     $("#peel_button").hide();
-    $("#swap_button").hide();
     $("#bananagrams_button").hide();
     $("#continue_game_button").hide();
 }
@@ -384,16 +415,6 @@ document.addEventListener("keyup", function (event) {
         event.preventDefault();
         // Trigger the button element with a click
         $("#peel_button").click();
-    }
-});
-
-// Swap
-document.addEventListener("keyup", function (event) {
-    if (event.keyCode === 83) {
-        // Cancel the default action, if needed
-        event.preventDefault();
-        // Trigger the button element with a click
-        $("#swap_button").click();
     }
 });
 

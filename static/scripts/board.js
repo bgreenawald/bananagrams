@@ -38,10 +38,13 @@ const createTiles = (lettersArray) => {
   return tilesArray;
 };
 
-const populateBoard = (num) => {
+const populateBoard = (rows, columns) => {
   let board = document.getElementById("board");
-  for (let i = 0; i < num; i++) {
-    board.innerHTML += `<div class="cell"></div>`;
+  let onerow = "";
+  for (let r=0; r < rows; r++) {
+    for (let c=0; c < columns; c++) {
+      board.innerHTML += `<div class="cell" data-row=${r} data-column=${c}></div>`;
+    }
   }
 
   // Attach the listeners to the grid cells
@@ -53,7 +56,19 @@ const populateBoard = (num) => {
     cell.addEventListener("dragend", handleDragEnd, options);
     cell.addEventListener("drop", handleDrop, options);
   });
+
+  centerBoard();
 };
+
+centerBoard = () => {
+  const boardViewport = document.getElementById("board-viewport");
+  const board = document.getElementById("board");
+  const scrollPositionX =  board.offsetLeft + (board.offsetWidth / 2);
+  const scrollPositionY = board.offsetTop + (board.offsetHeight / 3);
+  boardViewport.scrollLeft = scrollPositionX;
+  boardViewport.scrollTop = scrollPositionY;
+
+}
 
 const fillCells = (parentId, childrenArrayOrCellNumber) => {
   const parent = document.getElementById(parentId);
@@ -148,10 +163,6 @@ const cleanBench = () => {
   });
 
 }
-
-// Pre-populatethe board
-populateBoard(1000);
-
 /*
   Ben Code
 */
@@ -406,3 +417,8 @@ document.addEventListener("keyup", function (event) {
         $("#bananagrams_button").click();
     }
 });
+
+
+
+// Pre-populatethe board
+populateBoard(35, 40);

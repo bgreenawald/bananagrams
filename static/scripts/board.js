@@ -127,11 +127,10 @@ const handleClick = e => {
 }
 
 const handleDragStart = e => {
-  console.log(`${e.type}`);
-  console.log('event', e)
   e.target.style.opacity = 0.4;
   e.target.style.cursor = "grabbing";
   e.dataTransfer.dropEffect = "copy";
+  e.dataTransfer.effectAllowed = "move";
   e.dataTransfer.setData("text", e.target.dataset.tileId)
 };
 
@@ -156,12 +155,10 @@ const handleDrop = e => {
   targetCell = e.target;
   targetCell.classList.remove("over");
   targetCell.classList.add("filled");
-  console.log(`target cell: ${targetCell} grabbedTile: ${grabbedTile}`)
 
   let id = e.dataTransfer.getData('text');
   let tileToAdd = document.querySelector(`.tile[data-tile-id="${id}"]`);
   e.target.appendChild(tileToAdd);
-  tileToAdd.style.opacity = "";
 
   // Clean out any empty bench slots
   cleanBench();
@@ -171,7 +168,6 @@ const handleDragEnd = e => {
   console.log(`${e.type}`);
   const id = e.dataTransfer.getData('text')
   let grabbedTile = document.querySelector(`.tile[data-tile-id="${id}"]`)
-   grabbedTile.style.opacity = 1;
 }
 
 const handleDoubleClick = e => {
@@ -186,13 +182,28 @@ const handleDoubleClick = e => {
   return false;
 }
 
+const resetTileOpacity = e => {
+  e.target.style.opacity = "";
+}
+
+const resetModifiers = (className) => {
+  const elements = Array.from(document.querySelectorAll(`.${className}`));
+  elements.forEach(element => {
+    element.classList.remove("selected");
+    element.classList.opacity = "";
+  })
+}
+
 const addTileListener = () => {
   document.querySelectorAll(".tile").forEach(tile => {
     tile.addEventListener("dragstart", handleDragStart, options);
     tile.addEventListener("dblclick", handleDoubleClick);
     tile.addEventListener("click", handleClick, options);
+    tile.addEventListener("dragend", resetTileOpacity, options);
   });
 }
+
+document.addEventListener("drop", () => {resetModifiers('tile')}, options);
 
 const cleanBench = () => {
   var bench = document.querySelector("#bench");

@@ -1,16 +1,22 @@
-$rows: 37;
-$columns: 20;
+$rows: 25;
+$columns: 38;
 $cell-dimension: 40px;
 
-body {
-  font-family: arial;
-}
 
 #board-viewport {
   position: relative;
-  height: 100%;
+  height: 80vh;
   width: 100%;
   overflow: scroll;
+}
+
+.game-header {
+  height: 20vh;
+  box-sizing: border-box;
+  // p {
+  //   margin: 0;
+  // }
+  padding: 10px;
 }
 
 #board {

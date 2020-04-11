@@ -8,7 +8,9 @@
     <title>Bananagrams</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-
+    
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css') }}" />
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/styles.css') }}" />
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/game.css') }}" />
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/board.css') }}" /> -->
 
@@ -18,8 +20,8 @@
     integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 
 <body>
-    <div class="home-container" id="css3-background-texture">
-        <div class="home-content">
+    <div class="game-container" id="css3-background-texture">
+        <header class="game-header">
             <div>
                 <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
             </div>
@@ -45,7 +47,7 @@
             <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()"
                 style="position: absolute; right: 10px;">Reset Game</button>
 
-        </div>
+        </header>
         <div id="board-viewport">
             <div id="board"></div>
         </div>

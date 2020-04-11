@@ -41,9 +41,17 @@ const createTiles = (lettersArray) => {
   return tilesArray;
 };
 
+const createCells = (rows, columns) => {
+  let cellsToAdd = "";
+  for (let r=0; r < rows; r++) {
+    for (let c=0; c < columns; c++) {
+      cellsToAdd.innerHTML += `<div class="cell" data-row=${r} data-column=${c}></div>`;
+    }
+  }
+}
+
 const populateBoard = (rows, columns) => {
   let board = document.getElementById("board");
-  let onerow = "";
   for (let r=0; r < rows; r++) {
     for (let c=0; c < columns; c++) {
       board.innerHTML += `<div class="cell" data-row=${r} data-column=${c}></div>`;
@@ -439,7 +447,7 @@ document.addEventListener("keyup", function (event) {
 
 
 // Pre-populatethe board
-populateBoard(35, 40);
+populateBoard(35, 45);
 
 window.addEventListener("click", e => {
   if(menuVisible)toggleMenu("hide");

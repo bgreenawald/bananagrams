@@ -1,5 +1,5 @@
 $rows: 35;
-$columns: 40;
+$columns: 45;
 $cell-dimension: 40px;
 
 
@@ -34,10 +34,10 @@ $cell-dimension: 40px;
   background-color: darken(antiquewhite, 10%);
   border-radius: 20px;
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: row wrap;
   padding: 20px;
   align-items: center;
-  width: 40px;
+  // width: 40px;
   z-index: 200;
   position: absolute;
   top: 15vh;

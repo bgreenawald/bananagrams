@@ -139,20 +139,22 @@ const handleDragEnd = e => {
    grabbedTile.style.opacity = 1;
 }
 
+const handleDoubleClick = e => {
+  e.preventDefault();
+  menu.setAttribute("active-tile-id", tile.getAttribute("data-tile-id"))
+  // Set the position for the menu
+  const origin = {
+    left: e.pageX,
+    top: e.pageY
+  };
+  setPosition(origin);
+  return false;
+}
+
 const addTileListener = () => {
   document.querySelectorAll(".tile").forEach(tile => {
     tile.addEventListener("dragstart", handleDragStart, options);
-    tile.addEventListener("dblclick", e => {
-      e.preventDefault();
-      menu.setAttribute("active-tile-id", tile.getAttribute("data-tile-id"))
-      // Set the position for the menu
-      const origin = {
-        left: e.pageX,
-        top: e.pageY
-      };
-      setPosition(origin);
-      return false;
-    });
+    tile.addEventListener("dblclick", handleDoubleClick);
   });
 }
 

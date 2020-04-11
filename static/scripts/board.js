@@ -114,7 +114,19 @@ const setPosition = ({ top, left }) => {
   toggleMenu('show');
 };
 
-const handleDragStart = (e) => {
+/********************* 
+ * 
+ *  event handlers   
+ *                  
+ *********************/
+
+const handleClick = e => {
+  e.preventDefault();
+  let classes = e.target.classList;
+  classes.contains('selected') ? classes.remove('selected') : classes.add('selected');
+}
+
+const handleDragStart = e => {
   console.log(`${e.type}`);
   console.log('event', e)
   e.target.style.opacity = 0.4;
@@ -123,18 +135,18 @@ const handleDragStart = (e) => {
   e.dataTransfer.setData("text", e.target.dataset.tileId)
 };
 
-let handleDragOver = (e) => {
+let handleDragOver = e => {
   if (e.preventDefault) e.preventDefault();
   e.dataTransfer.dropEffect = "move";
   return false;
 };
 
-const handleDragEnter = (e) => {
+const handleDragEnter = e => {
   e.preventDefault();
   e.target.classList.add("over");
 };
 
-const handleDragLeave = (e) => {
+const handleDragLeave = e => {
   e.preventDefault();
   e.target.classList.remove("over");
 };
@@ -178,6 +190,7 @@ const addTileListener = () => {
   document.querySelectorAll(".tile").forEach(tile => {
     tile.addEventListener("dragstart", handleDragStart, options);
     tile.addEventListener("dblclick", handleDoubleClick);
+    tile.addEventListener("click", handleClick, options);
   });
 }
 
@@ -447,7 +460,7 @@ document.addEventListener("keyup", function (event) {
 
 
 // Pre-populatethe board
-populateBoard(35, 45);
+populateBoard(15, 15);
 
 window.addEventListener("click", e => {
   if(menuVisible)toggleMenu("hide");

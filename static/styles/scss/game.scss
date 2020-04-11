@@ -1,5 +1,5 @@
-$rows: 35;
-$columns: 45;
+$rows: 15;
+$columns: 15;
 $cell-dimension: 40px;
 
 
@@ -73,6 +73,10 @@ $cell-dimension: 40px;
   border: 3px solid darken(burlywood, 30%);
   margin: 1px;
   z-index: 999;
+}
+
+.tile.selected {
+  opacity: .5;
 }
 
 .cell.over {

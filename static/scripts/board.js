@@ -137,7 +137,7 @@ const handleClick = e => {
 
 const handleDragStart = e => {
   e.target.style.opacity = .4;
-  e.target.classList.remove('.selected');
+  e.target.classList.remove('selected');
   let selectedTiles = Array.from(document.querySelectorAll('.selected'));
   // casing of tileId is set by browser parsing
   tilesToDrag = selectedTiles.map(tile => {

@@ -289,6 +289,7 @@ var href_parts = window.location.href.split("/");
 var game_name = href_parts[href_parts.length - 1];
 var player_id = null;
 var tiles = [];
+var players = null;
 
 // Whether the current client has already joined the game
 var hasJoined = false;
@@ -311,16 +312,24 @@ socket.on("connect", function () {
 // --------------------------------------
 // Render game action
 socket.on("render_game", function (resp) {
-    // Do not render the game if the client has not joined the game
-    if (!hasJoined) {
-        return;
-    }
+
     if (!resp.hasOwnProperty("status_code")) {
         showError("Did not recieve a response from the server.")
     } else {
         if (resp["status_code"] == 200) {
             game_state = JSON.parse(resp.payload);
-            render_game(game_state);
+            // Do not render the game if the client has not joined the game
+            players = game_state["players"];
+            let player_list = document.getElementById("players");
+            player_list.innerHTML = ""
+            Object.entries(players).forEach(player => {
+              player_list.innerHTML += "<li>" + player[0] + "</li>";
+            })
+            if (!hasJoined) {
+              return;
+            } else {
+              render_game(game_state);
+            }
         } else {
             if (!resp.hasOwnProperty("message")) {
                 showError("An error occurred, but no message was given.")
@@ -453,6 +462,11 @@ function continue_game() {
 
 // Reset the game
 function reset() {
+    document.querySelectorAll(`.tile`).forEach(tile => {
+      tile.parentNode.removeChild(tile);
+    });
+    cleanBench();
+    tiles = [];
     socket.emit("reset", {
         "name": game_name
     });

@@ -52,7 +52,7 @@ const getUserLetters = () => {
 const createTiles = (lettersArray) => {
   let tilesArray = [];
   Array.prototype.forEach.call(lettersArray, function(letter, index) {
-    tilesArray.push(`<div class="cell"><span class="tile" data-tile-id="${numberOfTiles}" data-row="0" data-column="${index}" draggable="true">${letter}</span></div>`);
+    tilesArray.push(`<div class="cell" data-row="0" data-column="${index}"><span class="tile" data-tile-id="${numberOfTiles}" draggable="true">${letter}</span></div>`);
     numberOfTiles += 1;
   });
 
@@ -136,14 +136,15 @@ const handleClick = e => {
 }
 
 const handleDragStart = e => {
-  e.target.classList.add('selected');
+  e.target.style.opacity = .4;
+  e.target.classList.remove('.selected');
   let selectedTiles = Array.from(document.querySelectorAll('.selected'));
   // casing of tileId is set by browser parsing
   tilesToDrag = selectedTiles.map(tile => {
     let tileData = {
       id: tile.dataset.tileId,
-      initialRow: tile.parentElement.dataset.row,
-      initialColumn: tile.parentElement.dataset.column
+      row: tile.parentElement.dataset.row,
+      column: tile.parentElement.dataset.column
     }
     return tileData
   });
@@ -171,32 +172,27 @@ const handleDragLeave = e => {
 
 const handleDrop = e => {
   e.preventDefault();
-  let primaryDestination = e.target;
-  primaryDestination.classList.remove("over");
-  primaryDestination.classList.add("filled");
+  let primaryDestinationCell = e.target;
+  primaryDestinationCell.classList.remove("over");
+  primaryDestinationCell.classList.add("filled");
 
   let id = e.dataTransfer.getData('text');
   let primaryTile = document.querySelector(`.tile[data-tile-id="${id}"]`);
-  // const primaryInitialCoords = [primaryTile.parentElement.dataset.row, primaryTile.parentElement.dataset.column];
+  primaryTile.dataset.row = primaryTile.parentElement.dataset.row;
+  primaryTile.dataset.column = primaryTile.parentElement.dataset.column;
+  
   e.target.appendChild(primaryTile);
-  primaryTile.dataset.destinationRow = primaryDestination.dataset.row;
-  primaryTile.dataset.destinationColumn = primaryDestination.dataset.column;
+  primaryTile.dataset.destinationRow = primaryDestinationCell.dataset.row;
+  primaryTile.dataset.destinationColumn = primaryDestinationCell.dataset.column;
 
-  // move the rest of the tiles:
-  // calculate the new coords for the rest of the tiles. 
-    // if primary tile's origin is not null,
-            // calculate distance difference from primary tile's origin vs. target cell 
+ 
       const rowChange = Number(primaryTile.dataset.destinationRow) - Number(primaryTile.dataset.row);
       const columnChange = Number(primaryTile.dataset.destinationColumn) - Number(primaryTile.dataset.column);
         // calculate new coors for secondary cells. (origins + dist = targets)
         tilesToDrag.forEach(tileData => {
           secondaryTile = document.querySelector(`.tile[data-tile-id="${tileData.id}"]`);
-
-          // secondaryTile.dataset.relativeRow = Number(primaryTile.dataset.row) - Number(secondaryTile.dataset.row); 
-          // secondaryTile.dataset.relativeColumn = Number(primaryTile.dataset.column) - Number(secondaryTile.dataset.column);
-
-          // secondaryTile.dataset.destinationRow = Number(secondaryTile.dataset.relativeRow) + Number(primaryTile.dataset.destinationRow);
-          // secondaryTile.dataset.destinationColumn =  Number(secondaryTile.dataset.relativeColumn) + Number(primaryTile.dataset.destinationColumn);
+          secondaryTile.dataset.row = secondaryTile.parentElement.dataset.row;
+          secondaryTile.dataset.column = secondaryTile.parentElement.dataset.column;
 
           secondaryTile.dataset.destinationRow = rowChange + Number(secondaryTile.dataset.row);
           secondaryTile.dataset.destinationColumn = columnChange + Number(secondaryTile.dataset.column);
@@ -204,22 +200,13 @@ const handleDrop = e => {
           let secondaryDestination = document.querySelector( `#board .cell[data-row="${secondaryTile.dataset.destinationRow}"][data-column="${secondaryTile.dataset.destinationColumn}"]`);
           secondaryDestination.appendChild(secondaryTile);
         })
-    // else primary tile's origin coords are null 
-      // 
-    // calculate distance difference from primary tile's origin vs. target cell
-  // get the new destination cells with the coords
-  // get the tiles to move from the global ids array
-  // append the tiles to the cells
-
-  // Clean out any empty bench slots
+  
   tilesToDrag = [];
   cleanBench();
 }
 
 const handleDragEnd = e => {
-  console.log(`${e.type}`);
-  const id = e.dataTransfer.getData('text')
-  let grabbedTile = document.querySelector(`.tile[data-tile-id="${id}"]`)
+  resetModifiers();
 }
 
 const handleDoubleClick = e => {
@@ -232,10 +219,6 @@ const handleDoubleClick = e => {
   };
   setPosition(origin);
   return false;
-}
-
-const resetTileOpacity = e => {
-  e.target.style.opacity = "";
 }
 
 const resetModifiers = (className) => {
@@ -251,7 +234,7 @@ const addTileListener = () => {
     tile.addEventListener("dragstart", handleDragStart, options);
     tile.addEventListener("dblclick", handleDoubleClick);
     tile.addEventListener("click", handleClick, options);
-    tile.addEventListener("dragend", resetTileOpacity, options);
+    tile.addEventListener("dragend", handleDragEnd, options);
   });
 }
 

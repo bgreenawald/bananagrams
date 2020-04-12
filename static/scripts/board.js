@@ -115,6 +115,15 @@ const populate = (parentid, childrenArray) => {
   })
 }
 
+const selectAllTiles = () => {
+  var board = document.querySelector("#board");
+  Array.from(document.querySelectorAll('.tile')).forEach(tile => {
+    if (board.contains(tile)) {
+      tile.classList.add('selected')
+    }
+  })
+}
+
 
 
 /********************* 
@@ -344,6 +353,7 @@ function render_game(resp) {
         $("#message").innerHTML = "<p>Game on! Build a valid scrabble board with your words.</p>"
         $("#options").show();
         $("#peel_button").show();
+        $("#select_button").show();
 
         // Render only the new tiles
         var newTiles = findDifference(cur_tiles, tiles);
@@ -356,6 +366,7 @@ function render_game(resp) {
         $("#message").innerHTML = "<p>Almost done! Be the first to complete your board.</p>"
         $("#options").show();
         $("#bananagrams_button").show();
+        $("#select_button").show();
     } // Game over
     else if (resp["state"] == "OVER") {
         hideButtons();
@@ -457,6 +468,7 @@ function hideButtons() {
     $("#start_game_button").hide();
     $("#split_button").hide();
     $("#peel_button").hide();
+    $("#select_button").hide();
     $("#bananagrams_button").hide();
     $("#continue_game_button").hide();
 }

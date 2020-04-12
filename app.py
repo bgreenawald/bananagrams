@@ -127,6 +127,9 @@ def load_game(json: Dict[Any, Any]):
     if game_name not in all_games:
         cur_game = Game(game_name)
         all_games[game_name] = cur_game
+    else:
+        game = all_games[game_name]
+        emit_game(game_name, game, "Game loaded.")
 
 
 @socketio.on("player_join")

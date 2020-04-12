@@ -307,6 +307,7 @@ socket.on("connect", function () {
     socket.emit("join", {
         "name": game_name
     });
+    load_game()
 });
 
 // --------------------------------------
@@ -402,7 +403,6 @@ function load_game() {
 
 // Join the game
 function player_join() {
-    load_game();
     player_id = document.getElementById("player_id").value;
     localStorage.setItem("player_id", player_id);
     socket.emit("player_join", {

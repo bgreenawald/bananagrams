@@ -3,14 +3,14 @@ html, body {
     padding: 0;
     margin: 0;
     width: 100%;
-}
-
-html {
     height: 100%;
 }
 
 body {
     min-height: 100%;
+    background: url('../../chalkboard-background.jpg');
+    background-size: cover;
+    color: lighten(antiquewhite, 15%);
 }
 
 @mixin flexbox() {
@@ -40,20 +40,38 @@ body {
 }
 
 .flex {
-    @include flexbox()
+    @include flexbox();
 }
 
-// ********** FONTS ********** //
-@import url('https://fonts.googleapis.com/css?family=Luckiest+Guy|Noto+Sans|Sigmar+One&display=swap');
+// ********** FONT IMPORTS ********** //
+@import url('https://fonts.googleapis.com/css?family=|Noto+Sans|Sigmar+One&display=swap');
 
-// h1 {
-//     font-family: 'Luckiest Guy', cursive;
-//     font-size: 3em;
-//     letter-spacing: .15em;
-//     -webkit-text-stroke: 0.5px black;
-//     text-shadow: 1px 1px black;
-//     text-align: center;
-// }
+// Eraser font
+@font-face {
+    font-family: 'eraser';
+    src: url("../../fonts/EraserRegular-DO1D.ttf");
+    font-style: 'normal';        
+    font-weight: 'normal';
+}
+
+@font-face {
+    font-family: 'eraser';
+    src: url("../../fonts/EraserDust-p70d.ttf");
+    font-style: 'italic';        
+    font-weight: 'normal';
+}
+
+
+// ********** PAGE FONTS ********** //
+h1 {
+    font-family: 'eraser', arial, sans-serif;
+    font-size: 3em;
+    letter-spacing: .15em;
+    // -webkit-text-stroke: 0.5px black;
+    // text-shadow: 1px 1px black;
+    text-align: center;
+    font-weight: normal;
+}
 
 // p {
 //     font-family: 'Luckiest Guy', cursive;

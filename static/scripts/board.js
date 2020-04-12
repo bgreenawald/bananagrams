@@ -9,9 +9,12 @@ let menuVisible = false;
 
 const options = false;
 
+let rows = 15;
+let columns = 15;
+
 
 // global items for multi drag and drop
-
+ 
 let tilesToDrag = [];
 
 
@@ -59,16 +62,7 @@ const createTiles = (lettersArray) => {
   return tilesArray;
 };
 
-const createCells = (rows, columns) => {
-  let cellsToAdd = "";
-  for (let r=0; r < rows; r++) {
-    for (let c=0; c < columns; c++) {
-      cellsToAdd.innerHTML += `<div class="cell" data-row=${r} data-column=${c}></div>`;
-    }
-  }
-}
-
-const populateBoard = (rows, columns) => {
+const populateBoard = () => {
   let board = document.getElementById("board");
   for (let r=0; r < rows; r++) {
     for (let c=0; c < columns; c++) {
@@ -196,7 +190,7 @@ const handleDrop = e => {
 
           secondaryTile.dataset.destinationRow = rowChange + Number(secondaryTile.dataset.row);
           secondaryTile.dataset.destinationColumn = columnChange + Number(secondaryTile.dataset.column);
-          
+
           let secondaryDestination = document.querySelector( `#board .cell[data-row="${secondaryTile.dataset.destinationRow}"][data-column="${secondaryTile.dataset.destinationColumn}"]`);
           secondaryDestination.appendChild(secondaryTile);
         })
@@ -524,7 +518,7 @@ document.addEventListener("keyup", function (event) {
 
 
 // Pre-populatethe board
-populateBoard(15, 15);
+populateBoard();
 
 window.addEventListener("click", e => {
   if(menuVisible)toggleMenu("hide");

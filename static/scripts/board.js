@@ -9,6 +9,18 @@ let menuVisible = false;
 
 const options = false;
 
+
+// global items for multi drag and drop
+
+let tilesToDrag = [];
+
+
+/********************* 
+ * 
+ *  Helper functions   
+ *                  
+ *********************/
+
 const isHashMap = (item) => {
     return (!Array.isArray(item) && typeof(item) === 'object')
 }
@@ -20,6 +32,12 @@ const saveToLocalStorage = (key, rawData) => {
     }
     localStorage.setItem(key, data)
 }
+
+/********************* 
+ * 
+ *  Render functions   
+ *                  
+ *********************/
 
 const getUserLetters = () => {
     const username = localStorage.getItem("player_id");
@@ -33,8 +51,8 @@ const getUserLetters = () => {
 
 const createTiles = (lettersArray) => {
   let tilesArray = [];
-  Array.prototype.forEach.call(lettersArray, function(letter) {
-    tilesArray.push(`<div class="cell"><span class="tile" data-tile-id="${numberOfTiles}" draggable="true">${letter}</span></div>`);
+  Array.prototype.forEach.call(lettersArray, function(letter, index) {
+    tilesArray.push(`<div class="cell"><span class="tile" data-tile-id="${numberOfTiles}" data-row="0" data-column="${index}" draggable="true">${letter}</span></div>`);
     numberOfTiles += 1;
   });
 
@@ -103,16 +121,7 @@ const populate = (parentid, childrenArray) => {
   })
 }
 
-const toggleMenu = command => {
-  menu.style.display = command === "show" ? "block" : "none";
-  menuVisible = !menuVisible;
-};
 
-const setPosition = ({ top, left }) => {
-  menu.style.left = `${left}px`;
-  menu.style.top = `${top}px`;
-  toggleMenu('show');
-};
 
 /********************* 
  * 
@@ -127,11 +136,21 @@ const handleClick = e => {
 }
 
 const handleDragStart = e => {
-  e.target.style.opacity = 0.4;
+  e.target.classList.add('selected');
+  let selectedTiles = Array.from(document.querySelectorAll('.selected'));
+  // casing of tileId is set by browser parsing
+  tilesToDrag = selectedTiles.map(tile => {
+    let tileData = {
+      id: tile.dataset.tileId,
+      initialRow: tile.parentElement.dataset.row,
+      initialColumn: tile.parentElement.dataset.column
+    }
+    return tileData
+  });
   e.target.style.cursor = "grabbing";
   e.dataTransfer.dropEffect = "copy";
   e.dataTransfer.effectAllowed = "move";
-  e.dataTransfer.setData("text", e.target.dataset.tileId)
+  e.dataTransfer.setData("text", e.target.dataset.tileId);
 };
 
 let handleDragOver = e => {
@@ -152,15 +171,48 @@ const handleDragLeave = e => {
 
 const handleDrop = e => {
   e.preventDefault();
-  targetCell = e.target;
-  targetCell.classList.remove("over");
-  targetCell.classList.add("filled");
+  let primaryDestination = e.target;
+  primaryDestination.classList.remove("over");
+  primaryDestination.classList.add("filled");
 
   let id = e.dataTransfer.getData('text');
-  let tileToAdd = document.querySelector(`.tile[data-tile-id="${id}"]`);
-  e.target.appendChild(tileToAdd);
+  let primaryTile = document.querySelector(`.tile[data-tile-id="${id}"]`);
+  // const primaryInitialCoords = [primaryTile.parentElement.dataset.row, primaryTile.parentElement.dataset.column];
+  e.target.appendChild(primaryTile);
+  primaryTile.dataset.destinationRow = primaryDestination.dataset.row;
+  primaryTile.dataset.destinationColumn = primaryDestination.dataset.column;
+
+  // move the rest of the tiles:
+  // calculate the new coords for the rest of the tiles. 
+    // if primary tile's origin is not null,
+            // calculate distance difference from primary tile's origin vs. target cell 
+      const rowChange = Number(primaryTile.dataset.destinationRow) - Number(primaryTile.dataset.row);
+      const columnChange = Number(primaryTile.dataset.destinationColumn) - Number(primaryTile.dataset.column);
+        // calculate new coors for secondary cells. (origins + dist = targets)
+        tilesToDrag.forEach(tileData => {
+          secondaryTile = document.querySelector(`.tile[data-tile-id="${tileData.id}"]`);
+
+          // secondaryTile.dataset.relativeRow = Number(primaryTile.dataset.row) - Number(secondaryTile.dataset.row); 
+          // secondaryTile.dataset.relativeColumn = Number(primaryTile.dataset.column) - Number(secondaryTile.dataset.column);
+
+          // secondaryTile.dataset.destinationRow = Number(secondaryTile.dataset.relativeRow) + Number(primaryTile.dataset.destinationRow);
+          // secondaryTile.dataset.destinationColumn =  Number(secondaryTile.dataset.relativeColumn) + Number(primaryTile.dataset.destinationColumn);
+
+          secondaryTile.dataset.destinationRow = rowChange + Number(secondaryTile.dataset.row);
+          secondaryTile.dataset.destinationColumn = columnChange + Number(secondaryTile.dataset.column);
+          
+          let secondaryDestination = document.querySelector( `#board .cell[data-row="${secondaryTile.dataset.destinationRow}"][data-column="${secondaryTile.dataset.destinationColumn}"]`);
+          secondaryDestination.appendChild(secondaryTile);
+        })
+    // else primary tile's origin coords are null 
+      // 
+    // calculate distance difference from primary tile's origin vs. target cell
+  // get the new destination cells with the coords
+  // get the tiles to move from the global ids array
+  // append the tiles to the cells
 
   // Clean out any empty bench slots
+  tilesToDrag = [];
   cleanBench();
 }
 
@@ -221,7 +273,24 @@ const cleanBench = () => {
     bench.removeChild(cell);
   });
 
+  // recalculate row and columns of bench
+  Array.from(bench.children).forEach((benchCell, index) => {
+    benchCell.dataset.column = index;
+  });
+
 }
+
+const toggleMenu = command => {
+  menu.style.display = command === "show" ? "block" : "none";
+  menuVisible = !menuVisible;
+};
+
+const setPosition = ({ top, left }) => {
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+  toggleMenu('show');
+};
+
 
 /*
   Ben Code

@@ -12,6 +12,7 @@ flask_socketio = "^4.2.1"
 apscheduler = "^3.6.3"
 flask_cors = "^3.0.8"
 Flask-Scss = "^0.5"
+eventlet = "^0.25.2"
 
 
 [tool.poetry.dev-dependencies]

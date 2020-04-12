@@ -15,16 +15,16 @@ from flask_socketio import emit, join_room, SocketIO
 from game import Game, GameException
 
 # Initialize the application
-app = Flask(__name__)
-app.debug = True
-app.config["SECRET_KEY"] = "secret!"
-socketio = SocketIO(app)
+application = Flask(__name__)
+application.debug = True
+application.config["SECRET_KEY"] = "secret!"
+app = SocketIO(application)
 
 # Add Sass
-Scss(app, static_dir="static/styles/css", asset_dir="static/styles/scss")
+Scss(application, static_dir="static/styles/css", asset_dir="static/styles/scss")
 
 # Initialize CORS
-CORS(app)
+CORS(application)
 
 # Setup logging
 if not os.path.isdir("logs"):
@@ -47,17 +47,17 @@ all_games: Dict[str, Game] = {}
 # ---------------------------------------
 
 
-@app.route("/")
+@application.route("/")
 def return_index() -> str:
     return render_template("index.html")
 
 
-@app.route("/game/<int:id>")
+@application.route("/game/<int:id>")
 def return_game(id: str) -> str:
     return render_template("game.html", id=id)
 
 
-@app.route("/api/get_names")
+@application.route("/api/get_names")
 def get_names() -> Response:
     ids = [x for x in all_games]
     return json.jsonify({"ids": ids})
@@ -68,7 +68,7 @@ def get_names() -> Response:
 # ---------------------------------------
 
 
-@socketio.on("join")
+@app.on("join")
 def on_join(data: Dict[str, Any]):
     """Joins the connection to the provided room
     Args:
@@ -79,14 +79,14 @@ def on_join(data: Dict[str, Any]):
     logger.info(f"{request.sid} has entered the room {room_name}")
 
 
-@socketio.on("connect")
+@app.on("connect")
 def on_connect():
     """Called on client connect.
     """
     logger.info(f"{request.sid} has connected.")
 
 
-@socketio.on("disconnect")
+@app.on("disconnect")
 def on_disconnect():
     """Called on client disconnect.
     """
@@ -114,7 +114,7 @@ def emit_game(game_name: str, game: Game, msg: str):
     )
 
 
-@socketio.on("load_game")
+@app.on("load_game")
 def load_game(json: Dict[Any, Any]):
     """Loads the current game game, or creates on if none exists.
     Args:
@@ -129,7 +129,7 @@ def load_game(json: Dict[Any, Any]):
         all_games[game_name] = cur_game
 
 
-@socketio.on("player_join")
+@app.on("player_join")
 def player_join(json: Dict[Any, Any]):
     """Adds a player to the game.
 
@@ -170,7 +170,7 @@ def player_join(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@socketio.on("start_game")
+@app.on("start_game")
 def start_game(json: Dict[Any, Any]):
     """Starts the game.
 
@@ -199,7 +199,7 @@ def start_game(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@socketio.on("peel")
+@app.on("peel")
 def peel(json: Dict[Any, Any]):
     """Gives every player a new tile.
 
@@ -228,7 +228,7 @@ def peel(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@socketio.on("swap")
+@app.on("swap")
 def swap(json: Dict[Any, Any]):
     """
     Swaps a letter for a given player.
@@ -266,7 +266,7 @@ def swap(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@socketio.on("bananagrams")
+@app.on("bananagrams")
 def bananagrams(json: Dict[Any, Any]):
     """
     When someone gets bananagrams.
@@ -296,7 +296,7 @@ def bananagrams(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@socketio.on("continue_game")
+@app.on("continue_game")
 def continue_game(json: Dict[Any, Any]):
     """
     Continues the game on false alarm banagrams.
@@ -326,7 +326,7 @@ def continue_game(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@socketio.on("reset")
+@app.on("reset")
 def reset(json: Dict[Any, Any]):
     """Resets the given game.
 
@@ -371,4 +371,4 @@ scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)
+    app.run(application, debug=True)

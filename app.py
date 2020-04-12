@@ -1,12 +1,9 @@
-import atexit
-import datetime
 import logging
 import os
 import sys
 from typing import Any, Dict
 
 import simplejson
-from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, json, render_template, request, Response
 from flask_cors import CORS
 from flask_scss import Scss
@@ -350,25 +347,6 @@ def reset(json: Dict[Any, Any]):
     game.reset()
     emit_game(game_name, game, "Game reset.")
 
-
-# ---------------------------------------
-# Other functions
-# ---------------------------------------
-
-# Schedule cleanup
-def _delete_old_games():
-    for game in all_games:
-        age = datetime.datetime.now() - all_games[game].date_created
-        if age.total_seconds() > 86400:
-            del all_games[game]
-
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=_delete_old_games, trigger="interval", seconds=3600)
-scheduler.start()
-
-# Shutdown your cron thread if the web process is stopped
-atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == "__main__":
     app.run(application, debug=True)

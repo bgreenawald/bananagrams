@@ -1,10 +1,11 @@
 // Color scheme: https://coolors.co/ffff99-91bfff-ffd754-1034a6-0057f9
+@import "./normalize.scss";
 
 // ********** INDEX ********** //
 
-.game-container {
+.game-container, .lobby {
     height: 100vh;
-    color: white;
+    color: $off-white;
     width: 100%;
     height: 100%;
     margin: 0 auto;
@@ -12,9 +13,11 @@
 
     position: relative;
     @include flexbox();
+    align-items: center;
+    justify-content: center;
 }
 
-.game-header {
+.lobby {
     flex-flow: column wrap;
     width: 60%;
     z-index: 100;
@@ -28,11 +31,57 @@
 //     box-shadow: 0px 3px 10px darken(black, 10%);
 // }
 
-.landing {
+.landing, .lobby-content {
     @include flexbox();
     flex-flow: column nowrap;
     align-items: center;
     justify-content: center;
     height: 100%;
     padding: 3vw;
+    max-width: 700px;
 }
+
+input {
+    margin: 5px;
+    padding: 20px 0px;
+    background-color: transparent;
+    border: 1px solid $off-white;
+    color: $off-white;
+    font-family: 'Gaegu';
+    border-radius: 10px;
+    font-size: 46px;
+    width: 40%;
+    text-align: center;
+}
+
+button {
+    padding: 10px 30px;
+    margin-top: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: block;
+    font-family: 'Gaegu';
+    font-size: 26px;
+
+
+    &.primary {
+      background-color: $primary-yellow;
+      color: $off-black;
+      transition: background-color 0.2s cubic-bezier(0.77, 0.2, 0.05, 1);
+  
+      &:hover {
+        background-color: lighten($primary-yellow, 10%);
+      }
+    }
+  
+    &.secondary {
+      background-color: transparent;
+      color: white;
+      transition: all 0.2s cubic-bezier(0.77, 0.2, 0.05, 1);
+  
+      &:hover {
+        background-color: white;
+        color: $off-black;
+      }
+    }
+  }

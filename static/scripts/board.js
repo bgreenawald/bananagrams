@@ -9,8 +9,8 @@ let menuVisible = false;
 
 const options = false;
 
-let rows = 15;
-let columns = 15;
+let rows = 35;
+let columns = 35;
 
 
 // global items for multi drag and drop
@@ -349,6 +349,7 @@ function render_game(resp) {
         $("#start_game_button").show();
     } // The main gamplay state
     else if (resp["state"] == "ACTIVE") {
+        $(".lobby").hide();
         hideButtons();
         $("#message").innerHTML = "<p>Game on! Build a valid scrabble board with your words.</p>"
         $("#options").show();

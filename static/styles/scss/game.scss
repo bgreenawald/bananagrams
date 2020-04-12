@@ -1,5 +1,6 @@
-$rows: 15;
-$columns: 15;
+@import './normalize.scss';
+$rows: 35;
+$columns: 35;
 $cell-dimension: 40px;
 
 
@@ -10,7 +11,7 @@ $cell-dimension: 40px;
   overflow: scroll;
 }
 
-.game-header {
+.lobby {
   height: 20vh;
   box-sizing: border-box;
   padding: 10px;
@@ -21,17 +22,18 @@ $cell-dimension: 40px;
   grid-template-columns: repeat($columns, $cell-dimension);
   grid-template-rows: repeat($rows, $cell-dimension);
   box-sizing: border-box;
-  background-color: darken(antiquewhite, 13%);
+  // background-color: darken(antiquewhite, 13%);
 
   .cell {
     border-radius: 2px;
-    background-color: antiquewhite;
-    border: 1px solid rgba(darken(antiquewhite, 20%), 0.5);
+    // background-color: antiquewhite;
+
+    border: 1px solid rgba($off-white, 0.5);
   }
 }
 
 #bench {
-  background-color: darken(antiquewhite, 10%);
+  // background-color: darken(antiquewhite, 10%);
   border-radius: 20px;
   display: flex;
   flex-flow: row wrap;
@@ -39,9 +41,9 @@ $cell-dimension: 40px;
   align-items: center;
   // width: 40px;
   z-index: 200;
-  position: absolute;
-  top: 15vh;
-  left: 2vw;
+  // position: absolute;
+  // top: 15vh;
+  // left: 2vw;
 
   .cell {
     min-width: $cell-dimension;
@@ -60,17 +62,16 @@ $cell-dimension: 40px;
 }
 
 .tile {
-  background-color: darken(burlywood, 7%);
+  background-color: transparent;
   z-index: 1;
-  color: white;
+  color: $off-white;
   cursor: pointer;
-  background-color: burlywood;
   border-radius: 10px;
   width: 20px;
   height: 20px;
   padding: 5px;
   text-align: center;
-  border: 3px solid darken(burlywood, 30%);
+  border: 3px solid $off-white;
   margin: 1px;
   z-index: 999;
 }
@@ -85,4 +86,39 @@ $cell-dimension: 40px;
 }
 .menu {
   display: none;
+}
+
+
+// game info
+.lobby {
+  position: absolute;
+  top: 0; 
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: url('../../chalkboard-background.jpg');
+  background-size: cover;
+
+  label {
+    font-family: 'Gaegu';
+  }
+  input {
+    font-size: 20px;
+  }
+  #join_game {
+    @include flexbox();
+    flex-flow: column nowrap;
+    // align-items: flex-start;
+    // justify-content: center;
+    // text-align: left;
+  }
+
+}
+
+// lobby wait
+#options {
+  @include flexbox();
+  justify-content: center;
+  align-items: center;
+  flex-flow: column nowrap;
 }

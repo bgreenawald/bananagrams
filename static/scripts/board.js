@@ -9,6 +9,21 @@ let menuVisible = false;
 
 const options = false;
 
+let rows = 15;
+let columns = 15;
+
+
+// global items for multi drag and drop
+ 
+let tilesToDrag = [];
+
+
+/********************* 
+ * 
+ *  Helper functions   
+ *                  
+ *********************/
+
 const isHashMap = (item) => {
     return (!Array.isArray(item) && typeof(item) === 'object')
 }
@@ -20,6 +35,12 @@ const saveToLocalStorage = (key, rawData) => {
     }
     localStorage.setItem(key, data)
 }
+
+/********************* 
+ * 
+ *  Render functions   
+ *                  
+ *********************/
 
 const getUserLetters = () => {
     const username = localStorage.getItem("player_id");
@@ -33,18 +54,20 @@ const getUserLetters = () => {
 
 const createTiles = (lettersArray) => {
   let tilesArray = [];
-  Array.prototype.forEach.call(lettersArray, function(letter) {
-    tilesArray.push(`<div class="cell"><span class="tile" data-tile-id="${numberOfTiles}" draggable="true">${letter}</span></div>`);
+  Array.prototype.forEach.call(lettersArray, function(letter, index) {
+    tilesArray.push(`<div class="cell" data-row="0" data-column="${index}"><span class="tile" data-tile-id="${numberOfTiles}" draggable="true">${letter}</span></div>`);
     numberOfTiles += 1;
   });
 
   return tilesArray;
 };
 
-const populateBoard = (num) => {
+const populateBoard = () => {
   let board = document.getElementById("board");
-  for (let i = 0; i < num; i++) {
-    board.innerHTML += `<div class="cell"></div>`;
+  for (let r=0; r < rows; r++) {
+    for (let c=0; c < columns; c++) {
+      board.innerHTML += `<div class="cell" data-row=${r} data-column=${c}></div>`;
+    }
   }
 
   // Attach the listeners to the grid cells
@@ -56,7 +79,19 @@ const populateBoard = (num) => {
     cell.addEventListener("dragend", handleDragEnd, options);
     cell.addEventListener("drop", handleDrop, options);
   });
+
+  centerBoard();
 };
+
+centerBoard = () => {
+  const boardViewport = document.getElementById("board-viewport");
+  const board = document.getElementById("board");
+  const scrollPositionX =  board.offsetLeft + (board.offsetWidth / 2);
+  const scrollPositionY = board.offsetTop + (board.offsetHeight / 3);
+  boardViewport.scrollLeft = scrollPositionX;
+  boardViewport.scrollTop = scrollPositionY;
+
+}
 
 const fillCells = (parentId, childrenArrayOrCellNumber) => {
   const parent = document.getElementById(parentId);
@@ -80,63 +115,102 @@ const populate = (parentid, childrenArray) => {
   })
 }
 
-const toggleMenu = command => {
-  menu.style.display = command === "show" ? "block" : "none";
-  menuVisible = !menuVisible;
-};
+const selectAllTiles = () => {
+  var board = document.querySelector("#board");
+  Array.from(document.querySelectorAll('.tile')).forEach(tile => {
+    if (board.contains(tile)) {
+      tile.classList.add('selected')
+    }
+  })
+}
 
-const setPosition = ({ top, left }) => {
-  menu.style.left = `${left}px`;
-  menu.style.top = `${top}px`;
-  toggleMenu('show');
-};
 
-const handleDragStart = (e) => {
-  console.log(`${e.type}`);
-  console.log('event', e)
-  e.target.style.opacity = 0.4;
+
+/********************* 
+ * 
+ *  event handlers   
+ *                  
+ *********************/
+
+const handleClick = e => {
+  e.preventDefault();
+  let classes = e.target.classList;
+  classes.contains('selected') ? classes.remove('selected') : classes.add('selected');
+}
+
+const handleDragStart = e => {
+  e.target.style.opacity = .4;
+  e.target.classList.remove('selected');
+  let selectedTiles = Array.from(document.querySelectorAll('.selected'));
+  // casing of tileId is set by browser parsing
+  tilesToDrag = selectedTiles.map(tile => {
+    let tileData = {
+      id: tile.dataset.tileId,
+      row: tile.parentElement.dataset.row,
+      column: tile.parentElement.dataset.column
+    }
+    return tileData
+  });
   e.target.style.cursor = "grabbing";
   e.dataTransfer.dropEffect = "copy";
-  e.dataTransfer.setData("text", e.target.dataset.tileId)
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text", e.target.dataset.tileId);
 };
 
-let handleDragOver = (e) => {
+let handleDragOver = e => {
   if (e.preventDefault) e.preventDefault();
   e.dataTransfer.dropEffect = "move";
   return false;
 };
 
-const handleDragEnter = (e) => {
+const handleDragEnter = e => {
   e.preventDefault();
   e.target.classList.add("over");
 };
 
-const handleDragLeave = (e) => {
+const handleDragLeave = e => {
   e.preventDefault();
   e.target.classList.remove("over");
 };
 
 const handleDrop = e => {
   e.preventDefault();
-  targetCell = e.target;
-  targetCell.classList.remove("over");
-  targetCell.classList.add("filled");
-  console.log(`target cell: ${targetCell} grabbedTile: ${grabbedTile}`)
+  let primaryDestinationCell = e.target;
+  primaryDestinationCell.classList.remove("over");
+  primaryDestinationCell.classList.add("filled");
 
   let id = e.dataTransfer.getData('text');
-  let tileToAdd = document.querySelector(`.tile[data-tile-id="${id}"]`);
-  e.target.appendChild(tileToAdd);
-  tileToAdd.style.opacity = "";
+  let primaryTile = document.querySelector(`.tile[data-tile-id="${id}"]`);
+  primaryTile.dataset.row = primaryTile.parentElement.dataset.row;
+  primaryTile.dataset.column = primaryTile.parentElement.dataset.column;
+  
+  e.target.appendChild(primaryTile);
+  primaryTile.dataset.destinationRow = primaryDestinationCell.dataset.row;
+  primaryTile.dataset.destinationColumn = primaryDestinationCell.dataset.column;
 
-  // Clean out any empty bench slots
+ 
+      const rowChange = Number(primaryTile.dataset.destinationRow) - Number(primaryTile.dataset.row);
+      const columnChange = Number(primaryTile.dataset.destinationColumn) - Number(primaryTile.dataset.column);
+        // calculate new coors for secondary cells. (origins + dist = targets)
+        tilesToDrag.forEach(tileData => {
+          secondaryTile = document.querySelector(`.tile[data-tile-id="${tileData.id}"]`);
+          secondaryTile.dataset.row = secondaryTile.parentElement.dataset.row;
+          secondaryTile.dataset.column = secondaryTile.parentElement.dataset.column;
+
+          secondaryTile.dataset.destinationRow = rowChange + Number(secondaryTile.dataset.row);
+          secondaryTile.dataset.destinationColumn = columnChange + Number(secondaryTile.dataset.column);
+
+          let secondaryDestination = document.querySelector( `#board .cell[data-row="${secondaryTile.dataset.destinationRow}"][data-column="${secondaryTile.dataset.destinationColumn}"]`);
+          secondaryDestination.appendChild(secondaryTile);
+        })
+  
+  tilesToDrag = [];
   cleanBench();
+  resetModifiers('tile');
 }
 
 const handleDragEnd = e => {
-  console.log(`${e.type}`);
-  const id = e.dataTransfer.getData('text')
-  let grabbedTile = document.querySelector(`.tile[data-tile-id="${id}"]`)
-   grabbedTile.style.opacity = 1;
+  e.target.style.opacity = "";
 }
 
 const handleDoubleClick = e => {
@@ -151,12 +225,24 @@ const handleDoubleClick = e => {
   return false;
 }
 
+const resetModifiers = (className) => {
+  const elements = Array.from(document.querySelectorAll(`.${className}`));
+  elements.forEach(element => {
+    element.classList.remove("selected");
+    element.style.opacity = "";
+  })
+}
+
 const addTileListener = () => {
   document.querySelectorAll(".tile").forEach(tile => {
     tile.addEventListener("dragstart", handleDragStart, options);
     tile.addEventListener("dblclick", handleDoubleClick);
+    tile.addEventListener("click", handleClick, options);
+    tile.addEventListener("dragend", handleDragEnd, options);
   });
 }
+
+document.addEventListener("drop", () => {resetModifiers('tile')}, options);
 
 const cleanBench = () => {
   var bench = document.querySelector("#bench");
@@ -174,14 +260,24 @@ const cleanBench = () => {
     bench.removeChild(cell);
   });
 
+  // recalculate row and columns of bench
+  Array.from(bench.children).forEach((benchCell, index) => {
+    benchCell.dataset.column = index;
+  });
+
 }
 
-window.addEventListener("click", e => {
-  if(menuVisible)toggleMenu("hide");
-});
+const toggleMenu = command => {
+  menu.style.display = command === "show" ? "block" : "none";
+  menuVisible = !menuVisible;
+};
 
-// Pre-populate the board
-populateBoard(400);
+const setPosition = ({ top, left }) => {
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+  toggleMenu('show');
+};
+
 
 /*
   Ben Code
@@ -257,6 +353,7 @@ function render_game(resp) {
         $("#message").innerHTML = "<p>Game on! Build a valid scrabble board with your words.</p>"
         $("#options").show();
         $("#peel_button").show();
+        $("#select_button").show();
 
         // Render only the new tiles
         var newTiles = findDifference(cur_tiles, tiles);
@@ -269,6 +366,7 @@ function render_game(resp) {
         $("#message").innerHTML = "<p>Almost done! Be the first to complete your board.</p>"
         $("#options").show();
         $("#bananagrams_button").show();
+        $("#select_button").show();
     } // Game over
     else if (resp["state"] == "OVER") {
         hideButtons();
@@ -370,6 +468,7 @@ function hideButtons() {
     $("#start_game_button").hide();
     $("#split_button").hide();
     $("#peel_button").hide();
+    $("#select_button").hide();
     $("#bananagrams_button").hide();
     $("#continue_game_button").hide();
 }
@@ -426,4 +525,13 @@ document.addEventListener("keyup", function (event) {
         // Trigger the button element with a click
         $("#bananagrams_button").click();
     }
+});
+
+
+
+// Pre-populatethe board
+populateBoard();
+
+window.addEventListener("click", e => {
+  if(menuVisible)toggleMenu("hide");
 });

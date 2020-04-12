@@ -1,62 +1,88 @@
-// ********** FONTS ********** //
-@import url('https://fonts.googleapis.com/css?family=Luckiest+Guy|Noto+Sans|Sigmar+One&display=swap');
+$rows: 15;
+$columns: 15;
+$cell-dimension: 40px;
 
-h1 {
-    font-family: 'Luckiest Guy', cursive;
-    font-size: 3em;
-    letter-spacing: .15em;
-    -webkit-text-stroke: 0.5px black;
-    text-shadow: 1px 1px black;
+
+#board-viewport {
+  position: relative;
+  height: 80vh;
+  width: 100%;
+  overflow: scroll;
 }
 
-p {
-    font-family: 'Luckiest Guy', cursive;
-    font-size: 1.5em;
-    letter-spacing: .15em;
-    -webkit-text-stroke: 1px black;
-    text-align: center;
-    text-shadow: 1px 1px black;
+.game-header {
+  height: 20vh;
+  box-sizing: border-box;
+  padding: 10px;
 }
 
-// ********** COLORS ********** //
+#board {
+  display: grid;
+  grid-template-columns: repeat($columns, $cell-dimension);
+  grid-template-rows: repeat($rows, $cell-dimension);
+  box-sizing: border-box;
+  background-color: darken(antiquewhite, 13%);
 
-$primary-blue: #0057F9;
-$primary-yellow: #FAD96E;
-$gradient-color: $primary-yellow;
-
-
-// ********** INDEX ********** //
-
-.home-container {
-    color: white;
-    width: 100%;
-    height: 100%;
-
-
-    -webkit-box-shadow: 0 0 25px 0 #fff;
-    background: $gradient-color;
-
-    background: -moz-linear-gradient(-45deg, $gradient-color 0%, $gradient-color 24%, #555555 25%, $gradient-color 26%, $gradient-color 50%, $gradient-color 74%, #555555 75%, $gradient-color 76%, $gradient-color 100%);
-
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, $gradient-color), color-stop(24%, $gradient-color), color-stop(25%, #555555), color-stop(26%, $gradient-color), color-stop(50%, $gradient-color), color-stop(74%, $gradient-color), color-stop(75%, #555555), color-stop(76%, $gradient-color), color-stop(100%, $gradient-color));
-    background: -webkit-linear-gradient(-45deg, $gradient-color 0%, $gradient-color 24%, #555555 25%, $gradient-color 26%, $gradient-color 50%, $gradient-color 74%, #555555 75%, $gradient-color 76%, $gradient-color 100%);
-    background: -o-linear-gradient(-45deg, $gradient-color 0%, $gradient-color 24%, #555555 25%, $gradient-color 26%, $gradient-color 50%, $gradient-color 74%, #555555 75%, $gradient-color 76%, $gradient-color 100%);
-    background: -ms-linear-gradient(-45deg, $gradient-color 0%, $gradient-color 24%, #555555 25%, $gradient-color 26%, $gradient-color 50%, $gradient-color 74%, #555555 75%, $gradient-color 76%, $gradient-color 100%);
-    background: linear-gradient(135deg, $gradient-color 0%, $gradient-color -10%, $gradient-color -24%, $gradient-color 54%, $gradient-color 97%, $gradient-color 136%, $gradient-color 195%, $gradient-color 4.8%, $gradient-color 70%);
+  .cell {
+    border-radius: 2px;
+    background-color: antiquewhite;
+    border: 1px solid rgba(darken(antiquewhite, 20%), 0.5);
+  }
 }
 
-.gradient {
-    position: absolute;
-    width: inherit;
-    height: inherit;
-    background: -moz-radial-gradient(center, ellipse cover, rgba(lighten($gradient-color, 20%), 0.25) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(lighten($gradient-color, 20%), 0.55)), color-stop(100%, rgba(lighten($gradient-color, 40%), 0)));
-    background: -webkit-radial-gradient(center, ellipse cover, rgba(lighten($gradient-color, 20%), 0.55) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
-    background: -o-radial-gradient(center, ellipse cover, rgba(lighten($gradient-color, 20%), 0.55) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
-    background: -ms-radial-gradient(center, ellipse cover, rgba(lighten($gradient-color, 20%), 0.55) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
-    background: radial-gradient(ellipse at center, rgba(lighten($gradient-color, 20%), 0.55) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
+#bench {
+  background-color: darken(antiquewhite, 10%);
+  border-radius: 20px;
+  display: flex;
+  flex-flow: row wrap;
+  padding: 20px;
+  align-items: center;
+  // width: 40px;
+  z-index: 200;
+  position: absolute;
+  top: 15vh;
+  left: 2vw;
+
+  .cell {
+    min-width: $cell-dimension;
+    min-height: $cell-dimension;
+    padding: 1px;
+    margin: 1px;
+  }
 }
 
+.cell {
+  z-index: 50;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.tile {
+  background-color: darken(burlywood, 7%);
+  z-index: 1;
+  color: white;
+  cursor: pointer;
+  background-color: burlywood;
+  border-radius: 10px;
+  width: 20px;
+  height: 20px;
+  padding: 5px;
+  text-align: center;
+  border: 3px solid darken(burlywood, 30%);
+  margin: 1px;
+  z-index: 999;
+}
+
+.tile.selected {
+  opacity: .5;
+}
+
+.cell.over {
+  opacity: 0.2;
+  background-color: darken(antiquewhite, 30%);
+}
 .menu {
   display: none;
 }

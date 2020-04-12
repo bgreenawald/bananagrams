@@ -203,10 +203,11 @@ const handleDrop = e => {
   
   tilesToDrag = [];
   cleanBench();
+  resetModifiers('tile');
 }
 
 const handleDragEnd = e => {
-  resetModifiers();
+  e.target.style.opacity = "";
 }
 
 const handleDoubleClick = e => {
@@ -225,7 +226,7 @@ const resetModifiers = (className) => {
   const elements = Array.from(document.querySelectorAll(`.${className}`));
   elements.forEach(element => {
     element.classList.remove("selected");
-    element.classList.opacity = "";
+    element.style.opacity = "";
   })
 }
 

@@ -1,54 +1,87 @@
 // Color scheme: https://coolors.co/ffff99-91bfff-ffd754-1034a6-0057f9
+@import "./normalize.scss";
 
 // ********** INDEX ********** //
 
-// .game-container {
-//     // background-color: blue;
-//     height: 100vh;
-//     color: white;
-//     width: 100%;
-//     height: 100%;
-//     margin: 0 auto;
+.game-container, .lobby {
+    height: 100vh;
+    color: $off-white;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
 
 
-//     -webkit-box-shadow: 0 0 25px 0 #fff;
-//     background: $gradient-color;
+    position: relative;
+    @include flexbox();
+    align-items: center;
+    justify-content: center;
+}
 
-//     background: -moz-linear-gradient(-45deg, $gradient-color 0%, $gradient-color 24%, #555555 25%, $gradient-color 26%, $gradient-color 50%, $gradient-color 74%, #555555 75%, $gradient-color 76%, $gradient-color 100%);
-
-//     background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, $gradient-color), color-stop(24%, $gradient-color), color-stop(25%, #555555), color-stop(26%, $gradient-color), color-stop(50%, $gradient-color), color-stop(74%, $gradient-color), color-stop(75%, #555555), color-stop(76%, $gradient-color), color-stop(100%, $gradient-color));
-//     background: -webkit-linear-gradient(-45deg, $gradient-color 0%, $gradient-color 24%, #555555 25%, $gradient-color 26%, $gradient-color 50%, $gradient-color 74%, #555555 75%, $gradient-color 76%, $gradient-color 100%);
-//     background: -o-linear-gradient(-45deg, $gradient-color 0%, $gradient-color 24%, #555555 25%, $gradient-color 26%, $gradient-color 50%, $gradient-color 74%, #555555 75%, $gradient-color 76%, $gradient-color 100%);
-//     background: -ms-linear-gradient(-45deg, $gradient-color 0%, $gradient-color 24%, #555555 25%, $gradient-color 26%, $gradient-color 50%, $gradient-color 74%, #555555 75%, $gradient-color 76%, $gradient-color 100%);
-//     background: linear-gradient(135deg, $gradient-color 0%, $gradient-color -10%, $gradient-color -24%, $gradient-color 54%, $gradient-color 97%, $gradient-color 136%, $gradient-color 195%, $gradient-color 4.8%, $gradient-color 70%);
-
-//     background-size: 70px 70px;
-//     position: relative;
-//     @include flexbox();
-// }
-
-// .gradient {
-//     position: absolute;
-//     width: inherit;
-//     height: inherit;
-//     background: -moz-radial-gradient(center, ellipse cover, rgba(lighten($gradient-color, 20%), 0.25) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
-//     background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(lighten($gradient-color, 20%), 0.55)), color-stop(100%, rgba(lighten($gradient-color, 40%), 0)));
-//     background: -webkit-radial-gradient(center, ellipse cover, rgba(lighten($gradient-color, 20%), 0.55) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
-//     background: -o-radial-gradient(center, ellipse cover, rgba(lighten($gradient-color, 20%), 0.55) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
-//     background: -ms-radial-gradient(center, ellipse cover, rgba(lighten($gradient-color, 20%), 0.55) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
-//     background: radial-gradient(ellipse at center, rgba(lighten($gradient-color, 20%), 0.55) 0%, rgba(lighten($gradient-color, 40%), 0) 100%);
-// }
-
-// .game-header {
-//     flex-flow: column wrap;
-//     width: 60%;
-//     z-index: 100;
-// }
+.lobby {
+    flex-flow: column wrap;
+    width: 60%;
+    z-index: 100;
+}
 
 // .rules-container {
 //     position: absolute;
 //     transform: rotate(-90deg);
 //     top: 40px;
 //     left: 0%;
-//     box-shadow: 0px 3px 10px darken($gradient-color, 10%);
+//     box-shadow: 0px 3px 10px darken(black, 10%);
 // }
+
+.landing, .lobby-content {
+    @include flexbox();
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 3vw;
+    max-width: 700px;
+}
+
+input {
+    margin: 5px;
+    padding: 20px 0px;
+    background-color: transparent;
+    border: 1px solid $off-white;
+    color: $off-white;
+    font-family: 'Gaegu';
+    border-radius: 10px;
+    font-size: 46px;
+    width: 40%;
+    text-align: center;
+}
+
+button {
+    padding: 10px 30px;
+    margin-top: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: block;
+    font-family: 'Gaegu';
+    font-size: 26px;
+
+
+    &.primary {
+      background-color: $primary-yellow;
+      color: $off-black;
+      transition: background-color 0.2s cubic-bezier(0.77, 0.2, 0.05, 1);
+  
+      &:hover {
+        background-color: lighten($primary-yellow, 10%);
+      }
+    }
+  
+    &.secondary {
+      background-color: transparent;
+      color: white;
+      transition: all 0.2s cubic-bezier(0.77, 0.2, 0.05, 1);
+  
+      &:hover {
+        background-color: white;
+        color: $off-black;
+      }
+    }
+  }

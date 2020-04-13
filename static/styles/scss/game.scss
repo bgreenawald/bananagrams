@@ -1,106 +1,138 @@
-@import './normalize.scss';
+@import "./normalize.scss";
 $rows: 35;
 $columns: 35;
 $cell-dimension: 40px;
 
-
-#board-viewport {
-  position: relative;
-  height: 80vh;
+#gameplay {
   width: 100%;
-  overflow: scroll;
-}
+  height: 100%;
+  @include flexbox();
+  flex-flow: column nowrap;
 
-.lobby {
-  height: 20vh;
-  box-sizing: border-box;
-  padding: 10px;
-}
-
-#board {
-  display: grid;
-  grid-template-columns: repeat($columns, $cell-dimension);
-  grid-template-rows: repeat($rows, $cell-dimension);
-  box-sizing: border-box;
-  // background-color: darken(antiquewhite, 13%);
-
-  .cell {
-    border-radius: 2px;
-    // background-color: antiquewhite;
-
-    border: 1px solid rgba($off-white, 0.5);
+  .game-menu {
+    flex-grow: 1;
+    width: 100%;
   }
-}
 
-#bench {
-  // background-color: darken(antiquewhite, 10%);
-  border-radius: 20px;
-  display: flex;
-  flex-flow: row wrap;
-  padding: 20px;
-  align-items: center;
-  // width: 40px;
-  z-index: 200;
-  // position: absolute;
-  // top: 15vh;
-  // left: 2vw;
+  #bench {
+    border-radius: 20px;
+    display: flex;
+    flex-flow: row wrap;
+    padding: 30px;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    // width: 40px;
+    // background-color: darken(antiquewhite, 10%);
+    // position: absolute;
+    // top: 15vh;
+    // left: 2vw;
+
+    .cell {
+      min-width: $cell-dimension;
+      min-height: $cell-dimension;
+      padding: 1px;
+      margin: 1px;
+    }
+  }
+
+  #board-viewport {
+    position: relative;
+    height: 70%;
+    width: 96%;
+    overflow: scroll;
+    margin: 0 auto;
+    flex-grow: 2;
+    #board {
+      display: grid;
+      grid-template-columns: repeat($columns, $cell-dimension);
+      grid-template-rows: repeat($rows, $cell-dimension);
+      box-sizing: border-box;
+      // background-color: darken(antiquewhite, 13%);
+
+      .cell {
+        border-radius: 2px;
+        // background-color: antiquewhite;
+        border: 1px solid rgba($off-white, 0.5);
+      }
+    }
+  }
 
   .cell {
-    min-width: $cell-dimension;
-    min-height: $cell-dimension;
-    padding: 1px;
+    z-index: 50;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+  }
+
+  .tile {
+    background-color: transparent;
+    z-index: 1;
+    color: $off-white;
+    cursor: pointer;
+    border-radius: 10px;
+    width: 20px;
+    height: 20px;
+    padding: 5px;
+    text-align: center;
+    // border: 2px solid $off-white;
     margin: 1px;
+    z-index: 999;
+    font-family: "stamp";
+    font-size: 40px;
+    margin: 4px 0px 0px -6px;
+    text-align: left;
+    line-height: 15px;
+  }
+
+  .tile.selected {
+    opacity: 0.5;
+  }
+
+  .cell.over {
+    opacity: 0.2;
+    background-color: darken(antiquewhite, 30%);
+  }
+  .menu {
+    display: none;
+  }
+
+  #buttons {
+    @include flexbox();
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: center;
+    button {
+      padding: 6px 30px;
+      font-size: 20px;
+    }
+  }
+
+  // footer
+  footer {
+    flex-grow: 1;
+    padding: 12px 5px;
+    p {
+      margin: 0;
+    }
   }
 }
-
-.cell {
-  z-index: 50;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-}
-
-.tile {
-  background-color: transparent;
-  z-index: 1;
-  color: $off-white;
-  cursor: pointer;
-  border-radius: 10px;
-  width: 20px;
-  height: 20px;
-  padding: 5px;
-  text-align: center;
-  border: 3px solid $off-white;
-  margin: 1px;
-  z-index: 999;
-}
-
-.tile.selected {
-  opacity: .5;
-}
-
-.cell.over {
-  opacity: 0.2;
-  background-color: darken(antiquewhite, 30%);
-}
-.menu {
-  display: none;
-}
-
 
 // game info
 .lobby {
   position: absolute;
-  top: 0; 
+  top: 0;
   left: 0;
   height: 100%;
   width: 100%;
-  background: url('../../chalkboard-background.jpg');
+  background: url("../../chalkboard-background.jpg");
   background-size: cover;
+  box-sizing: border-box;
+  padding: 10px;
 
   label {
-    font-family: 'Gaegu';
+    font-family: "Gaegu";
   }
   input {
     font-size: 20px;
@@ -108,11 +140,7 @@ $cell-dimension: 40px;
   #join_game {
     @include flexbox();
     flex-flow: column nowrap;
-    // align-items: flex-start;
-    // justify-content: center;
-    // text-align: left;
   }
-
 }
 
 // lobby wait

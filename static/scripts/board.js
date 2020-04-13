@@ -337,6 +337,7 @@ function render_game(resp) {
 
     // Hide the join game option
     $("#join_game").hide();
+    $('#gameplay').hide();
 
     // Render the game based on the various game states
 
@@ -349,6 +350,7 @@ function render_game(resp) {
         $("#start_game_button").show();
     } // The main gamplay state
     else if (resp["state"] == "ACTIVE") {
+      $("#gameplay").show();
         $(".lobby").hide();
         hideButtons();
         $("#message").innerHTML = "<p>Game on! Build a valid scrabble board with your words.</p>"
@@ -364,7 +366,8 @@ function render_game(resp) {
     } // Can no longer peel
     else if (resp["state"] == "ENDGAME") {
         hideButtons();
-        $("#message").innerHTML = "<p>Almost done! Be the first to complete your board.</p>"
+        
+        $("#message").innerHTML = "<p>Almost done! Be the first to complete your board.</p>";
         $("#options").show();
         $("#bananagrams_button").show();
         $("#select_button").show();

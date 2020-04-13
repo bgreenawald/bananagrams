@@ -215,7 +215,7 @@ const handleDragEnd = e => {
 
 const handleDoubleClick = e => {
   e.preventDefault();
-  menu.setAttribute("active-tile-id", tile.getAttribute("data-tile-id"))
+  menu.setAttribute("active-tile-id", e.target.getAttribute("data-tile-id"))
   // Set the position for the menu
   const origin = {
     left: e.pageX,
@@ -438,7 +438,8 @@ function swap() {
         "name": game_name,
         "letter": letter,
         "player_id": player_id
-    })
+    });
+    cleanBench();
 }
 
 // Bananagrams

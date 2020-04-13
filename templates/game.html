@@ -9,10 +9,8 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
     
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css') }}" />
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/styles.css') }}" />
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/game.css') }}" />
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='styles/css/board.css') }}" /> -->
 
 </head>
 
@@ -21,47 +19,49 @@
 
 <body>
     <div class="game-container" id="css3-background-texture">
-        <header class="game-header">
-            <div>
-                <p>
-                    Your game ID is {{id}}. Share your current URL with friends and they can access the game too!
-                </p>
-                <div>
-                    <p>Players in lobby</p>
-                    <ul id="players">
-                    </ul>
-                </div>
-
-            </div>
+        <header class="lobby">
+           <div class="lobby-content">
             <div id="error"></div>
             <div id="join_game">
                 <p>First things first, enter your username to join the game.</p>
-                <label for="username">Username</label>
+                <!-- <label for="username">Username</label> -->
                 <input id="player_id" type="text" placeholder="Enter your username">
                 <button id="player_id_submit" class="btn btn-primary" type="submit" onclick="player_join()">Join the
                     Game</button>
             </div>
             <div id="message"></div>
             <div id="game_info"></div>
+                <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
             <div id="options" style="display: none;">
+                <p class="lobby-wait-message">Waiting for other players.  Hit start when everyone has joined.</p>
                 <button class="btn btn-primary" id="start_game_button" type="submit" onclick="start_game()">Start</button>
-                <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
-                <button class="btn btn-primary" id="select_button" type="submit" onclick="selectAllTiles()">Select All Tiles</button>
-                <button class="btn btn-primary" id="bananagrams_button" type="submit"
-                    onclick="bananagrams()">Bananagrams</button>
-                <button class="btn btn-primary" id="continue_game_button" type="submit"
-                    onclick="continue_game()">Continue Game</button>
-                <button class="menu" onclick="swap()">Swap Tile</button>
             </div>
-            <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()"
-                style="position: absolute; right: 10px;">Reset Game</button>
-
+           </div>
         </header>
-        <div id="board-viewport">
-            <div id="board"></div>
-        </div>
-        <div id="bench"></div>
+        <div id="gameplay">
+            <div class="game-menu">
 
+                <div id="buttons">
+                    <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()">Start New Game</button>
+                    <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
+                    <button class="btn btn-primary" id="select_button" type="submit" onclick="selectAllTiles()">Select All Tiles</button>
+                    <button class="btn btn-primary" id="bananagrams_button" type="submit"
+                        onclick="bananagrams()">Bananagrams</button>
+                    <button class="btn btn-primary" id="continue_game_button" type="submit"
+                        onclick="continue_game()">Continue Game</button>
+                    <button class="menu" onclick="swap()">Swap Tile</button> 
+                </div>   
+                <div id="bench"></div>
+            </div>
+
+            <div id="board-viewport">
+                <div id="board"></div>
+            </div>
+                <footer>
+                    <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
+                </footer>
+    
+        </div>
         <script src="{{url_for('static', filename='scripts/board.js')}}"></script>
     </div>
 </body>

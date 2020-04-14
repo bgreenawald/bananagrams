@@ -1,9 +1,12 @@
+import atexit
+import datetime
 import logging
 import os
 import sys
 from typing import Any, Dict
 
 import simplejson
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, json, render_template, request, Response
 from flask_cors import CORS
 from flask_scss import Scss
@@ -12,16 +15,16 @@ from flask_socketio import emit, join_room, SocketIO
 from game import Game, GameException
 
 # Initialize the application
-application = Flask(__name__)
-application.debug = True
-application.config["SECRET_KEY"] = "secret!"
-app = SocketIO(application)
+app = Flask(__name__)
+app.debug = True
+app.config["SECRET_KEY"] = "secret!"
+socketio = SocketIO(app)
 
 # Add Sass
-Scss(application, static_dir="static/styles/css", asset_dir="static/styles/scss")
+Scss(app, static_dir="static/styles/css", asset_dir="static/styles/scss")
 
 # Initialize CORS
-CORS(application)
+CORS(app)
 
 # Setup logging
 if not os.path.isdir("logs"):
@@ -44,17 +47,17 @@ all_games: Dict[str, Game] = {}
 # ---------------------------------------
 
 
-@application.route("/")
+@app.route("/")
 def return_index() -> str:
     return render_template("index.html")
 
 
-@application.route("/game/<int:id>")
+@app.route("/game/<int:id>")
 def return_game(id: str) -> str:
     return render_template("game.html", id=id)
 
 
-@application.route("/api/get_names")
+@app.route("/api/get_names")
 def get_names() -> Response:
     ids = [x for x in all_games]
     return json.jsonify({"ids": ids})
@@ -65,7 +68,7 @@ def get_names() -> Response:
 # ---------------------------------------
 
 
-@app.on("join")
+@socketio.on("join")
 def on_join(data: Dict[str, Any]):
     """Joins the connection to the provided room
     Args:
@@ -76,14 +79,14 @@ def on_join(data: Dict[str, Any]):
     logger.info(f"{request.sid} has entered the room {room_name}")
 
 
-@app.on("connect")
+@socketio.on("connect")
 def on_connect():
     """Called on client connect.
     """
     logger.info(f"{request.sid} has connected.")
 
 
-@app.on("disconnect")
+@socketio.on("disconnect")
 def on_disconnect():
     """Called on client disconnect.
     """
@@ -111,7 +114,7 @@ def emit_game(game_name: str, game: Game, msg: str):
     )
 
 
-@app.on("load_game")
+@socketio.on("load_game")
 def load_game(json: Dict[Any, Any]):
     """Loads the current game game, or creates on if none exists.
     Args:
@@ -129,7 +132,7 @@ def load_game(json: Dict[Any, Any]):
         emit_game(game_name, game, "Game loaded.")
 
 
-@app.on("player_join")
+@socketio.on("player_join")
 def player_join(json: Dict[Any, Any]):
     """Adds a player to the game.
 
@@ -170,7 +173,7 @@ def player_join(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@app.on("start_game")
+@socketio.on("start_game")
 def start_game(json: Dict[Any, Any]):
     """Starts the game.
 
@@ -199,7 +202,7 @@ def start_game(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@app.on("peel")
+@socketio.on("peel")
 def peel(json: Dict[Any, Any]):
     """Gives every player a new tile.
 
@@ -228,7 +231,7 @@ def peel(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@app.on("swap")
+@socketio.on("swap")
 def swap(json: Dict[Any, Any]):
     """
     Swaps a letter for a given player.
@@ -266,7 +269,7 @@ def swap(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@app.on("bananagrams")
+@socketio.on("bananagrams")
 def bananagrams(json: Dict[Any, Any]):
     """
     When someone gets bananagrams.
@@ -296,7 +299,7 @@ def bananagrams(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@app.on("continue_game")
+@socketio.on("continue_game")
 def continue_game(json: Dict[Any, Any]):
     """
     Continues the game on false alarm banagrams.
@@ -326,7 +329,7 @@ def continue_game(json: Dict[Any, Any]):
         emit_error(game_name, str(e))
 
 
-@app.on("reset")
+@socketio.on("reset")
 def reset(json: Dict[Any, Any]):
     """Resets the given game.
 
@@ -351,5 +354,25 @@ def reset(json: Dict[Any, Any]):
     emit_game(game_name, game, "Game reset.")
 
 
+# ---------------------------------------
+# Other functions
+# ---------------------------------------
+
+# Schedule cleanup
+def _delete_old_games():
+    for game in all_games:
+        age = datetime.datetime.now() - all_games[game].date_created
+        if age.total_seconds() > 86400:
+            del all_games[game]
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=_delete_old_games, trigger="interval", seconds=3600)
+scheduler.start()
+
+# Shutdown your cron thread if the web process is stopped
+atexit.register(lambda: scheduler.shutdown())
+
+
 if __name__ == "__main__":
-    app.run(application, debug=True)
+    socketio.run(app, debug=True)

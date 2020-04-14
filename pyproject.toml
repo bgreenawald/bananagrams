@@ -5,7 +5,7 @@ description = ""
 authors = ["Benjamin Greenawald <bgreenawald@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 simplejson = "^3.17.0"
 flask = "^1.1.1"
 flask_socketio = "^4.2.1"
@@ -13,6 +13,7 @@ flask_cors = "^3.0.8"
 Flask-Scss = "^0.5"
 eventlet = "^0.25.2"
 apscheduler = "^3.6.3"
+gunicorn = {extras = ["eventlet"], version = "^20.0.4"}
 
 
 [tool.poetry.dev-dependencies]

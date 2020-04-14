@@ -15,7 +15,7 @@ from flask_socketio import emit, join_room, SocketIO
 from game import Game, GameException
 
 # Initialize the application
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='static')
 app.debug = True
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app)

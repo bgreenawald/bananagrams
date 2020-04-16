@@ -196,6 +196,18 @@ const setPosition = ({ top, left }) => {
   toggleMenu('show');
 };
 
+const enableDragging = () => {
+  document.querySelectorAll(".tile").forEach(tile => {
+    tile.draggable = true;
+  });
+}
+
+const disableDragging = () => {
+  document.querySelectorAll(".tile").forEach(tile => {
+    tile.draggable = false;
+  });
+}
+
 
 /*
   Ben Code
@@ -294,7 +306,7 @@ function render_game(resp) {
     } // Can no longer peel
     else if (resp["state"] == "ENDGAME") {
         hideButtons();
-        
+        enableDragging();
         $("#message").innerHTML = "<p>Almost done! Be the first to complete your board.</p>";
         $("#options").show();
         $("#bananagrams_button").show();
@@ -302,6 +314,7 @@ function render_game(resp) {
     } // Game over
     else if (resp["state"] == "OVER") {
         hideButtons();
+        disableDragging();
         $("#message").innerHTML =
             "<p>Game over? Check the winning board. If it's a false alarm, click 'Continue Game,' otherwise, click 'Reset Game' to play again.</p>"
         $("#options").show();

@@ -477,11 +477,6 @@ document.addEventListener("keyup", function (event) {
     }
 });
 
-
-
-// Pre-populatethe board
-populateBoard();
-
 window.addEventListener("click", e => {
   if(menuVisible)toggleMenu("hide");
 });

@@ -8,39 +8,39 @@
     <title>Bananagrams</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-    
+
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/styles.css') }}" />
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/game.css') }}" />
 
 </head>
 
-<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
-    integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I="
+    crossorigin="anonymous"></script>
 
 <body>
     <div class="game-container" id="css3-background-texture">
         <header class="lobby">
-           <div class="lobby-content">
-            <div id="error"></div>
-            <div id="join_game">
-                <p>First things first, enter your username to join the game.</p>
-                <!-- <label for="username">Username</label> -->
-                <input id="player_id" type="text" placeholder="Enter your username">
-                <button id="player_id_submit" class="btn btn-primary" type="submit" onclick="player_join()">Join the
-                    Game</button>
-            </div>
-            <div id="message"></div>
-            <div id="game_info"></div>
+            <div class="lobby-content">
+                <div id="error"></div>
+                <div id="join_game">
+                    <p>First things first, enter your username to join the game.</p>
+                    <!-- <label for="username">Username</label> -->
+                    <input id="player_id" type="text" placeholder="Enter your username">
+                    <button id="player_id_submit" class="btn btn-primary" type="submit" onclick="player_join()">Join the Game
+                    </button>
+                </div>
+                <div id="message"></div>
+                <div id="game_info"></div>
                 <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
-            <div id="options" style="display: none;">
-                <p class="lobby-wait-message">Waiting for other players.  Hit start when everyone has joined.</p>
-                <button class="btn btn-primary" id="start_game_button" type="submit" onclick="start_game()">Start</button>
-                <div>
-                    <p>Players in Lobby:</p>
-                    <ul id="players"></ul>
+                <div id="options" style="display: none;">
+                    <p class="lobby-wait-message">Waiting for other players. Hit start when everyone has joined.</p>
+                    <button class="btn btn-primary" id="start_game_button" type="submit" onclick="start_game()">Start</button>
+                    <div>
+                        <p>Players in Lobby:</p>
+                        <ul id="players"></ul>
+                    </div>
                 </div>
             </div>
-           </div>
         </header>
         <div id="gameplay">
             <div class="game-menu">
@@ -49,22 +49,20 @@
                     <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()">Start New Game</button>
                     <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
                     <button class="btn btn-primary" id="select_button" type="submit" onclick="selectAllTiles()">Select All Tiles</button>
-                    <button class="btn btn-primary" id="bananagrams_button" type="submit"
-                        onclick="bananagrams()">Bananagrams</button>
-                    <button class="btn btn-primary" id="continue_game_button" type="submit"
-                        onclick="continue_game()">Continue Game</button>
-                    <button class="menu" onclick="swap()">Swap Tile</button> 
-                </div>   
+                    <button class="btn btn-primary" id="bananagrams_button" type="submit" onclick="bananagrams()">Bananagrams</button>
+                    <button class="btn btn-primary" id="continue_game_button" type="submit" onclick="continue_game()">Continue Game</button>
+                    <button class="menu" onclick="swap()">Swap Tile</button>
+                </div>
                 <div id="bench"></div>
             </div>
 
             <div id="board-viewport">
                 <div id="board"></div>
             </div>
-                <footer>
-                    <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
-                </footer>
-    
+            <footer>
+                <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
+            </footer>
+
         </div>
         <script src="{{url_for('static', filename='scripts/board.js')}}"></script>
         <script async src="{{url_for('static', filename='scripts/populate.js')}}"></script>
@@ -74,12 +72,12 @@
 </html>
 
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
-</script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
-</script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous">
+    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous">
+    </script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous">
+    </script>

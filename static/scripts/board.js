@@ -457,25 +457,6 @@ input.addEventListener("keyup", function (event) {
     }
 });
 
-// Peel
-document.addEventListener("keyup", function (event) {
-    if (event.keyCode === 80) {
-        // Cancel the default action, if needed
-        event.preventDefault();
-        // Trigger the button element with a click
-        $("#peel_button").click();
-    }
-});
-
-// Document
-document.addEventListener("keyup", function (event) {
-    if (event.keyCode === 66) {
-        // Cancel the default action, if needed
-        event.preventDefault();
-        // Trigger the button element with a click
-        $("#bananagrams_button").click();
-    }
-});
 
 window.addEventListener("click", e => {
   if(menuVisible)toggleMenu("hide");

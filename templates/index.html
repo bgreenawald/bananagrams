@@ -1,27 +1,26 @@
-
-
-
 <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Bananagrams</title>
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-        <!-- <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css') }}" /> -->
-        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/styles.css') }}" />
 
-    </head>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bananagrams</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/normalize.css') }}" /> -->
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/styles.css') }}" />
+
+</head>
 
 <body>
     <div class="game-container" id="css3-background-texture">
         <div class="landing flex">
             <h1>Bananagrams Online</h1>
             <p class="caption">
-                Enter a game ID, or accept the default. Once you start, you will
-                recieve a URL to share with your friends so they can join.
+                Enter a game ID, or accept the default. Once you start, you will recieve a URL to share with your friends so they can join.
             </p>
             <input id="game_id" type="text">
             <button id="game_id_submit" class="btn btn-primary" type="submit" onclick="createGame()">Create New Game</button>
@@ -34,12 +33,12 @@
 <script>
 
     $.ajax({
-            url: "/api/get_names",
-    }).done(function(res) {
+        url: "/api/get_names",
+    }).done(function (res) {
         var used_ids = res["ids"];
         var rand_id = generate_id();
 
-        while(used_ids.includes(rand_id)) {
+        while (used_ids.includes(rand_id)) {
             rand_id = generate_id()
         }
 
@@ -48,9 +47,9 @@
 
 
     function generate_id() {
-        var min=0;
-        var max=999999;
-        var random =Math.floor(Math.random() * (+max - +min)) + +min;
+        var min = 0;
+        var max = 999999;
+        var random = Math.floor(Math.random() * (+max - +min)) + +min;
         return random;
     }
 
@@ -58,7 +57,7 @@
         $.ajax({
             url: "/api/get_names",
             async: false,
-        }).done(function(res) {
+        }).done(function (res) {
             var used_ids = res["ids"];
             console.log(used_ids);
             var input_name = document.getElementById("game_id").value;
@@ -80,7 +79,7 @@
     var input = document.getElementById("game_id");
 
     // Execute a function when the user releases a key on the keyboard
-    input.addEventListener("keyup", function(event) {
+    input.addEventListener("keyup", function (event) {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
             // Cancel the default action, if needed

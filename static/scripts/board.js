@@ -14,7 +14,7 @@ let columns = 35;
 
 
 // global items for multi drag and drop
- 
+
 let tilesToDrag = [];
 
 
@@ -25,7 +25,7 @@ let tilesToDrag = [];
  *********************/
 
 const isHashMap = (item) => {
-    return (!Array.isArray(item) && typeof(item) === 'object')
+    return (!Array.isArray(item) && typeof (item) === 'object')
 }
 
 const saveToLocalStorage = (key, rawData) => {
@@ -53,45 +53,45 @@ const getUserLetters = () => {
 }
 
 const createTiles = (lettersArray) => {
-  let tilesArray = [];
-  Array.prototype.forEach.call(lettersArray, function(letter, index) {
-    tilesArray.push(`<div class="cell" data-row="0" data-column="${index}"><span class="tile" data-tile-id="${numberOfTiles}" draggable="true">${letter}</span></div>`);
-    numberOfTiles += 1;
-  });
+    let tilesArray = [];
+    Array.prototype.forEach.call(lettersArray, function (letter, index) {
+        tilesArray.push(`<div class="cell" data-row="0" data-column="${index}"><span class="tile" data-tile-id="${numberOfTiles}" draggable="true">${letter}</span></div>`);
+        numberOfTiles += 1;
+    });
 
-  return tilesArray;
+    return tilesArray;
 };
 
 
 const fillCells = (parentId, childrenArrayOrCellNumber) => {
-  const parent = document.getElementById(parentId);
-  if (typeof(childrenArrayOrCellNumber) === "number") {
-    let num = childrenArrayOrCellNumber;
-    for (let i = 0; i < num; i++) {
-      parent.innerHTML += `<div class="cell"></div>`;
+    const parent = document.getElementById(parentId);
+    if (typeof (childrenArrayOrCellNumber) === "number") {
+        let num = childrenArrayOrCellNumber;
+        for (let i = 0; i < num; i++) {
+            parent.innerHTML += `<div class="cell"></div>`;
+        }
     }
-  }
-  else if (Array.isArray(childrenArrayOrCellNumber))
+    else if (Array.isArray(childrenArrayOrCellNumber))
 
-  children.forEach(child => {
-    parent.innerHTML += child;
-  })
+        children.forEach(child => {
+            parent.innerHTML += child;
+        })
 }
 
 const populate = (parentid, childrenArray) => {
-  const parent = document.getElementById(parentid);
-  childrenArray.forEach(child => {
-    parent.innerHTML += child;
-  })
+    const parent = document.getElementById(parentid);
+    childrenArray.forEach(child => {
+        parent.innerHTML += child;
+    })
 }
 
 const selectAllTiles = () => {
-  var board = document.querySelector("#board");
-  Array.from(document.querySelectorAll('.tile')).forEach(tile => {
-    if (board.contains(tile)) {
-      tile.classList.add('selected')
-    }
-  })
+    var board = document.querySelector("#board");
+    Array.from(document.querySelectorAll('.tile')).forEach(tile => {
+        if (board.contains(tile)) {
+            tile.classList.add('selected')
+        }
+    })
 }
 
 
@@ -103,109 +103,109 @@ const selectAllTiles = () => {
  *********************/
 
 const handleClick = e => {
-  e.preventDefault();
-  let classes = e.target.classList;
-  classes.contains('selected') ? classes.remove('selected') : classes.add('selected');
+    e.preventDefault();
+    let classes = e.target.classList;
+    classes.contains('selected') ? classes.remove('selected') : classes.add('selected');
 }
 
 const handleDragStart = e => {
-  e.target.style.opacity = .4;
-  e.target.classList.remove('selected');
-  let selectedTiles = Array.from(document.querySelectorAll('.selected'));
-  // casing of tileId is set by browser parsing
-  tilesToDrag = selectedTiles.map(tile => {
-    let tileData = {
-      id: tile.dataset.tileId,
-      row: tile.parentElement.dataset.row,
-      column: tile.parentElement.dataset.column
-    }
-    return tileData
-  });
-  e.target.style.cursor = "grabbing";
-  e.dataTransfer.dropEffect = "copy";
-  e.dataTransfer.effectAllowed = "move";
-  e.dataTransfer.setData("text", e.target.dataset.tileId);
+    e.target.style.opacity = .4;
+    e.target.classList.remove('selected');
+    let selectedTiles = Array.from(document.querySelectorAll('.selected'));
+    // casing of tileId is set by browser parsing
+    tilesToDrag = selectedTiles.map(tile => {
+        let tileData = {
+            id: tile.dataset.tileId,
+            row: tile.parentElement.dataset.row,
+            column: tile.parentElement.dataset.column
+        }
+        return tileData
+    });
+    e.target.style.cursor = "grabbing";
+    e.dataTransfer.dropEffect = "copy";
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text", e.target.dataset.tileId);
 };
 
 const handleDragEnd = e => {
-  e.target.style.opacity = "";
+    e.target.style.opacity = "";
 }
 
 const handleDoubleClick = e => {
-  e.preventDefault();
-  menu.setAttribute("active-tile-id", e.target.getAttribute("data-tile-id"))
-  // Set the position for the menu
-  const origin = {
-    left: e.pageX,
-    top: e.pageY
-  };
-  setPosition(origin);
-  return false;
+    e.preventDefault();
+    menu.setAttribute("active-tile-id", e.target.getAttribute("data-tile-id"))
+    // Set the position for the menu
+    const origin = {
+        left: e.pageX,
+        top: e.pageY
+    };
+    setPosition(origin);
+    return false;
 }
 
 const resetModifiers = (className) => {
-  const elements = Array.from(document.querySelectorAll(`.${className}`));
-  elements.forEach(element => {
-    element.classList.remove("selected");
-    element.style.opacity = "";
-  })
+    const elements = Array.from(document.querySelectorAll(`.${className}`));
+    elements.forEach(element => {
+        element.classList.remove("selected");
+        element.style.opacity = "";
+    })
 }
 
 const addTileListener = () => {
-  document.querySelectorAll(".tile").forEach(tile => {
-    tile.addEventListener("dragstart", handleDragStart, options);
-    tile.addEventListener("dblclick", handleDoubleClick);
-    tile.addEventListener("click", handleClick, options);
-    tile.addEventListener("dragend", handleDragEnd, options);
-  });
+    document.querySelectorAll(".tile").forEach(tile => {
+        tile.addEventListener("dragstart", handleDragStart, options);
+        tile.addEventListener("dblclick", handleDoubleClick);
+        tile.addEventListener("click", handleClick, options);
+        tile.addEventListener("dragend", handleDragEnd, options);
+    });
 }
 
-document.addEventListener("drop", () => {resetModifiers('tile')}, options);
+document.addEventListener("drop", () => { resetModifiers('tile') }, options);
 
 const cleanBench = () => {
-  var bench = document.querySelector("#bench");
+    var bench = document.querySelector("#bench");
 
-  // Create a list of all empty children
-  var emptyCells = [];
-  Array.prototype.forEach.call(bench.children, function(cell, index){
-    if (cell.children.length == 0) {
-      emptyCells.push(cell);
-    }
-  });
+    // Create a list of all empty children
+    var emptyCells = [];
+    Array.prototype.forEach.call(bench.children, function (cell, index) {
+        if (cell.children.length == 0) {
+            emptyCells.push(cell);
+        }
+    });
 
-  // Remove each empty child from the bench
-  Array.prototype.forEach.call(emptyCells, function(cell, index){
-    bench.removeChild(cell);
-  });
+    // Remove each empty child from the bench
+    Array.prototype.forEach.call(emptyCells, function (cell, index) {
+        bench.removeChild(cell);
+    });
 
-  // recalculate row and columns of bench
-  Array.from(bench.children).forEach((benchCell, index) => {
-    benchCell.dataset.column = index;
-  });
+    // recalculate row and columns of bench
+    Array.from(bench.children).forEach((benchCell, index) => {
+        benchCell.dataset.column = index;
+    });
 
 }
 
 const toggleMenu = command => {
-  menu.style.display = command === "show" ? "block" : "none";
-  menuVisible = !menuVisible;
+    menu.style.display = command === "show" ? "block" : "none";
+    menuVisible = !menuVisible;
 };
 
 const setPosition = ({ top, left }) => {
-  menu.style.left = `${left}px`;
-  menu.style.top = `${top}px`;
-  toggleMenu('show');
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+    toggleMenu('show');
 };
 
 const enableDragging = () => {
-  document.querySelectorAll(".tile").forEach(tile => {
-    tile.draggable = true;
-  });
+    document.querySelectorAll(".tile").forEach(tile => {
+        tile.draggable = true;
+    });
 }
 
 const disableDragging = () => {
-  document.querySelectorAll(".tile").forEach(tile => {
-    tile.draggable = false;
-  });
+    document.querySelectorAll(".tile").forEach(tile => {
+        tile.draggable = false;
+    });
 }
 
 
@@ -254,12 +254,12 @@ socket.on("render_game", function (resp) {
             let player_list = document.getElementById("players");
             player_list.innerHTML = ""
             Object.entries(players).forEach(player => {
-              player_list.innerHTML += "<li>" + player[0] + "</li>";
+                player_list.innerHTML += "<li>" + player[0] + "</li>";
             })
             if (!hasJoined) {
-              return;
+                return;
             } else {
-              render_game(game_state);
+                render_game(game_state);
             }
         } else {
             if (!resp.hasOwnProperty("message")) {
@@ -404,7 +404,7 @@ function continue_game() {
 // Reset the game
 function reset() {
     document.querySelectorAll(`.tile`).forEach(tile => {
-      tile.parentNode.removeChild(tile);
+        tile.parentNode.removeChild(tile);
     });
     cleanBench();
     tiles = [];
@@ -429,15 +429,15 @@ function hideButtons() {
 }
 
 function findDifference(a, b) {
-  var ret = a.slice();
-  for (val of b) {
-    var index = ret.indexOf(val);
-    if (index > -1) {
-      ret.splice(index, 1);
+    var ret = a.slice();
+    for (val of b) {
+        var index = ret.indexOf(val);
+        if (index > -1) {
+            ret.splice(index, 1);
+        }
     }
-  }
 
-  return ret;
+    return ret;
 }
 
 // const findDifference = (newTiles, oldTiles) => {
@@ -464,5 +464,5 @@ input.addEventListener("keyup", function (event) {
 
 
 window.addEventListener("click", e => {
-  if(menuVisible)toggleMenu("hide");
+    if (menuVisible) toggleMenu("hide");
 });

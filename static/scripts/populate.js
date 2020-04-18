@@ -2,8 +2,8 @@
 
 const populateBoard = () => {
   let board = document.getElementById("board");
-  for (let r=0; r < rows; r++) {
-    for (let c=0; c < columns; c++) {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < columns; c++) {
       board.innerHTML += `<div class="cell" data-row=${r} data-column=${c}></div>`;
     }
   }
@@ -24,7 +24,7 @@ const populateBoard = () => {
 const centerBoard = () => {
   const boardViewport = document.getElementById("board-viewport");
   const board = document.getElementById("board");
-  const scrollPositionX =  board.offsetLeft + (board.offsetWidth / 2);
+  const scrollPositionX = board.offsetLeft + (board.offsetWidth / 2);
   const scrollPositionY = board.offsetTop + (board.offsetHeight / 3);
   boardViewport.scrollLeft = scrollPositionX;
   boardViewport.scrollTop = scrollPositionY;
@@ -66,20 +66,20 @@ const handleDrop = e => {
   primaryTile.dataset.destinationRow = primaryDestinationCell.dataset.row;
   primaryTile.dataset.destinationColumn = primaryDestinationCell.dataset.column;
 
-      const rowChange = Number(primaryTile.dataset.destinationRow) - Number(primaryTile.dataset.row);
-      const columnChange = Number(primaryTile.dataset.destinationColumn) - Number(primaryTile.dataset.column);
-        // calculate new coors for secondary cells. (origins + dist = targets)
-        tilesToDrag.forEach(tileData => {
-          secondaryTile = document.querySelector(`.tile[data-tile-id="${tileData.id}"]`);
-          secondaryTile.dataset.row = secondaryTile.parentElement.dataset.row;
-          secondaryTile.dataset.column = secondaryTile.parentElement.dataset.column;
+  const rowChange = Number(primaryTile.dataset.destinationRow) - Number(primaryTile.dataset.row);
+  const columnChange = Number(primaryTile.dataset.destinationColumn) - Number(primaryTile.dataset.column);
+  // calculate new coors for secondary cells. (origins + dist = targets)
+  tilesToDrag.forEach(tileData => {
+    secondaryTile = document.querySelector(`.tile[data-tile-id="${tileData.id}"]`);
+    secondaryTile.dataset.row = secondaryTile.parentElement.dataset.row;
+    secondaryTile.dataset.column = secondaryTile.parentElement.dataset.column;
 
-          secondaryTile.dataset.destinationRow = rowChange + Number(secondaryTile.dataset.row);
-          secondaryTile.dataset.destinationColumn = columnChange + Number(secondaryTile.dataset.column);
+    secondaryTile.dataset.destinationRow = rowChange + Number(secondaryTile.dataset.row);
+    secondaryTile.dataset.destinationColumn = columnChange + Number(secondaryTile.dataset.column);
 
-          let secondaryDestination = document.querySelector( `#board .cell[data-row="${secondaryTile.dataset.destinationRow}"][data-column="${secondaryTile.dataset.destinationColumn}"]`);
-          secondaryDestination.appendChild(secondaryTile);
-        })
+    let secondaryDestination = document.querySelector(`#board .cell[data-row="${secondaryTile.dataset.destinationRow}"][data-column="${secondaryTile.dataset.destinationColumn}"]`);
+    secondaryDestination.appendChild(secondaryTile);
+  })
 
   tilesToDrag = [];
   cleanBench();

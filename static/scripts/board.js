@@ -379,6 +379,10 @@ function swap() {
     let tileToRemove = document.querySelector(`.tile[data-tile-id="${active_tile_id}"]`);
     let letter = tileToRemove.textContent;
     tileToRemove.parentNode.removeChild(tileToRemove);
+    // Also remove element from the global tiles array
+    var index = tiles.indexOf(letter);
+    if (index !== -1) tiles.splice(index, 1);
+
     socket.emit("swap", {
         "name": game_name,
         "letter": letter,

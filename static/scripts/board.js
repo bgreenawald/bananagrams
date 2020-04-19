@@ -285,8 +285,6 @@ function render_game(resp) {
     if (game_state["state"] == "IDLE") {
         hideButtons();
         $(".lobby").show();
-        $("#message").innerHTML =
-            "<p>Waiting for other players to join. When everyone is in, click 'Deal the Tiles'</p>"
         $("#options").show();
         $("#start_game_button").show();
     } // The main gamplay state
@@ -294,7 +292,6 @@ function render_game(resp) {
         $("#gameplay").show();
         $(".lobby").hide();
         hideButtons();
-        $("#message").innerHTML = "<p>Game on! Build a valid scrabble board with your words.</p>"
         $("#options").show();
         $("#peel_button").show();
         $("#select_button").show();
@@ -310,7 +307,6 @@ function render_game(resp) {
         enableDragging();
         $("#gameplay").show();
         $(".lobby").hide();
-        $("#message").innerHTML = "<p>Almost done! Be the first to complete your board.</p>";
         $("#options").show();
         $("#bananagrams_button").show();
         $("#select_button").show();
@@ -320,8 +316,6 @@ function render_game(resp) {
         disableDragging();
         $("#gameplay").show();
         $(".lobby").hide();
-        $("#message").innerHTML =
-            "<p>Game over? Check the winning board. If it's a false alarm, click 'Continue Game,' otherwise, click 'Reset Game' to play again.</p>"
         $("#options").show();
         $("#continue_game_button").show();
     } // Unknown state

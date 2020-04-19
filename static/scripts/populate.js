@@ -1,4 +1,3 @@
-/* Populate the board. */
 
 const populateBoard = () => {
   let board = document.getElementById("board");
@@ -77,9 +76,15 @@ const handleDrop = e => {
     secondaryTile.dataset.destinationRow = rowChange + Number(secondaryTile.dataset.row);
     secondaryTile.dataset.destinationColumn = columnChange + Number(secondaryTile.dataset.column);
 
+    secondaryTile.dataset.row = secondaryTile.dataset.destinationRow;
+    secondaryTile.dataset.column = secondaryTile.dataset.destinationColumn;
+
     let secondaryDestination = document.querySelector(`#board .cell[data-row="${secondaryTile.dataset.destinationRow}"][data-column="${secondaryTile.dataset.destinationColumn}"]`);
     secondaryDestination.appendChild(secondaryTile);
   })
+
+  primaryTile.dataset.row = primaryTile.dataset.destinationRow;
+  primaryTile.dataset.column = primaryTile.dataset.destinationColumn;
 
   tilesToDrag = [];
   cleanBench();

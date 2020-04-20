@@ -42,6 +42,9 @@ logger.addHandler(shell_handler)
 # Dictionary to hold all games
 all_games: Dict[str, Game] = {}
 
+# Boolean to determine if game is being run locally. Used for testing
+test = False
+
 # ---------------------------------------
 # App routes
 # ---------------------------------------
@@ -224,7 +227,7 @@ def peel(json: Dict[Any, Any]):
         return
 
     try:
-        game.peel()
+        game.peel(test=test)
         emit_game(game_name, game, "New tile given out.")
     except GameException as e:
         logging.error("Exception occurred", exc_info=True)
@@ -290,6 +293,11 @@ def bananagrams(json: Dict[Any, Any]):
         logger.warning(f"Could not find the game named {game_name}.")
         emit_error(game_name, f"Could not find the game named {game_name}.")
         return
+
+    if "player_id" not in json:
+        emit_error(json["name"], "Invalid data for this endpoint. Missing 'player_id'")
+    if "words" not in json:
+        emit_error(json["name"], "Invalid data for this endpoint. Missing 'words'")
 
     try:
         game.bananagrams()
@@ -376,3 +384,4 @@ atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
+    test = True

@@ -273,17 +273,25 @@ class testGameMethods(unittest.TestCase):
 
         with self.subTest("Test bananagrams from invalid state 'Active'"):
             try:
-                g.bananagrams()
+                g.bananagrams("winning_player", ["winning", "words"])
             except GameException:
                 pass
             else:
                 self.fail()
+        with self.subTest("Test winning player empty before game over."):
+            self.assertEqual(g.winning_player, None)
+        with self.subTest("Test winning tiles empty before game over."):
+            self.assertEqual(g.winning_words, None)
 
         g.peel(test=True)
-        g.bananagrams()
+        g.bananagrams("winning_player", ["winning", "words", "xdefx"])
 
         with self.subTest("Test game in over state."):
             self.assertEqual(g.state, State.OVER)
+        with self.subTest("Test winning player after game over."):
+            self.assertEqual(g.winning_player, "winning_player")
+        with self.subTest("Test winning tiles after game over."):
+            self.assertEqual(g.winning_words, [("winning", True), ("words", True), ("xdefx", False)])
 
     def test_continue(self):
         g = Game("")
@@ -303,7 +311,7 @@ class testGameMethods(unittest.TestCase):
             else:
                 self.fail()
 
-        g.bananagrams()
+        g.bananagrams("player_id", ["winning", "words", "xdefx"])
         g.continue_game()
 
         with self.subTest("Test game in endgame state."):

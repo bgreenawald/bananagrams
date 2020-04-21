@@ -319,9 +319,14 @@ var game_name = href_parts[href_parts.length - 1];
 var player_id = null;
 var tiles = [];
 var players = null;
+var game_state = null;
 
 // Whether the current client has already joined the game
 var hasJoined = false;
+
+// Initially hide everything
+document.getElementById("gameplay").style.display = "none";
+document.getElementById("game_over").style.display = "none";
 
 // Warn user before leaving
 window.onbeforeunload = function () {
@@ -374,15 +379,12 @@ function render_game(resp) {
     console.log(resp);
     var cur_tiles = resp["players"][player_id];
 
-    // Hide the join game option
-    $("#join_game").hide();
-    $('#gameplay').hide();
-
     // Render the game based on the various game states
 
     // Waiting to give out tiles
-    if (game_state["state"] == "IDLE") {
+    if (resp["state"] == "IDLE") {
         hideButtons();
+        $("#join_game").hide();
         $(".lobby").show();
         $("#options").show();
         $("#start_game_button").show();
@@ -406,17 +408,39 @@ function render_game(resp) {
         enableDragging();
         $("#gameplay").show();
         $(".lobby").hide();
+        $("#game_over").hide();
+        $("#board-viewport").show();
         $("#options").show();
         $("#bananagrams_button").show();
         $("#select_button").show();
+
+        // Render only the new tiles
+        var newTiles = findDifference(cur_tiles, tiles);
+        tiles = cur_tiles;
+        populate("bench", createTiles(newTiles));
+        addTileListener();
     } // Game over
     else if (resp["state"] == "OVER") {
         hideButtons();
         disableDragging();
-        $("#gameplay").show();
+        $("#game_over").show();
+        $("#board-viewport").hide();
         $(".lobby").hide();
-        $("#options").show();
+        $("#options").show()
         $("#continue_game_button").show();
+
+        // Display the winning content
+        document.getElementById("winning_player").textContent = `${resp["winning_player"]} has called Bananagrams. Verify their board and either continue the game or start a new one!`
+        // Check each winning word's validity and color accordingly
+        var winning_words_list = document.getElementById("winning_words");
+        winning_words_list.innerHTML = "";
+        resp["winning_words"].forEach(word_pair => {
+            if (word_pair[1]) {
+                winning_words_list.innerHTML += `<li style="color: green">${word_pair[0]}</li>`
+            } else {
+                winning_words_list.innerHTML += `<li style="color: red">${word_pair[0]}</li>`
+            }
+        })
     } // Unknown state
     else {
         showError(`An error occurred: Unknown client state.`)
@@ -461,6 +485,11 @@ function split() {
 
 // Perform the peel action
 function peel() {
+    // Make sure the board is valid
+    if (!isValidBoard()) {
+        alert("Your bench must be empty and your board must be valid.")
+        return
+    }
     socket.emit("peel", {
         "name": game_name,
     })
@@ -486,8 +515,17 @@ function swap() {
 
 // Bananagrams
 function bananagrams() {
+    // Make sure the board is valid
+    if (!isValidBoard()) {
+        alert("Your bench must be empty and your board must be valid.")
+        return
+    }
+
+    var words = getAllWords();
     socket.emit("bananagrams", {
         "name": game_name,
+        "player_id": player_id,
+        "words": words
     })
 }
 

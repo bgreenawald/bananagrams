@@ -300,7 +300,7 @@ def bananagrams(json: Dict[Any, Any]):
         emit_error(json["name"], "Invalid data for this endpoint. Missing 'words'")
 
     try:
-        game.bananagrams()
+        game.bananagrams(json["player_id"], json["words"])
         emit_game(game_name, game, "Bananagrams.")
     except GameException as e:
         logging.error("Exception occurred", exc_info=True)

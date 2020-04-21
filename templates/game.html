@@ -43,7 +43,6 @@
         </header>
         <div id="gameplay">
             <div class="game-menu">
-
                 <div id="buttons">
                     <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()">Start New Game</button>
                     <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
@@ -53,11 +52,16 @@
                     <button class="menu" onclick="swap()">Swap Tile</button>
                 </div>
                 <div id="bench"></div>
+                <div id="game_over">
+                    <p id="winning_player" style="padding-top: 100px;"></p>
+                    <ul id="winning_words"></ul>
+                </div>
             </div>
 
             <div id="board-viewport">
                 <div id="board"></div>
             </div>
+
             <footer>
                 <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
             </footer>

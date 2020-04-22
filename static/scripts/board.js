@@ -409,7 +409,6 @@ function render_game(resp) {
         $("#gameplay").show();
         $(".lobby").hide();
         $("#game_over").hide();
-        $("#board-viewport").show();
         $("#options").show();
         $("#bananagrams_button").show();
         $("#select_button").show();
@@ -424,7 +423,7 @@ function render_game(resp) {
         hideButtons();
         disableDragging();
         $("#game_over").show();
-        $("#board-viewport").hide();
+        $("#gameplay").hide()
         $(".lobby").hide();
         $("#options").show()
         $("#continue_game_button").show();
@@ -436,9 +435,9 @@ function render_game(resp) {
         winning_words_list.innerHTML = "";
         resp["winning_words"].forEach(word_pair => {
             if (word_pair[1]) {
-                winning_words_list.innerHTML += `<li style="color: green">${word_pair[0]}</li>`
+                winning_words_list.innerHTML += `<p style="color: green">${word_pair[0]}</p>`
             } else {
-                winning_words_list.innerHTML += `<li style="color: red">${word_pair[0]}</li>`
+                winning_words_list.innerHTML += `<p style="color: red">${word_pair[0]}</p>`
             }
         })
     } // Unknown state

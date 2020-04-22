@@ -48,14 +48,9 @@
                     <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
                     <button class="btn btn-primary" id="select_button" type="submit" onclick="selectAllTiles()">Select All Tiles</button>
                     <button class="btn btn-primary" id="bananagrams_button" type="submit" onclick="bananagrams()">Bananagrams</button>
-                    <button class="btn btn-primary" id="continue_game_button" type="submit" onclick="continue_game()">Continue Game</button>
                     <button class="menu" onclick="swap()">Swap Tile</button>
                 </div>
                 <div id="bench"></div>
-                <div id="game_over">
-                    <p id="winning_player" style="padding-top: 100px;"></p>
-                    <ul id="winning_words"></ul>
-                </div>
             </div>
 
             <div id="board-viewport">
@@ -66,6 +61,20 @@
                 <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
             </footer>
 
+        </div>
+        <div id="game_over" style="text-align: -webkit-center;">
+            <div class="game-menu">
+                <div id="buttons_endgame">
+                    <button class="btn btn-primary" type="submit" onclick="reset()">Start New Game</button>
+                    <button class="btn btn-primary" type="submit" onclick="continue_game()">Continue Game</button>
+                </div>
+            </div>
+            <div id="game_over">
+                <h3>Game Over...?</h3>
+                <p id="winning_player"></p>
+                <strong>The winning players words:</strong>
+                <div id="winning_words" style=></div>
+            </div>
         </div>
         <script src="{{url_for('static', filename='scripts/board.js')}}"></script>
         <script async src="{{url_for('static', filename='scripts/populate.js')}}"></script>

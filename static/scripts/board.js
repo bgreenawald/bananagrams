@@ -163,15 +163,26 @@ let handleDragOver = e => {
     return false;
 };
 
-const handleDragEndBoard = e => {
-    e.target.style.opacity = "";
+const handleOnMouseDown = e => {
+    if (e.preventDefault) e.preventDefault();
+    return false;
 }
+
+var id = null;
 
 const handleDrop = e => {
     e.preventDefault();
     let primaryDestinationCell = e.target;
 
-    let id = e.dataTransfer.getData('text');
+    // Get the tile ID and handle the null case
+    id = e.dataTransfer.getData('text');
+    if (id === null || id.trim() === "") {
+        if (primaryDestinationCell.classList.contains("over")) {
+            primaryDestinationCell.classList.remove("over");
+        }
+        return;
+    }
+
     let primaryTile = document.querySelector(`.tile[data-tile-id="${id}"]`);
     let sourceRow = primaryTile.parentElement.dataset.row;
     let sourceColumn = primaryTile.parentElement.dataset.column;
@@ -394,11 +405,11 @@ const populateBoard = () => {
 
     // Attach the listeners to the grid cells
     document.querySelectorAll(".cell").forEach((cell) => {
+        cell.addEventListener("onmousedown", handleOnMouseDown, options)
         cell.addEventListener("dragenter", handleDragEnter, options);
         cell.addEventListener("dragleave", handleDragLeave, options);
         cell.addEventListener("dragover", handleDragOver, options);
-
-        cell.addEventListener("dragend", handleDragEndBoard, options);
+        cell.addEventListener("dragend", handleDragEnd, options);
         cell.addEventListener("drop", handleDrop, options);
     });
 

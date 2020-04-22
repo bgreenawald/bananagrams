@@ -12,7 +12,6 @@ const options = false;
 let rows = 35;
 let columns = 35;
 
-
 // global items for multi drag and drop
 
 let tilesToDrag = [];
@@ -208,6 +207,106 @@ const disableDragging = () => {
     });
 }
 
+const getTileNeighbors = (tile) => {
+    let neighbors = [];
+    let tileRow = parseInt(tile.getAttribute("data-row"));
+    let tileColumn = parseInt(tile.getAttribute("data-column"));
+    var board = document.querySelector("#board");
+
+    // Based on the row and column values, get the appropriate neighbors
+    if (tileRow > 0) {
+        neighbors.push(board.querySelectorAll(`.cell[data-row="${tileRow - 1}"][data-column="${tileColumn}"]`)[0])
+    }
+    if (tileRow < rows - 1) {
+        neighbors.push(board.querySelectorAll(`.cell[data-row="${tileRow + 1}"][data-column="${tileColumn}"]`)[0])
+    }
+    if (tileColumn > 0) {
+        neighbors.push(board.querySelectorAll(`.cell[data-row="${tileRow}"][data-column="${tileColumn - 1}"]`)[0])
+    }
+    if (tileColumn < columns - 1) {
+        neighbors.push(board.querySelectorAll(`.cell[data-row="${tileRow}"][data-column="${tileColumn + 1}"]`)[0])
+    }
+
+    return neighbors;
+}
+
+const isValidBoard = () => {
+    var board = document.querySelector("#board");
+
+    // Make sure the bench is empty
+    if (document.getElementById("bench").children.length > 0) {
+        return false;
+    }
+
+    // Using a queue, process each tile and make sure we can get to every tile
+    var processTiles = [];
+    var seenTiles = [];
+    processTiles.push(board.querySelectorAll(".tile")[0]);
+    while (processTiles.length > 0) {
+        var curTile = processTiles.pop();
+
+        if (!seenTiles.includes(curTile)) {
+            seenTiles.push(curTile);
+        }
+
+        // Get all neighbors of the current tiles and push them on if they haven't yet been seen
+        Array.from(getTileNeighbors(curTile)).forEach(neighbor => {
+            if (neighbor.children.length > 0) {
+                var childTile = neighbor.children[0];
+
+                // If we have not yet seen the processed tile, push it onto the queue
+                if (!seenTiles.includes(childTile)) {
+                    processTiles.push(childTile);
+                }
+            }
+        })
+    }
+
+    // If we hit every tile, then we have a valid board
+    console.log(`Seen tiles ${seenTiles.length}`);
+    console.log(`All tiles ${board.querySelectorAll(".tile").length}`);
+
+    return seenTiles.length === board.querySelectorAll(".tile").length;
+}
+
+const getAllWords = () => {
+    let allWords = [];
+    // Get all words row wise
+    for (let r = 0; r < rows; r++) {
+        var curWord = "";
+        for (let c = 0; c < columns; c++) {
+            var curCell = board.querySelectorAll(`.cell[data-row="${r}"][data-column="${c}"]`)[0];
+            if (curCell.children.length > 0) {
+                curWord += curCell.children[0].textContent;
+            }
+            else {
+                if (curWord.length > 1) {
+                    allWords.push(curWord);
+                }
+                curWord = "";
+            }
+        }
+    }
+
+    // Get all column wise
+    for (let c = 0; c < columns; c++) {
+        var curWord = "";
+        for (let r = 0; r < rows; r++) {
+            var curCell = board.querySelectorAll(`.cell[data-row="${r}"][data-column="${c}"]`)[0];
+            if (curCell.children.length > 0) {
+                curWord += curCell.children[0].textContent;
+            }
+            else {
+                if (curWord.length > 1) {
+                    allWords.push(curWord);
+                }
+                curWord = "";
+            }
+        }
+    }
+
+    return allWords;
+}
 
 /*
   Ben Code
@@ -220,9 +319,14 @@ var game_name = href_parts[href_parts.length - 1];
 var player_id = null;
 var tiles = [];
 var players = null;
+var game_state = null;
 
 // Whether the current client has already joined the game
 var hasJoined = false;
+
+// Initially hide everything
+document.getElementById("gameplay").style.display = "none";
+document.getElementById("game_over").style.display = "none";
 
 // Warn user before leaving
 window.onbeforeunload = function () {
@@ -275,15 +379,12 @@ function render_game(resp) {
     console.log(resp);
     var cur_tiles = resp["players"][player_id];
 
-    // Hide the join game option
-    $("#join_game").hide();
-    $('#gameplay').hide();
-
     // Render the game based on the various game states
 
     // Waiting to give out tiles
-    if (game_state["state"] == "IDLE") {
+    if (resp["state"] == "IDLE") {
         hideButtons();
+        $("#join_game").hide();
         $(".lobby").show();
         $("#options").show();
         $("#start_game_button").show();
@@ -307,17 +408,38 @@ function render_game(resp) {
         enableDragging();
         $("#gameplay").show();
         $(".lobby").hide();
+        $("#game_over").hide();
         $("#options").show();
         $("#bananagrams_button").show();
         $("#select_button").show();
+
+        // Render only the new tiles
+        var newTiles = findDifference(cur_tiles, tiles);
+        tiles = cur_tiles;
+        populate("bench", createTiles(newTiles));
+        addTileListener();
     } // Game over
     else if (resp["state"] == "OVER") {
         hideButtons();
         disableDragging();
-        $("#gameplay").show();
+        $("#game_over").show();
+        $("#gameplay").hide()
         $(".lobby").hide();
-        $("#options").show();
+        $("#options").show()
         $("#continue_game_button").show();
+
+        // Display the winning content
+        document.getElementById("winning_player").textContent = `${resp["winning_player"]} has called Bananagrams. Verify their board and either continue the game or start a new one!`
+        // Check each winning word's validity and color accordingly
+        var winning_words_list = document.getElementById("winning_words");
+        winning_words_list.innerHTML = "";
+        resp["winning_words"].forEach(word_pair => {
+            if (word_pair[1]) {
+                winning_words_list.innerHTML += `<p style="color: green">${word_pair[0]}</p>`
+            } else {
+                winning_words_list.innerHTML += `<p style="color: red">${word_pair[0]}</p>`
+            }
+        })
     } // Unknown state
     else {
         showError(`An error occurred: Unknown client state.`)
@@ -362,6 +484,11 @@ function split() {
 
 // Perform the peel action
 function peel() {
+    // Make sure the board is valid
+    if (!isValidBoard()) {
+        alert("Your bench must be empty and your board must be valid.")
+        return
+    }
     socket.emit("peel", {
         "name": game_name,
     })
@@ -387,8 +514,17 @@ function swap() {
 
 // Bananagrams
 function bananagrams() {
+    // Make sure the board is valid
+    if (!isValidBoard()) {
+        alert("Your bench must be empty and your board must be valid.")
+        return
+    }
+
+    var words = getAllWords();
     socket.emit("bananagrams", {
         "name": game_name,
+        "player_id": player_id,
+        "words": words
     })
 }
 

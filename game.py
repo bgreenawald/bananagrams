@@ -2,7 +2,7 @@ import datetime
 import random
 from enum import Enum
 from threading import Lock
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 TILE_FREQUENCIES = {
@@ -18,6 +18,10 @@ TILE_FREQUENCIES = {
     13: ["A"],
     18: ["E"],
 }
+
+# Read in the word list
+with open("words/words.txt", "r") as file:
+    WORDS = set([x.strip() for x in file.readlines()])
 
 
 class State(Enum):
@@ -52,6 +56,8 @@ class Game(object):
         num_players (int): The number of players.
         player_tiles (Dict[str, List[str]]): A dictionary mapping each player to their tiles.
         last_peel (datetime.datetime): The time of the last peel, used to prevent overlapping peels.
+        winning_words (List[Tuple[str, bool]]): List of words from the (potentially) winning player
+        winning_player (str): ID of the (potentially) winning player
         lock (threading.Lock): A lock to keep the game state synchronized.
 
     """
@@ -79,6 +85,10 @@ class Game(object):
         # Player tile tracking
         self.players = {}
 
+        # Data for the end of the game
+        self.winning_words = None
+        self.winning_player = None
+
         # Lock for synchronization
         self.lock = Lock()
 
@@ -98,6 +108,10 @@ class Game(object):
 
         # Date created
         self.date_created = datetime.datetime.now()
+
+        # Reset end of game data
+        self.winning_words = None
+        self.winning_player = None
 
         # Reset player tiles
         for player in self.players:
@@ -121,6 +135,9 @@ class Game(object):
             "tiles_remaining": self.tiles_remaining,
             # Players
             "players": self.players,
+            # End of game
+            "winning_words": self.winning_words,
+            "winning_player": self.winning_player,
         }
 
     for_json = __json__
@@ -263,17 +280,29 @@ class Game(object):
         finally:
             self.lock.release()
 
-    def bananagrams(self):
-        """End the game (someone has bananagrams)
+    def bananagrams(self, player_id: str, word_list: List[str]):
+        """
+        End the game (someone has bananagrams)
+
+        Args:
+            player_id (str): The ID of the potentially winning player.
+            word_list (List[str]): The list of the winning words.
         """
         self.lock.acquire(timeout=2)
         try:
+            winning_words = []
             if self.state != State.ENDGAME:
                 raise GameException(
                     f"Cannot call bananagrams, game state is {self.state}. Should be 'ENDGAME'"
                 )
             else:
                 self.state = State.OVER
+            self.winning_player = player_id
+
+            # Iterate over the winning words and check each against the dictionary
+            for word in word_list:
+                winning_words.append((word, word.upper() in WORDS))
+            self.winning_words = winning_words
         finally:
             self.lock.release()
 

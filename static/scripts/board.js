@@ -173,14 +173,14 @@ const handleDrop = e => {
 
     let id = e.dataTransfer.getData('text');
     let primaryTile = document.querySelector(`.tile[data-tile-id="${id}"]`);
-    primaryTile.dataset.row = primaryTile.parentElement.dataset.row;
-    primaryTile.dataset.column = primaryTile.parentElement.dataset.column;
+    let sourceRow = primaryTile.parentElement.dataset.row;
+    let sourceColumn = primaryTile.parentElement.dataset.column;
 
-    primaryTile.dataset.destinationRow = primaryDestinationCell.dataset.row;
-    primaryTile.dataset.destinationColumn = primaryDestinationCell.dataset.column;
+    let destinationRow = primaryDestinationCell.dataset.row;
+    let destinationColumn = primaryDestinationCell.dataset.column;
 
-    const rowChange = Number(primaryTile.dataset.destinationRow) - Number(primaryTile.dataset.row);
-    const columnChange = Number(primaryTile.dataset.destinationColumn) - Number(primaryTile.dataset.column);
+    const rowChange = Number(destinationRow) - Number(sourceRow);
+    const columnChange = Number(destinationColumn) - Number(sourceColumn);
 
     var queueLength = null;
 
@@ -190,22 +190,23 @@ const handleDrop = e => {
         for (var i = 0; i < queueLength; i += 1) {
             var tileData = tilesToDrag.shift();
             secondaryTile = document.querySelector(`.tile[data-tile-id="${tileData.id}"]`);
-            secondaryTile.dataset.row = secondaryTile.parentElement.dataset.row;
-            secondaryTile.dataset.column = secondaryTile.parentElement.dataset.column;
+            sourceRow = secondaryTile.parentElement.dataset.row;
+            sourceColumn = secondaryTile.parentElement.dataset.column;
 
-            secondaryTile.dataset.destinationRow = rowChange + Number(secondaryTile.dataset.row);
-            secondaryTile.dataset.destinationColumn = columnChange + Number(secondaryTile.dataset.column);
+            destinationRow = rowChange + Number(sourceRow);
+            destinationColumn = columnChange + Number(sourceColumn);
 
-            secondaryTile.dataset.row = secondaryTile.dataset.destinationRow;
-            secondaryTile.dataset.column = secondaryTile.dataset.destinationColumn;
-
-            let secondaryDestination = document.querySelector(`#board .cell[data-row="${secondaryTile.dataset.destinationRow}"][data-column="${secondaryTile.dataset.destinationColumn}"]`);
+            let secondaryDestination = document.querySelector(
+                `#board .cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
+            );
             if (secondaryDestination.children.length > 0) {
                 tilesToDrag.push(tileData);
             } else {
                 secondaryDestination.appendChild(secondaryTile);
                 primaryDestinationCell.classList.remove("over");
                 primaryDestinationCell.classList.add("filled");
+                secondaryTile.dataset.row = destinationRow;
+                secondaryTile.dataset.column = destinationColumn;
             }
         }
     }

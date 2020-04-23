@@ -515,12 +515,17 @@ function render_game(resp) {
         $("#options").show();
         $("#peel_button").show();
         $("#select_button").show();
+        $("#tiles_remaining").show();
+
+        // Update the count
+        document.getElementById("tiles_remaining_count").textContent = resp["tiles_remaining"];
 
         // Render only the new tiles
         var newTiles = findDifference(cur_tiles, tiles);
         tiles = cur_tiles;
         populate("bench", createTiles(newTiles));
         addTileListener();
+
     } // Can no longer peel
     else if (resp["state"] == "ENDGAME") {
         hideButtons();
@@ -679,6 +684,7 @@ function hideButtons() {
     $("#select_button").hide();
     $("#bananagrams_button").hide();
     $("#continue_game_button").hide();
+    $("#tiles_remaining").hide();
 }
 
 function findDifference(a, b) {

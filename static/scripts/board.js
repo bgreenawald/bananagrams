@@ -1,4 +1,3 @@
-
 let grabbedTile = null;
 let targetCell = null;
 let originCell = null;
@@ -17,10 +16,10 @@ let columns = 35;
 let tilesToDrag = [];
 
 
-/********************* 
- * 
- *  Helper functions   
- *                  
+/*********************
+ *
+ *  Helper functions
+ *
  *********************/
 
 const isHashMap = (item) => {
@@ -35,10 +34,10 @@ const saveToLocalStorage = (key, rawData) => {
     localStorage.setItem(key, data)
 }
 
-/********************* 
- * 
- *  Render functions   
- *                  
+/*********************
+ *
+ *  Render functions
+ *
  *********************/
 
 const getUserLetters = () => {
@@ -69,8 +68,7 @@ const fillCells = (parentId, childrenArrayOrCellNumber) => {
         for (let i = 0; i < num; i++) {
             parent.innerHTML += `<div class="cell"></div>`;
         }
-    }
-    else if (Array.isArray(childrenArrayOrCellNumber))
+    } else if (Array.isArray(childrenArrayOrCellNumber))
 
         children.forEach(child => {
             parent.innerHTML += child;
@@ -95,10 +93,10 @@ const selectAllTiles = () => {
 
 
 
-/********************* 
- * 
- *  event handlers   
- *                  
+/*********************
+ *
+ *  event handlers
+ *
  *********************/
 
 const handleClick = e => {
@@ -109,7 +107,9 @@ const handleClick = e => {
 
 const handleDragStart = e => {
     e.target.style.opacity = .4;
-    e.target.classList.remove('selected');
+    if (!e.target.classList.contains('selected')) {
+        e.target.classList.add("selected")
+    };
     let selectedTiles = Array.from(document.querySelectorAll('.selected'));
     // casing of tileId is set by browser parsing
     tilesToDrag = selectedTiles.map(tile => {
@@ -142,6 +142,90 @@ const handleDoubleClick = e => {
     return false;
 }
 
+const handleDragEnter = e => {
+    e.preventDefault();
+    if (e.target.children.length === 0) {
+        e.target.classList.add("over");
+    }
+
+};
+
+const handleDragLeave = e => {
+    e.preventDefault();
+    if (e.target.classList.contains("over")) {
+        e.target.classList.remove("over");
+    }
+};
+
+let handleDragOver = e => {
+    if (e.preventDefault) e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    return false;
+};
+
+const handleOnMouseDown = e => {
+    if (e.preventDefault) e.preventDefault();
+    return false;
+}
+
+var id = null;
+
+const handleDrop = e => {
+    e.preventDefault();
+    let primaryDestinationCell = e.target;
+
+    // Get the tile ID and handle the null case
+    id = e.dataTransfer.getData('text');
+    if (id === null || id.trim() === "") {
+        if (primaryDestinationCell.classList.contains("over")) {
+            primaryDestinationCell.classList.remove("over");
+        }
+        return;
+    }
+
+    let primaryTile = document.querySelector(`.tile[data-tile-id="${id}"]`);
+    let sourceRow = primaryTile.parentElement.dataset.row;
+    let sourceColumn = primaryTile.parentElement.dataset.column;
+
+    let destinationRow = primaryDestinationCell.dataset.row;
+    let destinationColumn = primaryDestinationCell.dataset.column;
+
+    const rowChange = Number(destinationRow) - Number(sourceRow);
+    const columnChange = Number(destinationColumn) - Number(sourceColumn);
+
+    var queueLength = null;
+
+    // Continuously try and move tiles one by one until no progress is made.
+    while (queueLength != tilesToDrag.length) {
+        queueLength = tilesToDrag.length;
+        for (var i = 0; i < queueLength; i += 1) {
+            var tileData = tilesToDrag.shift();
+            secondaryTile = document.querySelector(`.tile[data-tile-id="${tileData.id}"]`);
+            sourceRow = secondaryTile.parentElement.dataset.row;
+            sourceColumn = secondaryTile.parentElement.dataset.column;
+
+            destinationRow = rowChange + Number(sourceRow);
+            destinationColumn = columnChange + Number(sourceColumn);
+
+            let secondaryDestination = document.querySelector(
+                `#board .cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
+            );
+            if (secondaryDestination.children.length > 0) {
+                tilesToDrag.push(tileData);
+            } else {
+                secondaryDestination.appendChild(secondaryTile);
+                primaryDestinationCell.classList.remove("over");
+                primaryDestinationCell.classList.add("filled");
+                secondaryTile.dataset.row = destinationRow;
+                secondaryTile.dataset.column = destinationColumn;
+            }
+        }
+    }
+    tilesToDrag = [];
+    cleanBench();
+    resetModifiers('tile');
+}
+
 const resetModifiers = (className) => {
     const elements = Array.from(document.querySelectorAll(`.${className}`));
     elements.forEach(element => {
@@ -159,7 +243,9 @@ const addTileListener = () => {
     });
 }
 
-document.addEventListener("drop", () => { resetModifiers('tile') }, options);
+document.addEventListener("drop", () => {
+    resetModifiers('tile')
+}, options);
 
 const cleanBench = () => {
     var bench = document.querySelector("#bench");
@@ -189,7 +275,10 @@ const toggleMenu = command => {
     menuVisible = !menuVisible;
 };
 
-const setPosition = ({ top, left }) => {
+const setPosition = ({
+    top,
+    left
+}) => {
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
     toggleMenu('show');
@@ -278,8 +367,7 @@ const getAllWords = () => {
             var curCell = board.querySelectorAll(`.cell[data-row="${r}"][data-column="${c}"]`)[0];
             if (curCell.children.length > 0) {
                 curWord += curCell.children[0].textContent;
-            }
-            else {
+            } else {
                 if (curWord.length > 1) {
                     allWords.push(curWord);
                 }
@@ -295,8 +383,7 @@ const getAllWords = () => {
             var curCell = board.querySelectorAll(`.cell[data-row="${r}"][data-column="${c}"]`)[0];
             if (curCell.children.length > 0) {
                 curWord += curCell.children[0].textContent;
-            }
-            else {
+            } else {
                 if (curWord.length > 1) {
                     allWords.push(curWord);
                 }
@@ -307,6 +394,38 @@ const getAllWords = () => {
 
     return allWords;
 }
+
+const populateBoard = () => {
+    let board = document.getElementById("board");
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            board.innerHTML += `<div class="cell" data-row=${r} data-column=${c}></div>`;
+        }
+    }
+
+    // Attach the listeners to the grid cells
+    document.querySelectorAll(".cell").forEach((cell) => {
+        cell.addEventListener("onmousedown", handleOnMouseDown, options)
+        cell.addEventListener("dragenter", handleDragEnter, options);
+        cell.addEventListener("dragleave", handleDragLeave, options);
+        cell.addEventListener("dragover", handleDragOver, options);
+        cell.addEventListener("dragend", handleDragEnd, options);
+        cell.addEventListener("drop", handleDrop, options);
+    });
+
+    centerBoard();
+};
+
+const centerBoard = () => {
+    const boardViewport = document.getElementById("board-viewport");
+    const board = document.getElementById("board");
+    const scrollPositionX = board.offsetLeft + (board.offsetWidth / 2);
+    const scrollPositionY = board.offsetTop + (board.offsetHeight / 3);
+    boardViewport.scrollLeft = scrollPositionX;
+    boardViewport.scrollTop = scrollPositionY;
+}
+
+populateBoard();
 
 /*
   Ben Code

@@ -1,10 +1,13 @@
 <div class="landing flex">
-    <h1>Chalkful</h1>
-    <p class="caption">
-        Welcome to Chalkful, the destination for Bananagrams online! Once you start, you will recieve a URL to share with your friends
-        so they can join.
-    </p>
-    <input id="game_id" type="text" readonly>
-    <button id="game_id_submit" class="btn btn-primary" type="submit" onclick="createGame()">Create New Game</button>
-    <div id="error"></div>
+  <h1>Chalkful</h1>
+  <p class="caption">
+    Welcome to Chalkful, the destination for Bananagrams online! Once you start, you will recieve a URL to share with
+    your friends
+    so they can join.
+  </p>
+  <input #gameID id="game_id" type="text" [value]="suggestedID">
+  <button id="game_id_submit" class="btn btn-primary" type="submit" (click)="createGame(gameID.value)">Create New
+    Game</button>
+  <div id="error"></div>
+  <!-- <p *ngFor="let id of gameIDs"> {{id}}</p> -->
 </div>

@@ -1,15 +1,20 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
-// import { InMemoryDataService } from './in-memory-data.service';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+
+
 import { LobbyComponent } from './components/lobby/lobby.component';
 import { BoardComponent } from './components/board/board.component';
 import { LandingComponent } from './components/landing/landing.component';
 import { GameoverComponent } from './components/gameover/gameover.component';
+import { PageNotFoundComponent } from './components/pagenotfound/pagenotfound.component';
+
+const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
 
 @NgModule({
   declarations: [
@@ -17,15 +22,14 @@ import { GameoverComponent } from './components/gameover/gameover.component';
     LobbyComponent,
     BoardComponent,
     LandingComponent,
-    GameoverComponent
+    GameoverComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
-    // HttpClientInMemoryWebApiModule.forRoot(
-    //   InMemoryDataService, { dataEncapsulation: false }
-    // )
+    HttpClientModule,
+    SocketIoModule.forRoot(config)
   ],
   providers: [],
   bootstrap: [AppComponent]

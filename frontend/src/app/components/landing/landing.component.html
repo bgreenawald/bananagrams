@@ -8,6 +8,5 @@
   <input #gameID id="game_id" type="text" [value]="suggestedID">
   <button id="game_id_submit" class="btn btn-primary" type="submit" (click)="createGame(gameID.value)">Create New
     Game</button>
-  <div id="error"></div>
-  <!-- <p *ngFor="let id of gameIDs"> {{id}}</p> -->
+  <p *ngIf="error" id="error">{{error}}</p>
 </div>

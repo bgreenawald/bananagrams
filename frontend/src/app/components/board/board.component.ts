@@ -1,4 +1,7 @@
+import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Socket } from 'ngx-socket-io';
 
 @Component({
   selector: 'app-board',
@@ -7,9 +10,21 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BoardComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private location: Location,
+    private route: ActivatedRoute,
+    private socket: Socket
+  ) { }
 
   ngOnInit(): void {
+    this.loadGame();
+  }
+
+  loadGame = (): void => {
+    const id = +this.route.snapshot.paramMap.get('id');
+    this.socket.emit("join", {
+      "name": id
+    })
   }
 
 

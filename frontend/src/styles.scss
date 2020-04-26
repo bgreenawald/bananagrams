@@ -7,19 +7,20 @@ $off-white: lighten(antiquewhite, 10%);
 $off-black: darken(antiquewhite, 50%);
 
 // ********** NORMALIZE ********** //
-html, body {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
+html,
+body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
 }
 
 body {
-    min-height: 100%;
-    background-image: url('/assets/chalkboard-background.jpg');
-    background-size: cover;
-    color: $off-white;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  min-height: 100%;
+  background-image: url('/assets/chalkboard-background.jpg');
+  background-size: cover;
+  color: $off-white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -27,51 +28,51 @@ body {
 }
 
 @mixin flexbox() {
-    display: flex;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
 }
 
 @mixin pos-a-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .pos-a {
-    position: absolute;
+  position: absolute;
 }
 
 .pos-r {
-    position: relative;
+  position: relative;
 }
 
 .flex {
-    @include flexbox();
+  @include flexbox();
 }
 
 // ********** FONT IMPORTS ********** //
-@import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Schoolbell&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Gaegu:wght@300;400;700&family=Schoolbell&display=swap');
 
 // Eraser font
 @font-face {
-    font-family: 'eraser';
-    src: url("/assets/fonts/EraserRegular-DO1D.ttf");
-    font-style: 'normal';        
-    font-weight: 'normal';
+  font-family: 'eraser';
+  src: url("/assets/fonts/EraserRegular-DO1D.ttf");
+  font-style: 'normal';
+  font-weight: 'normal';
 }
 
 @font-face {
-    font-family: 'eraser';
-    src: url("/assets/fonts/EraserDust-p70d.ttf");
-    font-style: 'italic';        
-    font-weight: 'normal';
+  font-family: 'eraser';
+  src: url("/assets/fonts/EraserDust-p70d.ttf");
+  font-style: 'italic';
+  font-weight: 'normal';
 }
 
 // @font-face {
@@ -82,41 +83,41 @@ body {
 // }
 
 @font-face {
-    font-family: 'ten-thousand-reasons';
-    src: url("/assets/fonts/KgTenThousandReasons-R1ll.ttf");
-    font-style: 'normal';        
-    font-weight: 'normal';
+  font-family: 'ten-thousand-reasons';
+  src: url("/assets/fonts/KgTenThousandReasons-R1ll.ttf");
+  font-style: 'normal';
+  font-weight: 'normal';
 }
 
 @font-face {
-    font-family: 'stamp';
-    src: url("/assets/fonts/KGThankYouStamp.ttf");
-    font-style: 'normal';        
-    font-weight: 'normal';
+  font-family: 'stamp';
+  src: url("/assets/fonts/KGThankYouStamp.ttf");
+  font-style: 'normal';
+  font-weight: 'normal';
 }
 
 
 
 // ********** PAGE FONTS ********** //
 h1 {
-    font-family: 'eraser', arial, sans-serif;
-    font-size: 5em;
-    letter-spacing: .15em;
-    margin: 0px;
-    // -webkit-text-stroke: 0.5px black;
-    // text-shadow: 1px 1px black;
-    text-align: center;
-    font-weight: normal;
+  font-family: 'eraser', arial, sans-serif;
+  font-size: 5em;
+  letter-spacing: .15em;
+  margin: 0px;
+  // -webkit-text-stroke: 0.5px black;
+  // text-shadow: 1px 1px black;
+  text-align: center;
+  font-weight: normal;
 }
 
 p {
-    font-family: 'gaegu', arial, sans-serif;
-    font-size: 1.5em;
-    // letter-spacing: .15em;
-    text-align: center;
-    font-weight: normal;
+  font-family: 'gaegu', arial, sans-serif;
+  font-size: 1.5em;
+  // letter-spacing: .15em;
+  text-align: center;
+  font-weight: normal;
 }
 
 p.caption {
-    font-size: 1.4em;
+  font-size: 1.4em;
 }

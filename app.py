@@ -19,6 +19,7 @@ app = Flask(__name__, static_url_path='', static_folder='static')
 app.debug = True
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app)
+socketio.init_app(app, cors_allowed_origins="*")
 
 # Add Sass
 Scss(app, static_dir="static/styles/css", asset_dir="static/styles/scss")

@@ -17,13 +17,19 @@ export class BoardComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadGame();
+    this.socketConnect();
   }
 
-  loadGame = (): void => {
+  socketConnect = (): void => {
     const id = +this.route.snapshot.paramMap.get('id');
-    this.socket.emit("join", {
-      "name": id
+    this.socket.on("connect", _ => {
+      this.socket.emit("join", {
+        "name": id
+      })
+    })
+
+    this.socket.on("render_game", resp => {
+      console.log(resp)
     })
   }
 

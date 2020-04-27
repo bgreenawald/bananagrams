@@ -6,10 +6,6 @@ import { Injectable } from '@angular/core';
 export class EventHandleService {
 
   constructor() { }
-  handleDragEnd = e => {
-    e.target.style.opacity = "";
-  }
-
 
   handleClick = e => {
     e.preventDefault();
@@ -37,6 +33,10 @@ export class EventHandleService {
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text", e.target.dataset.tileId);
   };
+
+  handleDragEnd = e => {
+    e.target.style.opacity = "";
+  }
 
   handleDoubleClick = e => {
     e.preventDefault();

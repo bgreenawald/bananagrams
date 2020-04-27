@@ -44,7 +44,7 @@ export class LandingComponent implements OnInit {
     let submittedID: number = Number(id.trim());
     if (!id) { return; }
     if (this.isIDUnique(submittedID)) {
-      this.router.navigate([`/game/${submittedID}`]);
+      this.router.navigate([`/lobby/${submittedID}`]);
     }
     else {
       this.error = "ID not available.  Please choose a different room."

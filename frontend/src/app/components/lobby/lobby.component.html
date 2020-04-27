@@ -1,22 +1,23 @@
 <header class="lobby">
-    <div class="lobby-content">
-        <div id="error"></div>
-        <div id="join_game">
-            <p>First things first, enter your username to join the game.</p>
-            <input id="player_id" type="text" placeholder="Enter your username">
-            <button id="player_id_submit" class="btn btn-primary" type="submit" onclick="player_join()">
-                Join the Game
-            </button>
-        </div>
-        <div id="game_info"></div>
-        <p>Your game ID is. Share your current URL with friends and they can access the game too!</p>
-        <div id="options" style="display: none;">
-            <p class="lobby-wait-message">Waiting for other players. Hit "Start" when everyone has joined.</p>
-            <button class="btn btn-primary" id="start_game_button" type="submit" onclick="start_game()">Start</button>
-            <div>
-                <p>Players in Lobby:</p>
-                <ul id="players"></ul>
-            </div>
-        </div>
+  <div class="lobby-content">
+    <div id="error"></div>
+    <div id="join_game" *ngIf="!playersInLobby">
+      <p>First things first, enter your username to join the game.</p>
+      <input #playerID id="player_id" type="text" placeholder="Enter your username">
+      <button id="player_id_submit" class="btn btn-primary" type="submit" (click)="playerJoin(playerID.value)">
+        Join the Game
+      </button>
     </div>
+    <div id="options" *ngIf="playersInLobby">
+      <div id="players-in-lobby">
+        <p>Players in Lobby:</p>
+        <ul id="players"></ul>
+        <p *ngFor="let player of playersInLobby">{{player}}</p>
+      </div>
+      <p class="lobby-wait-message">Waiting for other players. Hit "Start" when everyone has joined.</p>
+      <button class="btn btn-primary" id="start_game_button" type="submit" onclick="start_game()">Start</button>
+    </div>
+    <div id="game_info"></div>
+    <p>Your game ID is. Share your current URL with friends and they can access the game too!</p>
+  </div>
 </header>

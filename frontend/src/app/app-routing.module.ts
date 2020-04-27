@@ -8,7 +8,7 @@ import { PageNotFoundComponent } from './components/pagenotfound/pagenotfound.co
 
 
 const routes: Routes = [
-  { path: 'lobby', component: LobbyComponent },
+  { path: 'lobby/:id', component: LobbyComponent },
   { path: 'game/:id', component: BoardComponent },
   { path: '', component: LandingComponent },
   { path: '**', component: PageNotFoundComponent }

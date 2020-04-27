@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { Socket } from 'ngx-socket-io';
-import { ActivatedRoute } from '@angular/router';
+
 import { Observable, of, fromEvent } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-lobby',
@@ -17,7 +20,8 @@ export class LobbyComponent implements OnInit {
 
   constructor(
     private socket: Socket,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -48,6 +52,10 @@ export class LobbyComponent implements OnInit {
           this.playersInLobby.push(user)
         }
       }
+
+      if (resp.message === "Game loaded.") {
+        this.router.navigate([`/game/${this.gameID}`]);
+      }
     })
   }
 
@@ -63,4 +71,9 @@ export class LobbyComponent implements OnInit {
     })
   }
 
+  startGame = (): void => {
+    this.socket.emit("state_game", {
+      "name": this.gameID
+    })
+  }
 }

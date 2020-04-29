@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Socket } from 'ngx-socket-io';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,22 +14,31 @@ export class SocketService {
   ) { }
 
   socketInit = (gameID: string): void => {
-    console.log('connecting game id', gameID)
     this.gameID = gameID;
+    console.log('initializating socket with', this.gameID)
 
     this.socket.on("connect", () => {
       this.socket.emit("join", {
         "name": this.gameID
-      })
-    });
-    this.socket.emit("load_game", {
-      "name": this.gameID
+      });
+      // this.socket.emit("load_game", {
+      //   "name": this.gameID
+      // });
+      this.socketReceive();
     });
   }
 
-  socketReceive = (): void => {
-    this.socket.on("render_game", response => {
-      return response;
+  socketSend = (gameID, message) => {
+    this.socket.emit(message, {
+      "name": gameID
+    })
+  }
+
+  socketReceive = () => {
+    return Observable.create((observer) => {
+      this.socket.on("game", message => {
+        observer.next(message)
+      })
     })
   }
 }

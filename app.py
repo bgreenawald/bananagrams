@@ -80,7 +80,8 @@ def on_join(data: Dict[str, Any]):
     """
     room_name = data["name"]
     join_room(room_name)
-    logger.info(f"{request.sid} has entered the room {room_name}")
+    # logger.info(f"{request.sid} has entered the room {room_name}")
+    logger.info(f"Client {request.sid} has connected to room {room_name}")
 
 
 @socketio.on("connect")

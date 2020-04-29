@@ -2,6 +2,8 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
+import { SocketService } from '../../services/socket.service';
+
 
 @Component({
   selector: 'app-board',
@@ -9,30 +11,37 @@ import { Socket } from 'ngx-socket-io';
   styleUrls: ['./board.component.scss']
 })
 export class BoardComponent implements OnInit {
+  public gameID: string; // numerical game id formatted as a string
+  public playerJoined: boolean = false;
+  public playerID: string;
 
   constructor(
     private location: Location,
     private route: ActivatedRoute,
-    private socket: Socket
+    private socket: Socket,
+    private socketService: SocketService
   ) { }
 
   ngOnInit(): void {
-    this.socketConnect();
+    // this.connectComponentToSocket();
+    // this.socketReceive();
   }
 
-  socketConnect = (): void => {
+  setGameID = () => {
     const id = +this.route.snapshot.paramMap.get('id');
-    this.socket.on("connect", _ => {
-      this.socket.emit("join", {
-        "name": id
-      })
-    })
-
-    this.socket.on("render_game", resp => {
-      console.log(resp)
-    })
+    this.gameID = id.toString();
   }
 
+  // connectComponentToSocket = () => {
+  //   this.socketService.socketInit(this.gameID);
+  // }
+
+  // socketReceive = (): void => {
+  //   this.socket.on("render_game", resp => {
+  //     console.log(resp.status_code, resp.message, JSON.parse(resp.payload));
+  //     let data = JSON.parse(resp.payload);
+  //   })
+  // }
 
   getUserLetters = () => {
     const username = localStorage.getItem("player_id");

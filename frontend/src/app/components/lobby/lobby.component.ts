@@ -6,6 +6,8 @@ import { Socket } from 'ngx-socket-io';
 import { Observable, of, fromEvent } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
+import { SocketService } from '../../services/socket.service';
+
 
 @Component({
   selector: 'app-lobby',
@@ -21,45 +23,23 @@ export class LobbyComponent implements OnInit {
   constructor(
     private socket: Socket,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private socketService: SocketService
   ) { }
-
   ngOnInit(): void {
-    this.socketReceive();
-    this.socketInit();
-  }
+    this.setGameID();
 
-  socketInit = (): void => {
-    const id = +this.route.snapshot.paramMap.get('id');
-    this.gameID = id.toString();
-
-    this.socket.on("connect", _ => {
-      this.socket.emit("join", {
-        "name": this.gameID
-      })
-      this.socket.emit("load_game", {
-        "name": this.gameID
-      })
+    // use socket.io to join the room with respective gameID/roomID
+    this.socket.emit("join", {
+      "name": this.gameID
     })
-  }
-
-  socketReceive = (): void => {
-    this.socket.on("render_game", resp => {
-      console.log(resp.status_code, resp.message, JSON.parse(resp.payload));
-      let data = JSON.parse(resp.payload);
-      if (data.players) {
-        for (let user in data.players) {
-          this.playersInLobby.push(user)
-        }
-      }
-
-      if (resp.message === "Game loaded.") {
-        this.router.navigate([`/game/${this.gameID}`]);
-      }
+    this.socket.emit("load_game", {
+      "name": this.gameID
     })
   }
 
   playerJoin = (playerID: string): void => {
+
     if (!playerID) return; //if the id input is empty, stop function execution here. 
 
     this.playerID = playerID;
@@ -69,11 +49,16 @@ export class LobbyComponent implements OnInit {
       "name": this.gameID,
       "player_id": this.playerID
     })
+    // this.socketService.socketSend(this.gameID, "player_join")
   }
 
   startGame = (): void => {
-    this.socket.emit("state_game", {
+    this.socket.emit("start_game", {
       "name": this.gameID
     })
+  }
+
+  setGameID = () => {
+    this.gameID = this.route.snapshot.paramMap.get("id");
   }
 }

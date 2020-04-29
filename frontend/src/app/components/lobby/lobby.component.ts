@@ -27,15 +27,7 @@ export class LobbyComponent implements OnInit {
     private socketService: SocketService
   ) { }
   ngOnInit(): void {
-    this.setGameID();
 
-    // use socket.io to join the room with respective gameID/roomID
-    this.socket.emit("join", {
-      "name": this.gameID
-    })
-    this.socket.emit("load_game", {
-      "name": this.gameID
-    })
   }
 
   playerJoin = (playerID: string): void => {
@@ -45,17 +37,10 @@ export class LobbyComponent implements OnInit {
     this.playerID = playerID;
     localStorage.setItem("player_id", playerID.toString());
 
-    this.socket.emit("player_join", {
-      "name": this.gameID,
-      "player_id": this.playerID
-    })
-    // this.socketService.socketSend(this.gameID, "player_join")
   }
 
   startGame = (): void => {
-    this.socket.emit("start_game", {
-      "name": this.gameID
-    })
+
   }
 
   setGameID = () => {

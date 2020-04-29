@@ -23,8 +23,7 @@ export class BoardComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // this.connectComponentToSocket();
-    // this.socketReceive();
+
   }
 
   setGameID = () => {
@@ -32,16 +31,6 @@ export class BoardComponent implements OnInit {
     this.gameID = id.toString();
   }
 
-  // connectComponentToSocket = () => {
-  //   this.socketService.socketInit(this.gameID);
-  // }
-
-  // socketReceive = (): void => {
-  //   this.socket.on("render_game", resp => {
-  //     console.log(resp.status_code, resp.message, JSON.parse(resp.payload));
-  //     let data = JSON.parse(resp.payload);
-  //   })
-  // }
 
   getUserLetters = () => {
     const username = localStorage.getItem("player_id");

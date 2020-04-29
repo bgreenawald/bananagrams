@@ -23,33 +23,6 @@ export class AppComponent implements OnInit {
     private socketService: SocketService
   ) { }
   ngOnInit() {
-    // if url has new game id,
-    // connect socket
-    this.router.events.subscribe(event => {
-      this.detectGameIDChange(event);
-    })
-    this.socketService.socketInit(this.gameID);
-    this.socketService
-      .socketReceive()
-      .subscribe((message: string) => {
-        console.log(message)
-      })
-  }
 
-
-  detectGameIDChange = (event) => {
-    if (event instanceof NavigationEnd) {
-      let currentGameID: string = event.url.split("/")[2];
-      if (this.gameID !== currentGameID && !!currentGameID) {
-        this.setGameID(currentGameID);
-        this.socketService.socketInit(this.gameID);
-      }
-    }
-  }
-
-  setGameID = (newGameID: string) => {
-    console.log('setting game id from: ', this.gameID)
-    this.gameID = newGameID;
-    console.log('to: ', this.gameID)
   }
 }

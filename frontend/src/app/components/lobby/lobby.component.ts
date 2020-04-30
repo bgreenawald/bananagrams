@@ -21,22 +21,25 @@ export class LobbyComponent implements OnInit {
   public playersInLobby: string[] = [];
 
   constructor(
-    private socket: Socket,
     private route: ActivatedRoute,
     private router: Router,
+    private socket: Socket,
     private socketService: SocketService
   ) { }
   ngOnInit(): void {
-
+    this.setGameID();
+    this.socketSubscribe();
+    this.socketService.loadOrCreateGame(this.gameID);
   }
 
   playerJoin = (playerID: string): void => {
-
     if (!playerID) return; //if the id input is empty, stop function execution here. 
+    // TODO: disable join the game button if input is empty
 
     this.playerID = playerID;
     localStorage.setItem("player_id", playerID.toString());
 
+    this.socketService.playerJoin(this.gameID, this.playerID);
   }
 
   startGame = (): void => {
@@ -44,6 +47,19 @@ export class LobbyComponent implements OnInit {
   }
 
   setGameID = () => {
-    this.gameID = this.route.snapshot.paramMap.get("id");
+    const id = this.route.snapshot.paramMap.get('id');
+    this.gameID = id;
+  }
+
+  socketSubscribe = () => {
+    this.socketService.receive()
+      .subscribe(resp => {
+        let payload = JSON.parse(resp.payload);
+        if (payload.players) {
+          for (let player in payload.players) {
+            this.playersInLobby.push(player)
+          }
+        }
+      })
   }
 }

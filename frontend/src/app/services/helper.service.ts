@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HelperService {
 
-  constructor() { }
+  constructor(
+    private router: Router
+  ) { }
 
   saveToLocalStorage = (key, rawData) => {
     let data = rawData;
@@ -13,6 +16,12 @@ export class HelperService {
       data = JSON.stringify(data);
     }
     localStorage.setItem(key, data)
+  }
+
+  getGameID = (): string => {
+    const url = this.router.routerState.snapshot.url;
+    const id = url.split("/")[2];
+    return id;
   }
 
   private _isHashMap = (item) => {

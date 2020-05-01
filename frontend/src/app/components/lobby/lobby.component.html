@@ -1,6 +1,6 @@
 <header class="lobby">
   <div class="lobby-content">
-    <div id="error"></div>
+    <div *ngIf="error" id="error">{{error}}</div>
     <div id="join_game" *ngIf="playersInLobby.length === 0">
       <p>First things first, enter your username to join the game.</p>
       <input #playerID id="player_id" type="text" placeholder="Enter your username">

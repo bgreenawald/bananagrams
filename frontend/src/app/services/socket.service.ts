@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
 })
 export class SocketService {
   // public gameID: string; // numerical game id formatted as a string
-
   constructor(
     private socket: Socket
   ) { }
@@ -29,7 +28,7 @@ export class SocketService {
     })
   }
 
-  receive = () => {
+  receive = (): Observable<any> => {
     return Observable.create(observer => {
       this.socket.on("render_game", resp => {
         observer.next(resp)

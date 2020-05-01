@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.detectIDChange();
-    this.socketSubscribe();
+    // this.socketSubscribe();
   }
 
   detectIDChange = () => {
@@ -43,11 +43,11 @@ export class AppComponent implements OnInit {
     })
   }
 
-  socketSubscribe = () => {
-    this.socketService.receive()
-      .subscribe(resp => {
-        let parsedPayload = JSON.parse(resp.payload);
-        console.log(parsedPayload)
-      })
-  }
+  // socketSubscribe = () => {
+  //   this.socketService.receive()
+  //     .subscribe(resp => {
+  //       let parsedPayload = JSON.parse(resp.payload);
+  //       console.log(parsedPayload)
+  //     })
+  // }
 }

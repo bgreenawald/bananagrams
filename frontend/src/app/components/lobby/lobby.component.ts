@@ -4,9 +4,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
 
 import { Observable, of, fromEvent } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map, tap, first } from 'rxjs/operators';
 
 import { SocketService } from '../../services/socket.service';
+import { Response } from 'selenium-webdriver/http';
 
 
 @Component({
@@ -19,12 +20,14 @@ export class LobbyComponent implements OnInit {
   public playerJoined: boolean = false;
   public playerID: string;
   public playersInLobby: string[] = [];
+  public error: string;
+  private messages$ = this.socketService.receive();
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private socket: Socket,
-    private socketService: SocketService
+    private socketService: SocketService,
   ) { }
   ngOnInit(): void {
     this.setGameID();
@@ -43,7 +46,14 @@ export class LobbyComponent implements OnInit {
   }
 
   startGame = (): void => {
-
+    this.socket.emit("start_game", {
+      "name": this.gameID
+    })
+    // TODO: only navigate if receive 200
+    this.socketService.receive().pipe(first()).subscribe(resp => {
+      console.log(resp)
+      if (resp.status_code === "200") this.router.navigate([`/game/${this.gameID}`]);
+    })
   }
 
   setGameID = () => {
@@ -52,14 +62,20 @@ export class LobbyComponent implements OnInit {
   }
 
   socketSubscribe = () => {
-    this.socketService.receive()
-      .subscribe(resp => {
-        let payload = JSON.parse(resp.payload);
-        if (payload.players) {
-          for (let player in payload.players) {
+    this.messages$.pipe(
+      map(resp => JSON.parse(resp.payload)),
+      catchError(_ => of(false))
+    )
+      .subscribe(data => {
+        if (data.players) {
+          for (let player in data.players) {
             this.playersInLobby.push(player)
           }
         }
-      })
+        else {
+          this.error = "error found"
+        }
+      }
+      )
   }
 }

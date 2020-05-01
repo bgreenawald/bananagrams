@@ -7,8 +7,7 @@ import { Observable, of, fromEvent, throwError } from 'rxjs';
 import { catchError, map, tap, first } from 'rxjs/operators';
 
 import { SocketService } from '../../services/socket.service';
-import { Response } from 'selenium-webdriver/http';
-
+import { ErrorService } from '../../services/error.service';
 
 @Component({
   selector: 'app-lobby',
@@ -24,6 +23,7 @@ export class LobbyComponent implements OnInit {
   private messages$ = this.socketService.receive();
 
   constructor(
+    private errorService: ErrorService,
     private route: ActivatedRoute,
     private router: Router,
     private socket: Socket,
@@ -82,8 +82,11 @@ export class LobbyComponent implements OnInit {
             this.playersInLobby.push(player)
           }
         }
+        if (value.message === "Game loaded.") {
+          this.router.navigate([`/game/${this.gameID}`])
+        }
       },
-        err => this.error = err
+        err => this.error = this.errorService.parseError(err)
       )
   }
 }

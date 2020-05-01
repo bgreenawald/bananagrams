@@ -30,6 +30,7 @@ export class LobbyComponent implements OnInit {
     private socketService: SocketService,
   ) { }
   ngOnInit(): void {
+    this.setPlayerID();
     this.setGameID();
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
@@ -49,16 +50,15 @@ export class LobbyComponent implements OnInit {
     this.socket.emit("start_game", {
       "name": this.gameID
     })
-    // TODO: only navigate if receive 200
-    // this.socketService.receive().pipe(first()).subscribe(resp => {
-    //   console.log(resp)
-    //   if (resp.status_code === "200") this.router.navigate([`/game/${this.gameID}`]);
-    // })
   }
 
   setGameID = () => {
     const id = this.route.snapshot.paramMap.get('id');
     this.gameID = id;
+  }
+
+  setPlayerID = () => {
+    this.playerID = localStorage.getItem("player_id");
   }
 
   socketSubscribe = () => {
@@ -77,6 +77,7 @@ export class LobbyComponent implements OnInit {
       .subscribe(value => {
         console.log(value)
         if (value.data.players) {
+          this.playersInLobby = [];
           for (let player in value.data.players) {
             this.playersInLobby.push(player)
           }

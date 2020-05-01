@@ -1,14 +1,14 @@
 <header class="lobby">
   <div class="lobby-content">
     <div *ngIf="error" id="error">{{error}}</div>
-    <div id="join_game" *ngIf="playersInLobby.length === 0">
+    <div id="join_game" *ngIf="!playerID">
       <p>First things first, enter your username to join the game.</p>
       <input #playerID id="player_id" type="text" placeholder="Enter your username">
       <button id="player_id_submit" class="btn btn-primary" type="submit" (click)="playerJoin(playerID.value)">
         Join the Game
       </button>
     </div>
-    <div id="options" *ngIf="playersInLobby.length > 0">
+    <div id="options" *ngIf="playerID">
       <div id="players-in-lobby">
         <p>Players in Lobby:</p>
         <ul id="players"></ul>

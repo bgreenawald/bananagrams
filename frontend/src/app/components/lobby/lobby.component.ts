@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { Socket } from 'ngx-socket-io';
 
-import { Observable, of, fromEvent } from 'rxjs';
+import { Observable, of, fromEvent, throwError } from 'rxjs';
 import { catchError, map, tap, first } from 'rxjs/operators';
 
 import { SocketService } from '../../services/socket.service';
@@ -50,10 +50,10 @@ export class LobbyComponent implements OnInit {
       "name": this.gameID
     })
     // TODO: only navigate if receive 200
-    this.socketService.receive().pipe(first()).subscribe(resp => {
-      console.log(resp)
-      if (resp.status_code === "200") this.router.navigate([`/game/${this.gameID}`]);
-    })
+    // this.socketService.receive().pipe(first()).subscribe(resp => {
+    //   console.log(resp)
+    //   if (resp.status_code === "200") this.router.navigate([`/game/${this.gameID}`]);
+    // })
   }
 
   setGameID = () => {
@@ -63,19 +63,26 @@ export class LobbyComponent implements OnInit {
 
   socketSubscribe = () => {
     this.messages$.pipe(
-      map(resp => JSON.parse(resp.payload)),
-      catchError(_ => of(false))
+      map(resp => {
+        if (resp.status_code !== 200) throw `error: ${resp.message}`
+        const value = {
+          ...resp,
+          "data": JSON.parse(resp.payload)
+        };
+        return value;
+      }
+      ),
+      catchError(errorMessage => throwError(errorMessage))
     )
-      .subscribe(data => {
-        if (data.players) {
-          for (let player in data.players) {
+      .subscribe(value => {
+        console.log(value)
+        if (value.data.players) {
+          for (let player in value.data.players) {
             this.playersInLobby.push(player)
           }
         }
-        else {
-          this.error = "error found"
-        }
-      }
+      },
+        err => this.error = err
       )
   }
 }

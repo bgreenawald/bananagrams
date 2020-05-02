@@ -15,6 +15,8 @@ import { GameoverComponent } from './components/gameover/gameover.component';
 import { PageNotFoundComponent } from './components/pagenotfound/pagenotfound.component';
 import { TileComponent } from './components/tile/tile.component';
 import { CellComponent } from './components/cell/cell.component';
+import { BenchComponent } from './components/bench/bench.component';
+import { GameComponent } from './components/game/game.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
 
@@ -27,7 +29,9 @@ const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
     GameoverComponent,
     PageNotFoundComponent,
     TileComponent,
-    CellComponent
+    CellComponent,
+    BenchComponent,
+    GameComponent
   ],
   imports: [
     BrowserModule,

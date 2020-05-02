@@ -5,6 +5,8 @@ import { Injectable } from '@angular/core';
 })
 export class RenderService {
 
+  public tilesArray
+
   constructor() { }
 
   public generateID = () => {
@@ -34,17 +36,6 @@ export class RenderService {
     // }
   }
 
-  createTiles = (lettersArray) => {
-    let tilesArray = [];
-    Array.prototype.forEach.call(lettersArray, function (letter, index) {
-      // tilesArray.push(`<div class="cell" data-row="0" data-column="${index}"><span class="tile" data-tile-id="${numberOfTiles}" draggable="true">${letter}</span></div>`);
-      // numberOfTiles += 1;
-    });
-
-    return tilesArray;
-  };
-
-
   fillCells = (parentId, childrenArrayOrCellNumber) => {
     const parent = document.getElementById(parentId);
     if (typeof (childrenArrayOrCellNumber) === "number") {
@@ -73,6 +64,18 @@ export class RenderService {
         tile.classList.add('selected')
       }
     })
+  }
+
+  getBrowserInfo = () => {
+    const browserInfo = {
+      width: window.innerWidth,
+      height: window.innerHeight
+    }
+    return browserInfo;
+  }
+
+  generateBoard = () => {
+
   }
 
 }

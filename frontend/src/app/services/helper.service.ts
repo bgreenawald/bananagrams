@@ -10,7 +10,14 @@ export class HelperService {
     private router: Router
   ) { }
 
-  saveToLocalStorage = (key, rawData) => {
+
+  public getGameID = (): string => {
+    const url = this.router.routerState.snapshot.url;
+    const id = url.split("/")[2];
+    return id;
+  }
+
+  public saveToLocalStorage = (key, rawData) => {
     let data = rawData;
     if (this._isHashMap(data)) {
       data = JSON.stringify(data);
@@ -18,11 +25,6 @@ export class HelperService {
     localStorage.setItem(key, data)
   }
 
-  getGameID = (): string => {
-    const url = this.router.routerState.snapshot.url;
-    const id = url.split("/")[2];
-    return id;
-  }
 
   private _isHashMap = (item) => {
     return (!Array.isArray(item) && typeof (item) === 'object')

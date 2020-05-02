@@ -8,6 +8,7 @@ import { catchError, map, tap, first } from 'rxjs/operators';
 
 import { SocketService } from '../../services/socket.service';
 import { ErrorService } from '../../services/error.service';
+import { AppComponent } from '../../app.component';
 
 @Component({
   selector: 'app-lobby',
@@ -17,12 +18,13 @@ import { ErrorService } from '../../services/error.service';
 export class LobbyComponent implements OnInit {
   public gameID: string; // numerical game id formatted as a string
   public playerJoined: boolean = false;
-  public playerID: string;
+  public playerID: string = this.app.playerID;
   public playersInLobby: string[] = [];
   public error: string;
-  private messages$ = this.socketService.receive();
+  private messages$ = this.app.getMessages();
 
   constructor(
+    public app: AppComponent,
     private errorService: ErrorService,
     private route: ActivatedRoute,
     private router: Router,
@@ -30,7 +32,6 @@ export class LobbyComponent implements OnInit {
     private socketService: SocketService,
   ) { }
   ngOnInit(): void {
-    this.setPlayerID();
     this.setGameID();
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
@@ -57,24 +58,10 @@ export class LobbyComponent implements OnInit {
     this.gameID = id;
   }
 
-  setPlayerID = () => {
-    this.playerID = localStorage.getItem("player_id");
-  }
 
   // TODO: refactor
   socketSubscribe = () => {
-    this.messages$.pipe(
-      map(resp => {
-        if (resp.status_code !== 200) throw `error: ${resp.message}`
-        const value = {
-          ...resp,
-          "data": JSON.parse(resp.payload)
-        };
-        return value;
-      }
-      ),
-      catchError(errorMessage => throwError(errorMessage))
-    )
+    this.messages$
       .subscribe(value => {
         console.log(value)
         if (value.data.players) {

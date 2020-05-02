@@ -13,6 +13,8 @@ import { BoardComponent } from './components/board/board.component';
 import { LandingComponent } from './components/landing/landing.component';
 import { GameoverComponent } from './components/gameover/gameover.component';
 import { PageNotFoundComponent } from './components/pagenotfound/pagenotfound.component';
+import { TileComponent } from './components/tile/tile.component';
+import { CellComponent } from './components/cell/cell.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
 
@@ -23,7 +25,9 @@ const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
     BoardComponent,
     LandingComponent,
     GameoverComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    TileComponent,
+    CellComponent
   ],
   imports: [
     BrowserModule,

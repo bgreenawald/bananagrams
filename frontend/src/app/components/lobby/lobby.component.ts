@@ -61,6 +61,7 @@ export class LobbyComponent implements OnInit {
     this.playerID = localStorage.getItem("player_id");
   }
 
+  // TODO: refactor
   socketSubscribe = () => {
     this.messages$.pipe(
       map(resp => {
@@ -82,7 +83,7 @@ export class LobbyComponent implements OnInit {
             this.playersInLobby.push(player)
           }
         }
-        if (value.message === "Game loaded.") {
+        if (value.message === "Game started") {
           this.router.navigate([`/game/${this.gameID}`])
         }
       },

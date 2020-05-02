@@ -29,6 +29,7 @@ export class LandingComponent implements OnInit {
   ngOnInit(): void {
     this.getIDs()
     this.generateNewID();
+    localStorage.clear();
   }
 
   getIDs = () => {

@@ -8,4 +8,7 @@
   display: flex;
   min-width: $cell-dimension;
   min-height: $cell-dimension;
+  margin: 0;
+  padding: 0;
+  border: 1px solid $off-white;
 }

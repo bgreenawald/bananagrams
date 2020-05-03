@@ -17,6 +17,7 @@ import { TileComponent } from './components/tile/tile.component';
 import { CellComponent } from './components/cell/cell.component';
 import { BenchComponent } from './components/bench/bench.component';
 import { GameComponent } from './components/game/game.component';
+import { MenuGameplayComponent } from './components/menu-gameplay/menu-gameplay.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
 
@@ -31,7 +32,8 @@ const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
     TileComponent,
     CellComponent,
     BenchComponent,
-    GameComponent
+    GameComponent,
+    MenuGameplayComponent
   ],
   imports: [
     BrowserModule,

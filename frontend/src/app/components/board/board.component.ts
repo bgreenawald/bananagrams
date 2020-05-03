@@ -20,7 +20,6 @@ export class BoardComponent implements OnInit {
   ngOnInit(): void {
     this.rows = new Array(Number(this.rowNumber)).fill(null).map((x, i) => i);
     this.columns = new Array(Number(this.rowNumber)).fill(null).map((x, i) => i);
-    console.log(this.rows)
   }
 
 }

@@ -1,12 +1,19 @@
 @import '../../../styles.scss';
 
+app-board {
+  flex-grow: 2;
+  //   border: 2px solid pink;
+  overflow: scroll;
+  height: 400px;
+  width: 96%;
+  position: relative;
+}
+
 #board-viewport {
   position: relative;
-  height: 70%;
-  width: 96%;
-  overflow: scroll;
+  //   overflow: scroll;
   margin: 0 auto;
-  flex-grow: 2;
+
 
   #board {
     display: grid;
@@ -18,7 +25,7 @@
     .cell {
       border-radius: 2px;
       // background-color: antiquewhite;
-      border: 1px solid rgba($off-white, 0.5);
+      //   border: 1px solid rgba($off-white, 0.5);
     }
   }
 }

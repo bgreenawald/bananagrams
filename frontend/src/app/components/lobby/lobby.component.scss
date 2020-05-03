@@ -3,3 +3,24 @@
 * {
   text-align: center;
 }
+
+label {
+  font-family: "Gaegu";
+}
+
+input {
+  font-size: 20px;
+}
+
+#join_game {
+  @include flexbox();
+  flex-flow: column nowrap;
+}
+
+// lobby wait
+#options {
+  @include flexbox();
+  justify-content: center;
+  align-items: center;
+  flex-flow: column nowrap;
+}

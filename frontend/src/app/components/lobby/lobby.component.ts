@@ -35,6 +35,12 @@ export class LobbyComponent implements OnInit {
     this.setGameID();
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
+    this.autoJoin();
+  }
+
+  autoJoin = () => {
+    console.log(this.playerID)
+    if (this.playerID) this.playerJoin(this.playerID);
   }
 
   playerJoin = (playerID: string): void => {

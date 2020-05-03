@@ -1,0 +1,11 @@
+@import '../../../styles.scss';
+
+.cell {
+  z-index: 50;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  min-width: $cell-dimension;
+  min-height: $cell-dimension;
+}

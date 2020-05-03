@@ -22,15 +22,8 @@ $cell-dimension: 40px;
     align-items: center;
     justify-content: center;
     z-index: 200;
-    // width: 40px;
-    // background-color: darken(antiquewhite, 10%);
-    // position: absolute;
-    // top: 15vh;
-    // left: 2vw;
 
     .cell {
-      min-width: $cell-dimension;
-      min-height: $cell-dimension;
       padding: 1px;
       margin: 1px;
     }
@@ -57,34 +50,6 @@ $cell-dimension: 40px;
         border: 1px solid rgba($off-white, 0.5);
       }
     }
-  }
-
-  .cell {
-    z-index: 50;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-  }
-
-  .tile {
-    background-color: transparent;
-    z-index: 1;
-    color: $off-white;
-    cursor: pointer;
-    border-radius: 10px;
-    width: 20px;
-    height: 20px;
-    padding: 5px;
-    text-align: center;
-    // border: 2px solid $off-white;
-    margin: 1px;
-    z-index: 999;
-    font-family: "stamp";
-    font-size: 40px;
-    margin: 4px 0px 0px -6px;
-    text-align: left;
-    line-height: 15px;
   }
 
   .tile.selected {

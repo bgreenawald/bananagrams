@@ -1,4 +1,4 @@
-app-bench {
+#bench {
   border-radius: 20px;
   display: flex;
   flex-flow: row wrap;
@@ -6,9 +6,4 @@ app-bench {
   align-items: center;
   justify-content: center;
   z-index: 200;
-
-  app-cell {
-    padding: 1px;
-    margin: 1px;
-  }
 }

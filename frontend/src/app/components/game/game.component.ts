@@ -24,7 +24,8 @@ export class GameComponent implements OnInit {
   public gameID: string; // numerical game id formatted as a string
   public playerJoined: boolean = false;
   public playerID: string = this.app.getPlayerID();
-  public rows: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  public tiles: string[];
+
   private messages$ = this.app.getMessages();
 
   constructor(
@@ -57,7 +58,9 @@ export class GameComponent implements OnInit {
   socketSubscribe = () => {
     this.messages$
       .subscribe(value => {
-        console.log(value)
+        console.log(value.data.players)
+        console.log(this.playerID)
+        this.tiles = value.data.players[this.playerID]
       },
         err => this.error = this.errorService.parseError(err)
       )

@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   public gameID: string; // numerical game id formatted as a string
   public playerID: string;
   public playersInLobby: string[];
+  private playersTiles: string[];
   private messages$ = this.socketService.receive();
 
   constructor(
@@ -60,9 +61,11 @@ export class AppComponent implements OnInit {
     this.playerID = localStorage.getItem("player_id");
   }
 
-  getPlayerID = () => this.playerID;
+  getPlayerID = (): string => this.playerID;
 
-  getGameID = () => this.gameID;
+  getGameID = (): string => this.gameID;
+
+  getPlayers = (): string[] => this.playersTiles;
 
   // TODO: refactor
   getMessages = (): Observable<any> => {

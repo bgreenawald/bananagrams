@@ -7,6 +7,8 @@ import { AppComponent } from './app.component';
 
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
+import { DragDropModule } from '@angular/cdk/drag-drop';
+
 
 import { LobbyComponent } from './components/lobby/lobby.component';
 import { BoardComponent } from './components/board/board.component';
@@ -18,6 +20,7 @@ import { CellComponent } from './components/cell/cell.component';
 import { BenchComponent } from './components/bench/bench.component';
 import { GameComponent } from './components/game/game.component';
 import { MenuGameplayComponent } from './components/menu-gameplay/menu-gameplay.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
 
@@ -39,7 +42,9 @@ const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    SocketIoModule.forRoot(config)
+    SocketIoModule.forRoot(config),
+    BrowserAnimationsModule,
+    DragDropModule
   ],
   providers: [],
   bootstrap: [AppComponent]

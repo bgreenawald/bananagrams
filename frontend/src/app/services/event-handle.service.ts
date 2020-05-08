@@ -140,13 +140,18 @@ export class EventHandleService {
     }
     this.tilesToDrag = [];
     this.clearSelectedTiles();
-    primaryDestinationCell.classList.remove("over")
+    this.cleanBench();
+    primaryDestinationCell.classList.remove("over");
   }
 
   clearSelectedTiles = () => {
     this.selectedTiles.forEach(tile => {
       tile.classList.remove('selected')
     })
+  }
+
+  cleanBench = () => {
+    // TODO
   }
 
 }

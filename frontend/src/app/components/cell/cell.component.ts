@@ -1,4 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ElementRef } from '@angular/core';
+
+import { EventHandleService } from '../../services/event-handle.service';
 
 @Component({
   selector: 'app-cell',
@@ -9,9 +11,39 @@ export class CellComponent implements OnInit {
   @Input() row!: number;
   @Input() column!: number;
 
-  constructor() { }
+  constructor(
+    private ref: ElementRef,
+    private eventHandler: EventHandleService
+  ) { }
 
   ngOnInit(): void {
   }
+
+  handleOnMouseDown = (e) => {
+    // console.log('mouse down')
+    // this.eventHandler.handleOnMouseDown(e);
+  }
+
+  handleDragEnter = (e) => {
+    this.eventHandler.handleDragEnter(e);
+  }
+
+  handleDragLeave = (e) => {
+    this.eventHandler.handleDragLeave(e);
+  }
+
+  handleDragOver = (e) => {
+    this.eventHandler.handleDragOver(e);
+  }
+
+  handleDragEnd = (e) => {
+    e.target.classList.remove('over')
+  }
+
+  handleDrop = (e) => {
+    console.log('drop')
+    this.eventHandler.handleDrop(e);
+  }
+
 
 }

@@ -1,3 +1,5 @@
-<div class="cell" [attr.data-row]="row" [attr.data-column]="column">
+<div class="cell" [attr.data-row]="row" [attr.data-column]="column" (mousedown)="handleOnMouseDown($event)"
+  (dragenter)="handleDragEnter($event)" (dragleave)="handleDragLeave($event)" (dragover)="handleDragOver($event)"
+  (dragend)="handleDragEnd($event)" (drop)="handleDrop($event)">
   <ng-content></ng-content>
 </div>

@@ -5,29 +5,43 @@ import { Injectable } from '@angular/core';
 })
 export class EventHandleService {
 
+  public selectedTiles = [];
+  public tilesToDrag = [];
+
   constructor() { }
 
   handleClick = e => {
     e.preventDefault();
     let classes = e.target.classList;
-    classes.contains('selected') ? classes.remove('selected') : classes.add('selected');
+    if (classes.contains('selected')) {
+      classes.remove('selected')
+    }
+    else {
+      classes.add('selected');
+      this.selectedTiles.push(e.target)
+    }
+    console.log('selected tiles', this.selectedTiles)
   }
 
-  handleDragStart = e => {
-    e.target.style.opacity = .4;
-    if (!e.target.classList.contains('selected')) {
-      e.target.classList.add("selected")
-    };
-    let selectedTiles = Array.from(document.querySelectorAll('.selected'));
+  handleDragStart = (e, selectedTiles) => {
+    // e.target.style.opacity = .4;
+    // if (!e.target.classList.contains('selected')) {
+    e.target.classList.add("selected")
+    this.selectedTiles.push(e.target)
+
+    // };
+    // e.target.classList.contains('selected') ? e.target.classList.remove('selected') : e.target.classList.add('selected')
+    // let selectedTiles = Array.from(document.querySelectorAll('.selected'));
     // casing of tileId is set by browser parsing
-    // tilesToDrag = selectedTiles.map(tile => {
-    //     let tileData = {
-    //         id: tile.dataset.tileId,
-    //         row: tile.parentElement.dataset.row,
-    //         column: tile.parentElement.dataset.column
-    //     }
-    //     return tileData
-    // });
+    this.tilesToDrag = this.selectedTiles.map(tile => {
+      const tileData = {
+        id: tile.dataset.tileId,
+        row: tile.parentElement.parentElement.dataset.row || 0,
+        column: tile.parentElement.parentElement.dataset.column || 0
+      }
+      return tileData
+    });
+    console.log('tiles to drag', this.tilesToDrag)
     e.target.style.cursor = "grabbing";
     e.dataTransfer.dropEffect = "copy";
     e.dataTransfer.effectAllowed = "move";
@@ -35,18 +49,16 @@ export class EventHandleService {
   };
 
   handleDragEnd = e => {
-    e.target.style.opacity = "";
+    e.preventDefault();
+    // e.target.style.opacity = "1";
+    this.selectedTiles.forEach(tile => {
+      tile.classList.remove('selected')
+    })
+    this.selectedTiles = [];
   }
 
   handleDoubleClick = e => {
     e.preventDefault();
-    // menu.setAttribute("active-tile-id", e.target.getAttribute("data-tile-id"))
-    // // Set the position for the menu
-    // const origin = {
-    //   left: e.pageX,
-    //   top: e.pageY
-    // };
-    // setPosition(origin);
     return false;
   }
 
@@ -78,10 +90,12 @@ export class EventHandleService {
 
   handleDrop = e => {
     e.preventDefault();
+
     let primaryDestinationCell = e.target;
 
     // Get the tile ID and handle the null case
     let id = e.dataTransfer.getData('text');
+
     if (id === null || id.trim() === "") {
       if (primaryDestinationCell.classList.contains("over")) {
         primaryDestinationCell.classList.remove("over");
@@ -90,46 +104,49 @@ export class EventHandleService {
     }
 
     let primaryTile = document.querySelector(`.tile[data-tile-id="${id}"]`);
-    let sourceRow = primaryTile.parentElement.dataset.row;
-    let sourceColumn = primaryTile.parentElement.dataset.column;
+    console.log(primaryTile.parentElement.parentElement.dataset)
+    let sourceRow = Number(primaryTile.parentElement.parentElement.dataset.row);
+    let sourceColumn = Number(primaryTile.parentElement.parentElement.dataset.column);
 
-    let destinationRow = primaryDestinationCell.dataset.row;
-    let destinationColumn = primaryDestinationCell.dataset.column;
 
-    const rowChange = Number(destinationRow) - Number(sourceRow);
-    const columnChange = Number(destinationColumn) - Number(sourceColumn);
+    let destinationRow = Number(primaryDestinationCell.dataset.row);
+    let destinationColumn = Number(primaryDestinationCell.dataset.column);
 
-    var queueLength = null;
+    const rowChange = destinationRow - sourceRow;
+    const columnChange = destinationColumn - sourceColumn;
 
-    // Continuously try and move tiles one by one until no progress is made.
-    // while (queueLength != tilesToDrag.length) {
-    //     queueLength = tilesToDrag.length;
-    //     for (var i = 0; i < queueLength; i += 1) {
-    //         var tileData = tilesToDrag.shift();
-    //         secondaryTile = document.querySelector(`.tile[data-tile-id="${tileData.id}"]`);
-    //         sourceRow = secondaryTile.parentElement.dataset.row;
-    //         sourceColumn = secondaryTile.parentElement.dataset.column;
 
-    //         destinationRow = rowChange + Number(sourceRow);
-    //         destinationColumn = columnChange + Number(sourceColumn);
+    //move additional cells 
+    if (this.selectedTiles.length > 0) {
+      this.selectedTiles.forEach((tile, i) => {
+        let sourceRow = Number(tile.parentElement.parentElement.dataset.row);
+        let sourceColumn = Number(tile.parentElement.parentElement.dataset.column);
 
-    //         let secondaryDestination = document.querySelector(
-    //             `#board .cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
-    //         );
-    //         if (secondaryDestination.children.length > 0) {
-    //             tilesToDrag.push(tileData);
-    //         } else {
-    //             secondaryDestination.appendChild(secondaryTile);
-    //             primaryDestinationCell.classList.remove("over");
-    //             primaryDestinationCell.classList.add("filled");
-    //             secondaryTile.dataset.row = destinationRow;
-    //             secondaryTile.dataset.column = destinationColumn;
-    //         }
-    //     }
-    // }
-    // tilesToDrag = [];
-    // cleanBench();
-    // resetModifiers('tile');
+        let destinationRow = rowChange + sourceRow;
+        let destinationColumn = columnChange + sourceColumn;
+
+        let secondaryDestination = document.querySelector(
+          `#board .cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
+        );
+
+        if (secondaryDestination.children.length === 0) {
+
+          secondaryDestination.appendChild(tile);
+          secondaryDestination.classList.add("filled");
+          tile.dataset.row = destinationRow;
+          tile.dataset.column = destinationColumn;
+        }
+      })
+    }
+    this.tilesToDrag = [];
+    this.clearSelectedTiles();
+    primaryDestinationCell.classList.remove("over")
+  }
+
+  clearSelectedTiles = () => {
+    this.selectedTiles.forEach(tile => {
+      tile.classList.remove('selected')
+    })
   }
 
 }

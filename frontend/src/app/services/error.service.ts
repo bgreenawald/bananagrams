@@ -11,8 +11,9 @@ export class ErrorService {
     switch (err) {
       case "error: Cannot start game, game state is State.ACTIVE. Should be 'IDLE'":
         return "This game is already underway!  Wait until it's over to join!"
+      // TODO: if error is not empty, send back error
       default:
-        return err
+        return "Error found!";
     }
   }
 }

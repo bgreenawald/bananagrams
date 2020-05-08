@@ -31,6 +31,7 @@ export class LobbyComponent implements OnInit {
     private socket: Socket,
     private socketService: SocketService,
   ) { }
+
   ngOnInit(): void {
     this.setGameID();
     this.socketSubscribe();

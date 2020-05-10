@@ -82,4 +82,13 @@ export class AppComponent implements OnInit {
       catchError(errorMessage => throwError(errorMessage))
     )
   }
+
+  handleClick = (e) => {
+    // is the clicked element NOT the swap button
+    const didClickOutsideSwap: boolean = !e.target.classList.contains('swap');
+    const swapButton = document.querySelector('button.swap');
+    if (swapButton && didClickOutsideSwap) {
+      this.helperService.globalClick('click')
+    }
+  }
 }

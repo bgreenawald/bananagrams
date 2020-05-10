@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, ElementRef } from '@angular/core';
 
 import { EventHandleService } from '../../services/event-handle.service';
+import { HelperService } from '../../services/helper.service';
 
 @Component({
   selector: 'app-tile',
@@ -16,8 +17,13 @@ export class TileComponent implements OnInit {
 
   constructor(
     private ref: ElementRef,
-    private eventHandler: EventHandleService
-  ) { }
+    private eventHandler: EventHandleService,
+    private helperService: HelperService
+  ) {
+    helperService.globalClick$.subscribe(click => {
+      this.clearSwapButton();
+    })
+  }
 
   ngOnInit(): void {
 
@@ -37,5 +43,9 @@ export class TileComponent implements OnInit {
 
   handleDragEnd = e => {
     this.eventHandler.handleDragEnd(e);
+  }
+
+  clearSwapButton = () => {
+    this.displaySwap = false;
   }
 }

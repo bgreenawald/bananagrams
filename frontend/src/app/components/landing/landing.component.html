@@ -5,7 +5,7 @@
     your friends
     so they can join.
   </p>
-  <input #gameID id="game_id" type="text" [value]="suggestedID">
+  <input #gameID id="game_id" type="text" [value]="suggestedID" (keydown.enter)="createGame(gameID.value)">
   <button id="game_id_submit" class="btn btn-primary" type="submit" (click)="createGame(gameID.value)">Create New
     Game</button>
   <p *ngIf="error" id="error">{{error}}</p>

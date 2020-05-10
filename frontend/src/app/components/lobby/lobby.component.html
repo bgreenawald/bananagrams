@@ -3,7 +3,8 @@
     <div *ngIf="error" id="error">{{error}}</div>
     <div id="join_game" *ngIf="!playerID">
       <p>First things first, enter your username to join the game.</p>
-      <input #playerID id="player_id" type="text" placeholder="Enter your username">
+      <input #playerID id="player_id" type="text" placeholder="Enter your username"
+        (keydown)="playerJoin(playerID.value)">
       <button id="player_id_submit" class="btn btn-primary" type="submit" (click)="playerJoin(playerID.value)">
         Join the Game
       </button>

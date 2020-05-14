@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Socket } from 'ngx-socket-io';
 
@@ -19,18 +19,19 @@ import { AppComponent } from '../../app.component';
   encapsulation: ViewEncapsulation.None
 })
 export class GameComponent implements OnInit {
-  public allTiles: string[];
   public error: string;
   public gameID: string; // numerical game id formatted as a string
   public playerJoined: boolean = false;
-  public playerID: string = this.app.getPlayerID();
+  public playerID: string = this.app.playerID;
+  public playersTiles: string[];
   public tiles: string[];
 
   private messages$ = this.app.getMessages();
 
   constructor(
-    private app: AppComponent,
+    public app: AppComponent,
     private route: ActivatedRoute,
+    private router: Router,
     private socket: Socket,
     private errorService: ErrorService,
     private socketService: SocketService
@@ -38,10 +39,11 @@ export class GameComponent implements OnInit {
 
   ngOnInit(): void {
     this._getPlayerID();
-    this._getUserLetters();
+    // this._getUserLetters();
     this.setGameID();
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
+    console.log(this)
   }
 
   setGameID = () => {
@@ -58,21 +60,14 @@ export class GameComponent implements OnInit {
   socketSubscribe = () => {
     this.messages$
       .subscribe(value => {
-        console.log(value.data.players)
-        console.log(this.playerID)
+        console.log(value)
         this.tiles = value.data.players[this.playerID]
+        // this.tiles = ["t"]
+        // if (value.state === "IDLE") {
+        //   this.router.navigate([`/lobby/${this.gameID}`])
+        // }
       },
         err => this.error = this.errorService.parseError(err)
       )
-  }
-
-  private _getUserLetters = () => {
-    this.allTiles = JSON.parse(localStorage.getItem("players"));
-    for (let player in this.allTiles) {
-      if (player === this.playerID) {
-        console.log(this.allTiles)
-        return this.allTiles[this.playerID];
-      }
-    }
   }
 }

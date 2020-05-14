@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   public gameID: string; // numerical game id formatted as a string
   public playerID: string;
   public playersInLobby: string[];
+  public tiles: string[];
   private playersTiles: string[];
   private messages$ = this.socketService.receive();
 
@@ -36,7 +37,7 @@ export class AppComponent implements OnInit {
     this.detectIDChange();
     this.setPlayerID();
     this.setGameID();
-    this.getMessages();
+    this.socketSubscribe();
   }
 
   detectIDChange = () => {
@@ -67,6 +68,8 @@ export class AppComponent implements OnInit {
 
   getPlayers = (): string[] => this.playersTiles;
 
+  getUserTiles = () => this.tiles;
+
   // TODO: refactor
   getMessages = (): Observable<any> => {
     return this.messages$.pipe(
@@ -81,6 +84,22 @@ export class AppComponent implements OnInit {
       ),
       catchError(errorMessage => throwError(errorMessage))
     )
+  }
+
+  socketSubscribe = () => {
+    this.getMessages()
+      .subscribe(value => {
+        console.log(value)
+        if (value.data.players) {
+          this.playersInLobby = [];
+          for (let player in value.data.players) {
+            this.playersInLobby.push(player)
+          }
+          this.tiles = value.data.players[this.playerID]
+        }
+      },
+        err => console.log(err)
+      )
   }
 
   handleClick = (e) => {

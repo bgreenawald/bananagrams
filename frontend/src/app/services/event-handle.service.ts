@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
+import { HelperService } from './helper.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventHandleService {
-
   public selectedTiles = [];
   public tilesToDrag = [];
 
-  constructor() { }
+  constructor(
+    private helperService: HelperService,
+  ) { }
 
   handleClick = e => {
     e.preventDefault();
@@ -20,7 +22,6 @@ export class EventHandleService {
       classes.add('selected');
       this.selectedTiles.push(e.target)
     }
-    console.log('selected tiles', this.selectedTiles)
   }
 
   handleDragStart = (e, selectedTiles) => {
@@ -41,7 +42,6 @@ export class EventHandleService {
       }
       return tileData
     });
-    console.log('tiles to drag', this.tilesToDrag)
     e.target.style.cursor = "grabbing";
     e.dataTransfer.dropEffect = "copy";
     e.dataTransfer.effectAllowed = "move";
@@ -140,8 +140,21 @@ export class EventHandleService {
     }
     this.tilesToDrag = [];
     this.clearSelectedTiles();
-    this.cleanBench();
+    this.helperService.cleanBench();
     primaryDestinationCell.classList.remove("over");
+  }
+
+  handleSwap = (activeTileID: number, tilesArray: string[]) => {
+    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"`);
+    const letter = tileToRemove.textContent;
+    tileToRemove.parentNode.removeChild(tileToRemove);
+    // Also remove element from the global tiles array
+    let index = tilesArray.indexOf(letter);
+    if (index !== -1) tilesArray.splice(index, 1);
+
+    this.helperService.cleanBench();
+
+    return letter;
   }
 
   clearSelectedTiles = () => {
@@ -149,9 +162,4 @@ export class EventHandleService {
       tile.classList.remove('selected')
     })
   }
-
-  cleanBench = () => {
-    // TODO
-  }
-
 }

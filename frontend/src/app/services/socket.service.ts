@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SocketService {
-  // public gameID: string; // numerical game id formatted as a string
   constructor(
     private socket: Socket
   ) { }

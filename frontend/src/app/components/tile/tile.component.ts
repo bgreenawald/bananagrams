@@ -1,7 +1,11 @@
 import { Component, OnInit, Input, ElementRef } from '@angular/core';
 
+import { Socket } from 'ngx-socket-io';
+
 import { EventHandleService } from '../../services/event-handle.service';
 import { HelperService } from '../../services/helper.service';
+
+import { AppComponent } from '../../app.component';
 
 @Component({
   selector: 'app-tile',
@@ -12,13 +16,17 @@ export class TileComponent implements OnInit {
   @Input() index: number;
   @Input() letter: string;
 
+  public gameID = this.app.gameID;
+  public playerID = this.app.playerID;
   public selectedTiles: any[] = [];
   public displaySwap: boolean = false;
 
   constructor(
-    private ref: ElementRef,
+    private app: AppComponent,
     private eventHandler: EventHandleService,
-    private helperService: HelperService
+    private helperService: HelperService,
+    private ref: ElementRef,
+    private socket: Socket
   ) {
     helperService.globalClick$.subscribe(click => {
       this.clearSwapButton();
@@ -43,6 +51,16 @@ export class TileComponent implements OnInit {
 
   handleDragEnd = e => {
     this.eventHandler.handleDragEnd(e);
+  }
+
+  handleSwap = () => {
+    const tiles = this.app.getUserTiles();
+    const letter = this.eventHandler.handleSwap(this.index, tiles);
+    this.socket.emit("swap", {
+      name: this.gameID,
+      "letter": letter,
+      "player_id": this.playerID
+    })
   }
 
   clearSwapButton = () => {

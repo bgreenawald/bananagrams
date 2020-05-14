@@ -13,6 +13,24 @@ export class HelperService {
     private router: Router
   ) { }
 
+  cleanBench = () => {
+    const bench = document.getElementById('bench');
+
+    let emptyCells = [];
+    Array.from(bench.children).forEach((cell, i) => {
+      if (cell.children.length === 0) {
+        emptyCells.push(cell);
+      }
+    })
+
+    Array.from(emptyCells).forEach(cell => {
+      bench.removeChild(cell);
+    })
+
+    Array.from(bench.children).forEach((benchCell, i) => {
+      benchCell.dataset.column = i;
+    })
+  }
 
   public getGameID = (): string => {
     const url = this.router.routerState.snapshot.url;

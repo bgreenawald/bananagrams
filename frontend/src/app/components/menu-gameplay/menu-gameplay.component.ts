@@ -30,6 +30,8 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   peel = () => {
+    // this.isValidBoard()
+    // throw error if not valid board
     this.socket.emit("peel", {
       "name": this.gameID
     })
@@ -41,18 +43,11 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   bananagrams = () => {
+    // this.isValidBoard() ? alert('works') : null;
     this.socket.emit("banangrams", {
       "name": this.gameID,
       "player_id": this.playerID,
       // "words": words
-    })
-  }
-
-  swap = () => {
-    this.socket.emit("swap", {
-      "name": this.gameID,
-      "player_id": this.playerID,
-      // "letter": letter
     })
   }
 

@@ -17,8 +17,10 @@ export class HelperService {
     const bench = document.getElementById('bench');
 
     let emptyCells = [];
-    Array.from(bench.children).forEach((cell, i) => {
-      if (cell.children.length === 0) {
+    const benchCells = Array.from(bench.children);
+    benchCells.forEach((cell, i) => {
+      const childTile = cell.children[0].children[0].children[0];
+      if (!childTile) {
         emptyCells.push(cell);
       }
     })
@@ -28,7 +30,7 @@ export class HelperService {
     })
 
     Array.from(bench.children).forEach((benchCell, i) => {
-      benchCell.dataset.column = i;
+      benchCell.children[0].dataset.column = i;
     })
   }
 

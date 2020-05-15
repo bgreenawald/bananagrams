@@ -16,7 +16,7 @@ import { AppComponent } from '../../app.component';
   styleUrls: ['./lobby.component.scss']
 })
 export class LobbyComponent implements OnInit {
-  public gameID: string = this.app.gameID; // numerical game id formatted as a string
+  public gameID: string; // numerical game id formatted as a string
   public playerJoined: boolean = false;
   public playerID: string = this.app.playerID;
   public playersInLobby: string[] = [];
@@ -33,6 +33,7 @@ export class LobbyComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.setGameID();
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
     this.autoJoin();
@@ -57,6 +58,11 @@ export class LobbyComponent implements OnInit {
     this.socket.emit("start_game", {
       "name": this.gameID
     })
+  }
+
+  setGameID = () => {
+    const id = this.route.snapshot.paramMap.get('id');
+    this.gameID = id;
   }
 
 

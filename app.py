@@ -16,7 +16,7 @@ from jsonschema import validate, ValidationError
 from game import Game, GameException
 
 # Initialize the application
-app = Flask(__name__, static_url_path='', static_folder='static')
+app = Flask(__name__, static_url_path="", static_folder="static")
 app.debug = True
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app)
@@ -78,12 +78,7 @@ def on_join(data: Dict[str, Any]):
     Args:
         data (dict): Name of the room.
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "name": {}
-        }
-    }
+    schema = {"type": "object", "properties": {"name": {}}}
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -136,16 +131,11 @@ def emit_game(game_name: str, game: Game, msg: str):
 def load_game(data: Dict[Any, Any]):
     """Loads the current game game, or creates on if none exists.
     Args:
-        json (Dict[Any, Any]): {
+        data (Dict[Any, Any]): {
             "game": (Any) The name of the game.
         }
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "name": {}
-        }
-    }
+    schema = {"type": "object", "properties": {"name": {}}}
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -174,13 +164,7 @@ def player_join(data: Dict[Any, Any]):
             "player_id": (Any) ID of the player to join the game.
         }
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "name": {},
-            "player_id": {}
-        }
-    }
+    schema = {"type": "object", "properties": {"name": {}, "player_id": {}}}
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -189,7 +173,7 @@ def player_join(data: Dict[Any, Any]):
         else:
             logger.error("No game specified in input.")
     else:
-        game_name = json["name"]
+        game_name = data["name"]
         try:
             game = all_games[game_name]
         except KeyError:
@@ -198,16 +182,16 @@ def player_join(data: Dict[Any, Any]):
             return
 
         # See if the player has already joined
-        if json["player_id"] in game.players:
+        if data["player_id"] in game.players:
             emit_game(
                 game_name,
                 game,
-                f"Player {json['player_id']} already joined, returning game.",
+                f"Player {data['player_id']} already joined, returning game.",
             )
             return
         try:
-            game.join_game(json["player_id"])
-            emit_game(game_name, game, f"Added player {json['player_id']} to game.")
+            game.join_game(data["player_id"])
+            emit_game(game_name, game, f"Added player {data['player_id']} to game.")
         except GameException as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
@@ -222,12 +206,7 @@ def start_game(data: Dict[Any, Any]):
             "name": (Any) The name of the game.
         }
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "name": {}
-        }
-    }
+    schema = {"type": "object", "properties": {"name": {}}}
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -261,12 +240,7 @@ def peel(data: Dict[Any, Any]):
             "game": (Any) The name of the game.
         }
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "name": {}
-        }
-    }
+    schema = {"type": "object", "properties": {"name": {}}}
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -275,7 +249,7 @@ def peel(data: Dict[Any, Any]):
         else:
             logger.error("No game specified in input.")
     else:
-        game_name = json["name"]
+        game_name = data["name"]
         try:
             game = all_games[game_name]
         except KeyError:
@@ -305,11 +279,7 @@ def swap(data: Dict[Any, Any]):
     """
     schema = {
         "type": "object",
-        "properties": {
-            "name": {},
-            "player_id": {},
-            "letter": {"type": "string"},
-        }
+        "properties": {"name": {}, "player_id": {}, "letter": {"type": "string"}},
     }
     try:
         validate(data, schema=schema)
@@ -329,7 +299,7 @@ def swap(data: Dict[Any, Any]):
 
         try:
             game.swap(data["letter"], data["player_id"])
-            emit_game(game_name, game, f"Performed swap for player {json['player_id']}")
+            emit_game(game_name, game, f"Performed swap for player {data['player_id']}")
         except GameException as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
@@ -349,11 +319,7 @@ def bananagrams(data: Dict[Any, Any]):
     """
     schema = {
         "type": "object",
-        "properties": {
-            "name": {},
-            "player_id": {},
-            "words": {"type": "array"},
-        }
+        "properties": {"name": {}, "player_id": {}, "words": {"type": "array"}},
     }
     try:
         validate(data, schema=schema)
@@ -389,12 +355,7 @@ def continue_game(data: Dict[Any, Any]):
             "game": (Any) The name of the game.
         }
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "name": {}
-        }
-    }
+    schema = {"type": "object", "properties": {"name": {}}}
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -424,16 +385,11 @@ def reset(data: Dict[Any, Any]):
     """Resets the given game.
 
     Args:
-        json (Dict[Any, Any]): {
+        data (Dict[Any, Any]): {
             "game": (Any) The name of the game.
         }
     """
-    schema = {
-        "type": "object",
-        "properties": {
-            "name": {}
-        }
-    }
+    schema = {"type": "object", "properties": {"name": {}}}
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -442,7 +398,7 @@ def reset(data: Dict[Any, Any]):
         else:
             logger.error("No game specified in input.")
     else:
-        game_name = json["name"]
+        game_name = data["name"]
         try:
             game = all_games[game_name]
         except KeyError:

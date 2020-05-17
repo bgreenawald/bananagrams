@@ -78,7 +78,11 @@ def on_join(data: Dict[str, Any]):
     Args:
         data (dict): Name of the room.
     """
-    schema = {"type": "object", "properties": {"name": {}}}
+    schema = {
+        "type": "object",
+        "properties": {"name": {"type": ["string", "number"]}},
+        "required": ["name"],
+    }
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -135,7 +139,11 @@ def load_game(data: Dict[Any, Any]):
             "game": (Any) The name of the game.
         }
     """
-    schema = {"type": "object", "properties": {"name": {}}}
+    schema = {
+        "type": "object",
+        "properties": {"name": {"type": ["string", "number"]}},
+        "required": ["name"],
+    }
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -164,7 +172,14 @@ def player_join(data: Dict[Any, Any]):
             "player_id": (Any) ID of the player to join the game.
         }
     """
-    schema = {"type": "object", "properties": {"name": {}, "player_id": {}}}
+    schema = {
+        "type": "object",
+        "properties": {
+            "name": {"type": ["string", "number"]},
+            "player_id": {"type": ["string", "number"]},
+        },
+        "required": ["name", "player_id"],
+    }
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -206,7 +221,11 @@ def start_game(data: Dict[Any, Any]):
             "name": (Any) The name of the game.
         }
     """
-    schema = {"type": "object", "properties": {"name": {}}}
+    schema = {
+        "type": "object",
+        "properties": {"name": {"type": ["string", "number"]}},
+        "required": ["name"],
+    }
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -240,7 +259,11 @@ def peel(data: Dict[Any, Any]):
             "game": (Any) The name of the game.
         }
     """
-    schema = {"type": "object", "properties": {"name": {}}}
+    schema = {
+        "type": "object",
+        "properties": {"name": {"type": ["string", "number"]}},
+        "required": ["name"],
+    }
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -279,7 +302,12 @@ def swap(data: Dict[Any, Any]):
     """
     schema = {
         "type": "object",
-        "properties": {"name": {}, "player_id": {}, "letter": {"type": "string"}},
+        "properties": {
+            "name": {"type": ["string", "number"]},
+            "player_id": {"type": ["string", "number"]},
+            "letter": {"type": "string"},
+        },
+        "required": ["name", "player_id", "letter"],
     }
     try:
         validate(data, schema=schema)
@@ -319,7 +347,12 @@ def bananagrams(data: Dict[Any, Any]):
     """
     schema = {
         "type": "object",
-        "properties": {"name": {}, "player_id": {}, "words": {"type": "array"}},
+        "properties": {
+            "name": {"type": ["string", "number"]},
+            "player_id": {"type": ["string", "number"]},
+            "words": {"type": "array"},
+        },
+        "required": ["name", "player_id", "words"],
     }
     try:
         validate(data, schema=schema)
@@ -355,7 +388,11 @@ def continue_game(data: Dict[Any, Any]):
             "game": (Any) The name of the game.
         }
     """
-    schema = {"type": "object", "properties": {"name": {}}}
+    schema = {
+        "type": "object",
+        "properties": {"name": {"type": ["string", "number"]}},
+        "required": ["name"],
+    }
     try:
         validate(data, schema=schema)
     except ValidationError as e:
@@ -389,7 +426,11 @@ def reset(data: Dict[Any, Any]):
             "game": (Any) The name of the game.
         }
     """
-    schema = {"type": "object", "properties": {"name": {}}}
+    schema = {
+        "type": "object",
+        "properties": {"name": {"type": ["string", "number"]}},
+        "required": ["name"],
+    }
     try:
         validate(data, schema=schema)
     except ValidationError as e:

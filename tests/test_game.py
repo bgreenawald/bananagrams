@@ -31,13 +31,14 @@ class testGameMethods(unittest.TestCase):
             self.assertEqual(g.state, State.ACTIVE)
 
         g.reset()
+        with self.subTest("Check number of players set to None."):
+            self.assertEqual(g.num_players, None)
         with self.subTest("Check players have no tiles after reset"):
-            print(g)
             self.assertTrue(all(g.players[id_] == [] for id_ in ids))
         g.join_game("id_2")
         with self.subTest("Check players can join after reset."):
             self.assertEqual(len(g.players), 3)
-        with self.subTest("Test game state before reset."):
+        with self.subTest("Test game state after reset."):
             self.assertEqual(g.state, State.IDLE)
 
     def test_join_player(self):
@@ -318,3 +319,7 @@ class testGameMethods(unittest.TestCase):
 
         with self.subTest("Test game in endgame state."):
             self.assertEqual(g.state, State.ENDGAME)
+        with self.subTest("Test winning player reset."):
+            self.assertEqual(g.winning_player, None)
+        with self.subTest("Test winning words reset."):
+            self.assertEqual(g.winning_words, None)

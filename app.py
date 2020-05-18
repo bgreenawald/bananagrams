@@ -244,7 +244,7 @@ def start_game(data: Dict[Any, Any]):
 
         try:
             game.start_game()
-            emit_game(game_name, game, "Game started")
+            emit_game(game_name, game, "Game started.")
         except GameException as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
@@ -327,7 +327,9 @@ def swap(data: Dict[Any, Any]):
 
         try:
             game.swap(data["letter"], data["player_id"])
-            emit_game(game_name, game, f"Performed swap for player {data['player_id']}")
+            emit_game(
+                game_name, game, f"Performed swap for player {data['player_id']}."
+            )
         except GameException as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))

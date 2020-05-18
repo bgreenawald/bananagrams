@@ -5,7 +5,7 @@ import time
 import pytest
 
 from app import app, all_games, socketio
-from game import Game, GameException, State
+from game import Game
 
 
 @pytest.fixture

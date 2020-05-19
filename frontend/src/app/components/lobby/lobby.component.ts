@@ -70,15 +70,12 @@ export class LobbyComponent implements OnInit {
   socketSubscribe = () => {
     this.messages$
       .subscribe(value => {
-        console.log(value)
+        console.log("DATA", value.data)
         if (value.data.players) {
           this.playersInLobby = [];
           for (let player in value.data.players) {
             this.playersInLobby.push(player)
           }
-        }
-        if (value.message === "Game started") {
-          this.router.navigate([`/game/${this.gameID}`])
         }
       },
         err => this.error = this.errorService.parseError(err)

@@ -20,4 +20,8 @@ export class ErrorService {
   displayError(message: string) {
     document.querySelector('#error').textContent = message;
   }
+
+  clearError = () => {
+    document.querySelector('#error').textContent = "";
+  }
 }

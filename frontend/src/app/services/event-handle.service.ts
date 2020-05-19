@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HelperService } from './helper.service';
+import { ErrorService } from './error.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,11 +10,13 @@ export class EventHandleService {
   public tilesToDrag = [];
 
   constructor(
+    private errorService: ErrorService,
     private helperService: HelperService,
   ) { }
 
   handleClick = e => {
     e.preventDefault();
+    this.errorService.clearError();
     let classes = e.target.classList;
     if (classes.contains('selected')) {
       classes.remove('selected')

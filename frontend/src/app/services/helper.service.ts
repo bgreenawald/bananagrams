@@ -15,23 +15,25 @@ export class HelperService {
 
   cleanBench = () => {
     const bench = document.getElementById('bench');
-
+    let benchCells = Array.from(document.querySelectorAll('#bench .cell'));
     let emptyCells = [];
-    const benchCells = Array.from(bench.children);
+
     benchCells.forEach((cell, i) => {
-      const childTile = cell.children[0].children[0].children[0];
+      const childTile = cell.children[0].children[0];
       if (!childTile) {
         emptyCells.push(cell);
       }
     })
 
-    Array.from(emptyCells).forEach(cell => {
-      bench.removeChild(cell);
+    emptyCells.forEach(cell => {
+      cell.parentNode.removeChild(cell)
     })
 
-    // Array.from(bench.children).forEach((benchCell, i) => {
-    //   benchCell.children[0].dataset.column = i;
-    // })
+    benchCells = Array.from(document.querySelectorAll('#bench .cell'));
+    benchCells.forEach((benchCell, i) => {
+      // benchCell.dataset.column = i;
+      console.log(benchCell)
+    })
   }
 
   public getGameID = (): string => {

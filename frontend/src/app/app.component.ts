@@ -90,13 +90,6 @@ export class AppComponent implements OnInit {
     this.getMessages()
       .subscribe(value => {
         console.log(value)
-        // if (value.data.players) {
-        // this.playersInLobby = [];
-        // for (let player in value.data.players) {
-        //   this.playersInLobby.push(player)
-        // }
-
-        // }
         switch (value.data.state) {
           case "IDLE":
             this.router.navigate([`/lobby/${this.gameID}`]);

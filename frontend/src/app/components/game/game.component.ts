@@ -39,11 +39,9 @@ export class GameComponent implements OnInit {
 
   ngOnInit(): void {
     this._getPlayerID();
-    // this._getUserLetters();
     this.setGameID();
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
-    console.log(this)
   }
 
   setGameID = () => {
@@ -53,7 +51,6 @@ export class GameComponent implements OnInit {
 
   _getPlayerID = () => {
     this.playerID = localStorage.getItem("player_id")
-    console.log(this.playerID)
   }
 
   // TODO: refactor
@@ -61,11 +58,7 @@ export class GameComponent implements OnInit {
     this.messages$
       .subscribe(value => {
         console.log(value)
-        // this.tiles = value.data.players[this.playerID]
         this.tiles = ["c", "a", "t"]
-        // if (value.state === "IDLE") {
-        //   this.router.navigate([`/lobby/${this.gameID}`])
-        // }
       },
         err => this.error = this.errorService.parseError(err)
       )

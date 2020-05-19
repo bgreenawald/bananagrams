@@ -5,7 +5,6 @@ app-game {
   height: 100%;
   @include flexbox();
   flex-flow: column nowrap;
-  // border: 6px solid yellow;
 
   .tile.selected {
     opacity: 0.5;
@@ -16,7 +15,6 @@ app-game {
     background-color: darken(antiquewhite, 30%);
   }
 
-  // footer
   footer {
     flex-grow: 1;
     padding: 12px 5px;

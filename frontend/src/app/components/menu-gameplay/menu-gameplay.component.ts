@@ -21,11 +21,9 @@ export class MenuGameplayComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.app.getGameID())
   }
 
   reset = () => {
-    // refresh the page would work the same??
     this.socket.emit("reset", {
       "name": this.gameID
     });
@@ -42,13 +40,12 @@ export class MenuGameplayComponent implements OnInit {
 
 
   selectAllTiles = () => {
-
+    
   }
 
   bananagrams = () => {
     if (this.isValidBoard()) {
       const words: string[] = this.getAllWords();
-      console.log(words)
       this.socket.emit("bananagrams", {
         "name": this.gameID,
         "player_id": this.playerID,
@@ -94,8 +91,6 @@ export class MenuGameplayComponent implements OnInit {
       })
     }
     // If we hit every tile, then we have a valid board
-    // console.log(`Seen tiles ${seenTiles.length}`);
-    // console.log(`All tiles ${board.querySelectorAll(".tile").length}`);
 
     let allTiles = board.querySelectorAll(".tile");
     return seenTiles.length === allTiles.length;

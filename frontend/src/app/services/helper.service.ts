@@ -19,7 +19,7 @@ export class HelperService {
     let emptyCells = [];
 
     benchCells.forEach((cell, i) => {
-      const childTile = cell.children[0].children[0];
+      const childTile = cell.children[0];
       if (!childTile) {
         emptyCells.push(cell);
       }

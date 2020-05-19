@@ -170,8 +170,8 @@ export class EventHandleService {
 
     // if desired target cell has no tile in it already 
     if (secondaryDestination.children.length === 0) {
-
-      secondaryDestination.appendChild(tile);
+      const tileHostComponent = tile.parentNode;
+      secondaryDestination.appendChild(tileHostComponent);
       secondaryDestination.classList.add("filled");
       tile.dataset.row = destinationRow;
       tile.dataset.column = destinationColumn;

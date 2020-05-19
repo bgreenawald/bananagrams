@@ -38,8 +38,8 @@ export class EventHandleService {
     this.tilesToDrag = this.selectedTiles.map(tile => {
       const tileData = {
         id: tile.dataset.tileId,
-        row: tile.parentElement.parentElement.dataset.row || 0,
-        column: tile.parentElement.parentElement.dataset.column || 0
+        row: tile.parentElement.parentElement.parentElement.dataset.row || 0,
+        column: tile.parentElement.parentElement.parentElement.dataset.column || 0
       }
       return tileData
     });
@@ -121,15 +121,15 @@ export class EventHandleService {
   }
 
   handleSwap = (activeTileID: number, tilesArray: string[]) => {
-    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"`);
-    const parentCell = tileToRemove.parentNode.parentNode.parentNode;
-    const letter = tileToRemove.textContent;
+    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"`).parentElement;
+    const parentCell = tileToRemove.parentNode.parentNode;
+    const letter = tileToRemove.children[0].textContent;
 
     tileToRemove.parentNode.removeChild(tileToRemove);
     parentCell.parentNode.removeChild(parentCell);
     // Also remove element from the global tiles array
-    let index = tilesArray.indexOf(letter);
-    if (index !== -1) tilesArray.splice(index, 1);
+    // let index = tilesArray.indexOf(letter);
+    // if (index !== -1) tilesArray.splice(index, 1);
 
     return letter;
   }
@@ -179,6 +179,4 @@ export class EventHandleService {
     // if (parentCell.parentNode ===)
     // parentCell.parentNode.removeChild(parentCell);
   }
-
-
 }

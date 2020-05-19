@@ -53,12 +53,12 @@ export class TileComponent implements OnInit {
     this.eventHandler.handleDragEnd(e);
   }
 
-  handleSwap = () => {
+  handleSwap = e => {
     const tiles = this.app.getUserTiles();
     const letter = this.eventHandler.handleSwap(this.index, tiles);
     this.socket.emit("swap", {
       name: this.gameID,
-      "letter": letter,
+      "letter": this.letter,
       "player_id": this.playerID
     })
   }

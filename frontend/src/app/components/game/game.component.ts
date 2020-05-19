@@ -61,8 +61,8 @@ export class GameComponent implements OnInit {
     this.messages$
       .subscribe(value => {
         console.log(value)
-        // this.tiles = value.data.players[this.playerID]
-        this.tiles = ["c", "a", "t"]
+        this.tiles = value.data.players[this.playerID]
+        // this.tiles = ["c", "a", "t"]
         // if (value.state === "IDLE") {
         //   this.router.navigate([`/lobby/${this.gameID}`])
         // }

@@ -25,10 +25,11 @@ export class EventHandleService {
   }
 
   handleDragStart = (e, selectedTiles) => {
-    // e.target.style.opacity = .4;
-    // if (!e.target.classList.contains('selected')) {
-    e.target.classList.add("selected")
-    this.selectedTiles.push(e.target)
+    const currentTile = e.target;
+    if (!this.selectedTiles.includes(currentTile)) {
+      e.target.classList.add("selected")
+      this.selectedTiles.push(e.target)
+    }
 
     // };
     // e.target.classList.contains('selected') ? e.target.classList.remove('selected') : e.target.classList.add('selected')
@@ -178,4 +179,6 @@ export class EventHandleService {
     // if (parentCell.parentNode ===)
     // parentCell.parentNode.removeChild(parentCell);
   }
+
+
 }

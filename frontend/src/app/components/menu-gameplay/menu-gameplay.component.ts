@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 
 import { AppComponent } from '../../app.component';
+import { ErrorService } from '../../services/error.service';
 
 @Component({
   selector: 'app-menu-gameplay',
@@ -15,6 +16,7 @@ export class MenuGameplayComponent implements OnInit {
 
   constructor(
     private app: AppComponent,
+    private errorService: ErrorService,
     private socket: Socket
   ) { }
 
@@ -30,11 +32,12 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   peel = () => {
-    this.isValidBoard()
-    // throw error if not valid board
-    this.socket.emit("peel", {
-      "name": this.gameID
-    })
+    if (this.isValidBoard()) {
+      this.socket.emit("peel", {
+        "name": this.gameID
+      })
+    }
+    else this.errorService.displayError('cannot peel')
   }
 
 
@@ -43,12 +46,14 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   bananagrams = () => {
-    this.isValidBoard() ? alert('works') : alert("invalid");
-    this.socket.emit("banangrams", {
-      "name": this.gameID,
-      "player_id": this.playerID,
-      // "words": words
-    })
+    if (this.isValidBoard()) {
+      this.socket.emit("banangrams", {
+        "name": this.gameID,
+        "player_id": this.playerID,
+        // "words": words
+      })
+    }
+    else this.errorService.displayError('cannot call bananagrams')
   }
 
   continueGame = () => {
@@ -65,7 +70,6 @@ export class MenuGameplayComponent implements OnInit {
 
     // Make sure the bench is empty
     if (benchTiles.length > 0) {
-      alert(benchTiles.length)
       return false;
     }
 

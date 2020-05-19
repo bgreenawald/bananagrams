@@ -16,4 +16,8 @@ export class ErrorService {
         return "Error found!";
     }
   }
+
+  displayError(message: string) {
+    document.querySelector('#error').textContent = message;
+  }
 }

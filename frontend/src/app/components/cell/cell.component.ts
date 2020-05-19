@@ -41,7 +41,6 @@ export class CellComponent implements OnInit {
   }
 
   handleDrop = (e) => {
-    console.log('drop')
     this.eventHandler.handleDrop(e);
   }
 

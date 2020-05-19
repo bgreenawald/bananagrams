@@ -29,9 +29,9 @@ export class HelperService {
       bench.removeChild(cell);
     })
 
-    Array.from(bench.children).forEach((benchCell, i) => {
-      benchCell.children[0].dataset.column = i;
-    })
+    // Array.from(bench.children).forEach((benchCell, i) => {
+    //   benchCell.children[0].dataset.column = i;
+    // })
   }
 
   public getGameID = (): string => {

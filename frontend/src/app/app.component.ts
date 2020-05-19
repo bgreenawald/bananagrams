@@ -91,11 +91,11 @@ export class AppComponent implements OnInit {
       .subscribe(value => {
         console.log(value)
         if (value.data.players) {
-          this.playersInLobby = [];
-          for (let player in value.data.players) {
-            this.playersInLobby.push(player)
-          }
-          this.tiles = value.data.players[this.playerID]
+          // this.playersInLobby = [];
+          // for (let player in value.data.players) {
+          //   this.playersInLobby.push(player)
+          // }
+
         }
       },
         err => console.log(err)

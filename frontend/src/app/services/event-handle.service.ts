@@ -104,7 +104,43 @@ export class EventHandleService {
     }
 
     let primaryTile = document.querySelector(`.tile[data-tile-id="${id}"]`);
-    console.log(primaryTile.parentElement.parentElement.dataset)
+    const [rowChange, columnChange] = this.calculateDistanceChange(primaryTile, primaryDestinationCell);
+
+    //move additional cells 
+    if (this.selectedTiles.length > 0) {
+      this.selectedTiles.forEach((tile, i) => {
+        this.moveTile(tile, rowChange, columnChange);
+      })
+    }
+
+    this.tilesToDrag = [];
+    this.clearSelectedTiles();
+    this.helperService.cleanBench();
+    primaryDestinationCell.classList.remove("over");
+  }
+
+  handleSwap = (activeTileID: number, tilesArray: string[]) => {
+    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"`);
+    const parentCell = tileToRemove.parentNode.parentNode.parentNode;
+    const letter = tileToRemove.textContent;
+
+    tileToRemove.parentNode.removeChild(tileToRemove);
+    parentCell.parentNode.removeChild(parentCell);
+    // Also remove element from the global tiles array
+    let index = tilesArray.indexOf(letter);
+    if (index !== -1) tilesArray.splice(index, 1);
+
+    return letter;
+  }
+
+  clearSelectedTiles = () => {
+    this.selectedTiles.forEach(tile => {
+      tile.classList.remove('selected')
+    })
+    this.selectedTiles = [];
+  }
+
+  calculateDistanceChange = (primaryTile, primaryDestinationCell) => {
     let sourceRow = Number(primaryTile.parentElement.parentElement.dataset.row);
     let sourceColumn = Number(primaryTile.parentElement.parentElement.dataset.column);
 
@@ -115,51 +151,31 @@ export class EventHandleService {
     const rowChange = destinationRow - sourceRow;
     const columnChange = destinationColumn - sourceColumn;
 
+    return [rowChange, columnChange];
+  }
 
-    //move additional cells 
-    if (this.selectedTiles.length > 0) {
-      this.selectedTiles.forEach((tile, i) => {
-        let sourceRow = Number(tile.parentElement.parentElement.dataset.row);
-        let sourceColumn = Number(tile.parentElement.parentElement.dataset.column);
+  moveTile = (tile, rowChange, columnChange) => {
+    // let parentCell = tile.parentNode.parentNode;
 
-        let destinationRow = rowChange + sourceRow;
-        let destinationColumn = columnChange + sourceColumn;
+    let sourceRow = Number(tile.parentElement.parentElement.dataset.row);
+    let sourceColumn = Number(tile.parentElement.parentElement.dataset.column);
 
-        let secondaryDestination = document.querySelector(
-          `#board .cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
-        );
+    let destinationRow = rowChange + sourceRow;
+    let destinationColumn = columnChange + sourceColumn;
 
-        if (secondaryDestination.children.length === 0) {
+    let secondaryDestination = document.querySelector(
+      `#board .cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
+    );
 
-          secondaryDestination.appendChild(tile);
-          secondaryDestination.classList.add("filled");
-          tile.dataset.row = destinationRow;
-          tile.dataset.column = destinationColumn;
-        }
-      })
+    // if desired target cell has no tile in it already 
+    if (secondaryDestination.children.length === 0) {
+
+      secondaryDestination.appendChild(tile);
+      secondaryDestination.classList.add("filled");
+      tile.dataset.row = destinationRow;
+      tile.dataset.column = destinationColumn;
     }
-    this.tilesToDrag = [];
-    this.clearSelectedTiles();
-    this.helperService.cleanBench();
-    primaryDestinationCell.classList.remove("over");
-  }
-
-  handleSwap = (activeTileID: number, tilesArray: string[]) => {
-    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"`);
-    const letter = tileToRemove.textContent;
-    tileToRemove.parentNode.removeChild(tileToRemove);
-    // Also remove element from the global tiles array
-    let index = tilesArray.indexOf(letter);
-    if (index !== -1) tilesArray.splice(index, 1);
-
-    this.helperService.cleanBench();
-
-    return letter;
-  }
-
-  clearSelectedTiles = () => {
-    this.selectedTiles.forEach(tile => {
-      tile.classList.remove('selected')
-    })
+    // if (parentCell.parentNode ===)
+    // parentCell.parentNode.removeChild(parentCell);
   }
 }

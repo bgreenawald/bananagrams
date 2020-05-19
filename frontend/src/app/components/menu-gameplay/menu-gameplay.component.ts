@@ -47,13 +47,15 @@ export class MenuGameplayComponent implements OnInit {
 
   bananagrams = () => {
     if (this.isValidBoard()) {
-      this.socket.emit("banangrams", {
+      const words: string[] = this.getAllWords();
+      console.log(words)
+      this.socket.emit("bananagrams", {
         "name": this.gameID,
         "player_id": this.playerID,
-        // "words": words
+        "words": words
       })
     }
-    else this.errorService.displayError('cannot call bananagrams')
+    else this.errorService.displayError('Cannot call bananagrams.  Board is invalid.')
   }
 
   continueGame = () => {
@@ -77,7 +79,6 @@ export class MenuGameplayComponent implements OnInit {
     let processTiles = [document.querySelector('.tile')];
     let seenTiles = [];
 
-    // Refactor? !!processTiles
     while (processTiles.length > 0) {
       let currentTile = processTiles.pop();
 
@@ -86,40 +87,92 @@ export class MenuGameplayComponent implements OnInit {
       }
 
       let neighborTiles = Array.from(this.getTileNeighbors(currentTile))
-      neighborTiles.forEach(neighbor => {
-        if (neighbor.children.length > 0) {
-          let childTile = neighbor.children[0];
-
-          if (!seenTiles.includes(childTile)) {
-            processTiles.push(childTile);
-          }
-
+      neighborTiles.forEach(neighborTile => {
+        if (!seenTiles.includes(neighborTile)) {
+          processTiles.push(neighborTile);
         }
       })
     }
     // If we hit every tile, then we have a valid board
-    console.log(`Seen tiles ${seenTiles.length}`);
-    console.log(`All tiles ${board.querySelectorAll(".tile").length}`);
+    // console.log(`Seen tiles ${seenTiles.length}`);
+    // console.log(`All tiles ${board.querySelectorAll(".tile").length}`);
 
     let allTiles = board.querySelectorAll(".tile");
     return seenTiles.length === allTiles.length;
   }
 
-  getTileNeighbors = (tile) => {
+  getTileNeighbors = (tile): any[] => {
     let neighbors = [];
     let tileRow = parseInt(tile.getAttribute("data-row"));
     let tileColumn = parseInt(tile.getAttribute("data-column"));
     var board = document.querySelector("#board");
 
-    // Based on the row and column values, get the appropriate neighbors
+    const neighborIndices = [
+      { row: tileRow - 1, column: tileColumn },
+      { row: tileRow + 1, column: tileColumn },
+      { row: tileRow, column: tileColumn + 1 },
+      { row: tileRow, column: tileColumn - 1 }
+    ]
 
-    neighbors.push(board.querySelectorAll(`.cell[data-row="${tileRow - 1}"][data-column="${tileColumn}"]`)[0])
-    neighbors.push(board.querySelectorAll(`.cell[data-row="${tileRow + 1}"][data-column="${tileColumn}"]`)[0])
-
-    neighbors.push(board.querySelectorAll(`.cell[data-row="${tileRow}"][data-column="${tileColumn - 1}"]`)[0])
-    neighbors.push(board.querySelectorAll(`.cell[data-row="${tileRow}"][data-column="${tileColumn + 1}"]`)[0])
-
+    neighborIndices.forEach(neighbor => {
+      const neighborTile = board.querySelector(`.cell[data-row="${neighbor.row}"][data-column="${neighbor.column}"] .tile`);
+      if (neighborTile) neighbors.push(neighborTile);
+    });
 
     return neighbors;
+  }
+
+  getAllWords = (): string[] => {
+    let allWords = [];
+
+    const [minRow, maxRow, minColumn, maxColumn] = this.findFilledArea();
+
+    // Get all words row wise
+    for (let r = minRow; r <= maxRow; r++) {
+      let curWord = "";
+      for (let c = minColumn; c <= maxColumn + 1; c++) {
+        var curTile = document.querySelectorAll(`#board .cell[data-row="${r}"][data-column="${c}"] .tile`);
+
+        if (curTile.length > 0) {
+          curWord += curTile[0].textContent;
+        } else {
+          if (curWord.length > 1) {
+            allWords.push(curWord);
+          }
+          curWord = "";
+        }
+      }
+    }
+
+    // Get all column wise
+    for (let c = minColumn; c <= maxColumn; c++) {
+      let curWord = "";
+      for (let r = minRow; r <= maxRow + 1; r++) {
+        var curCell = document.querySelectorAll(`#board .cell[data-row="${r}"][data-column="${c}"]`)[0];
+        if (curCell.children.length > 0) {
+          curWord += curCell.querySelector('.tile').textContent;
+        } else {
+          if (curWord.length > 1) {
+            allWords.push(curWord);
+          }
+          curWord = "";
+        }
+      }
+    }
+    return allWords;
+  }
+
+  findFilledArea = (): number[] => {
+    let allTiles: any[] = Array.from(document.querySelectorAll('#board .tile'));
+    let occupiedColumns = allTiles.map((tile: any) => tile.dataset.column);
+    let occupiedRows = allTiles.map((tile: any) => tile.dataset.row);
+
+
+    const minRow = Math.min(...occupiedRows);
+    const maxRow = Math.max(...occupiedRows);
+    const minColumn = Math.min(...occupiedColumns);
+    const maxColumn = Math.max(...occupiedColumns);
+
+    return [minRow, maxRow, minColumn, maxColumn];
   }
 }

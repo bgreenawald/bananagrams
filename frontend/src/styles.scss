@@ -20,7 +20,6 @@ body {
 }
 
 body {
-  // min-height: 100%;
   background-image: url('/assets/chalkboard-background.jpg');
   background-size: cover;
   color: $off-white;
@@ -79,13 +78,6 @@ body {
   font-weight: 'normal';
 }
 
-// @font-face {
-//     font-family: 'crayon-crumble';
-//     src: url("./assets/fonts/DkCrayonCrumble-ddll.ttf");
-//     font-style: 'normal';        
-//     font-weight: 'normal';
-// }
-
 @font-face {
   font-family: 'ten-thousand-reasons';
   src: url("/assets/fonts/KgTenThousandReasons-R1ll.ttf");
@@ -108,8 +100,6 @@ h1 {
   font-size: 5em;
   letter-spacing: .15em;
   margin: 0px;
-  // -webkit-text-stroke: 0.5px black;
-  // text-shadow: 1px 1px black;
   text-align: center;
   font-weight: normal;
 }
@@ -117,7 +107,6 @@ h1 {
 p {
   font-family: 'gaegu', arial, sans-serif;
   font-size: 1.5em;
-  // letter-spacing: .15em;
   text-align: center;
   font-weight: normal;
 }
@@ -126,5 +115,12 @@ p.caption {
   font-size: 1.4em;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

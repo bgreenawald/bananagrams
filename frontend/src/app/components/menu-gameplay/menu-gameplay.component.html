@@ -4,11 +4,12 @@
     <button class="btn btn-primary" id="select_button" type="submit" (click)="selectAllTiles()">Select All
       Tiles</button>
     <button class="btn btn-primary" id="bananagrams_button" type="submit" (click)="bananagrams()">Bananagrams</button>
-    <button class="menu" onclick="swap()">Swap Tile</button>
     <div id="tiles_remaining">
       <p>Tiles Remaining</p>
-      <p id="tiles_remaining_count"></p>
+      <p id="tiles_remaining_count">{{tilesRemaining}}</p>
     </div>
   </div>
 
-  <p id="error"></p>
+  <div class="error-container">
+    <p class="error-content"></p>
+  </div>

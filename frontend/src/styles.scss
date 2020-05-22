@@ -95,13 +95,30 @@ body {
 
 
 // ********** PAGE FONTS ********** //
-h1 {
+
+h1,
+h2,
+h3,
+h4,
+h5 {
   font-family: 'eraser', arial, sans-serif;
+}
+
+h1,
+h2 {
   font-size: 5em;
   letter-spacing: .15em;
   margin: 0px;
   text-align: center;
   font-weight: normal;
+}
+
+h2 {
+  font-size: 3em;
+}
+
+h3 {
+  font-size: 1.5em;
 }
 
 p {
@@ -123,4 +140,37 @@ body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+button {
+  padding: 10px 30px;
+  margin-top: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: block;
+  font-family: 'Gaegu';
+  font-size: 26px;
+
+
+  &.primary {
+    background-color: $primary-yellow;
+    color: $off-black;
+    transition: background-color 0.2s cubic-bezier(0.77, 0.2, 0.05, 1);
+
+    &:hover {
+      background-color: lighten($primary-yellow, 10%);
+    }
+  }
+
+  &.secondary {
+    background-color: transparent;
+    color: white;
+    transition: all 0.2s cubic-bezier(0.77, 0.2, 0.05, 1);
+
+    &:hover {
+      background-color: white;
+      color: $off-black;
+    }
+  }
 }

@@ -8,5 +8,7 @@
   <input #gameID id="game_id" type="text" [value]="suggestedID" (keydown.enter)="createGame(gameID.value)">
   <button id="game_id_submit" class="btn btn-primary" type="submit" (click)="createGame(gameID.value)">Create New
     Game</button>
-  <p *ngIf="error" id="error">{{error}}</p>
+  <div class="error-container">
+    <p *ngIf="error" class='error-content'>{{error}}</p>
+  </div>
 </div>

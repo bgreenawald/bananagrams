@@ -23,4 +23,21 @@ input {
   justify-content: center;
   align-items: center;
   flex-flow: column nowrap;
+
+  #players-in-lobby {
+    width: 100%;
+
+    #players {
+      width: 100%;
+      @include flexbox();
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      align-content: space-around;
+
+      .player {
+        width: 33%;
+        height: 33%;
+      }
+    }
+  }
 }

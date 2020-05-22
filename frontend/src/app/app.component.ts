@@ -97,9 +97,14 @@ export class AppComponent implements OnInit {
           case "ACTIVE":
             this.router.navigate([`/game/${this.gameID}`]);
             break;
+          case "OVER":
+            this.router.navigate([`/game/${this.gameID}/over`])
+          default:
+            this.router.navigate([`**`]);
+            break;
         }
       },
-        err => console.log(err)
+        err => this.errorService.displayError(err)
       )
   }
 

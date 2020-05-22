@@ -4,6 +4,7 @@ import { Socket } from 'ngx-socket-io';
 
 import { AppComponent } from '../../app.component';
 import { ErrorService } from '../../services/error.service';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
   selector: 'app-menu-gameplay',
@@ -11,16 +12,20 @@ import { ErrorService } from '../../services/error.service';
   styleUrls: ['./menu-gameplay.component.scss']
 })
 export class MenuGameplayComponent implements OnInit {
-  gameID: string = this.app.getGameID();
-  playerID: string = this.app.getPlayerID();
+  public gameID: string = this.app.getGameID();
+  public playerID: string = this.app.getPlayerID();
+  public tilesRemaining: number;
+  private message$ = this.app.getMessages();
 
   constructor(
     private app: AppComponent,
     private errorService: ErrorService,
-    private socket: Socket
+    private socket: Socket,
+    private socketService: SocketService
   ) { }
 
   ngOnInit(): void {
+    this.socketSubscribe();
   }
 
   reset = () => {
@@ -40,7 +45,7 @@ export class MenuGameplayComponent implements OnInit {
 
 
   selectAllTiles = () => {
-    
+
   }
 
   bananagrams = () => {
@@ -169,5 +174,17 @@ export class MenuGameplayComponent implements OnInit {
     const maxColumn = Math.max(...occupiedColumns);
 
     return [minRow, maxRow, minColumn, maxColumn];
+  }
+
+  socketSubscribe = () => {
+    this.message$.
+      subscribe(value => {
+        console.log(value.data)
+        if (value.data.tiles_remaining) {
+          this.tilesRemaining = value.data.tiles_remaining
+        }
+      },
+        err => this.errorService.parseError(err)
+      )
   }
 }

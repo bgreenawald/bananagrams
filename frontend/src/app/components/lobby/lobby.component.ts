@@ -70,7 +70,6 @@ export class LobbyComponent implements OnInit {
   socketSubscribe = () => {
     this.messages$
       .subscribe(value => {
-        console.log("DATA", value.data)
         if (value.data.players) {
           this.playersInLobby = [];
           for (let player in value.data.players) {
@@ -78,7 +77,8 @@ export class LobbyComponent implements OnInit {
           }
         }
       },
-        err => this.error = this.errorService.parseError(err)
+        // err => this.error = this.errorService.parseError(err)
+        err => console.log('error')
       )
   }
 }

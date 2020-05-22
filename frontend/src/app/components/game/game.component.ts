@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Socket } from 'ngx-socket-io';
@@ -19,6 +19,13 @@ import { AppComponent } from '../../app.component';
   encapsulation: ViewEncapsulation.None
 })
 export class GameComponent implements OnInit {
+  @HostListener('window:beforeunload', ['$event'])
+  confirmExit($event: any) {
+    $event.preventDefault();
+    // Chrome prevents custom navigate away messages. 
+    $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
+  }
+
   public error: string;
   public gameID: string; // numerical game id formatted as a string
   public playerJoined: boolean = false;
@@ -58,6 +65,7 @@ export class GameComponent implements OnInit {
     this.messages$
       .subscribe(value => {
         console.log(value)
+        // this.tiles = value.data.players[this.playerID]
         this.tiles = ["c", "a", "t"]
       },
         err => this.error = this.errorService.parseError(err)

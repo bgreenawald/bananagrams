@@ -15,11 +15,11 @@ export class HelperService {
 
   cleanBench = () => {
     const bench = document.getElementById('bench');
-    let benchCells = Array.from(document.querySelectorAll('#bench .cell'));
+    let benchCells = Array.from(document.querySelectorAll('#bench app-cell'));
     let emptyCells = [];
 
     benchCells.forEach((cell, i) => {
-      const childTile = cell.children[0];
+      const childTile = cell.children[0].children[0];
       if (!childTile) {
         emptyCells.push(cell);
       }
@@ -27,12 +27,6 @@ export class HelperService {
 
     emptyCells.forEach(cell => {
       cell.parentNode.removeChild(cell)
-    })
-
-    benchCells = Array.from(document.querySelectorAll('#bench .cell'));
-    benchCells.forEach((benchCell, i) => {
-      // benchCell.dataset.column = i;
-      console.log(benchCell)
     })
   }
 

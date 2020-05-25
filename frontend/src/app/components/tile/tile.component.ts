@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, HostListener, HostBinding } from '@angular/core';
 
 import { Socket } from 'ngx-socket-io';
 
@@ -13,12 +13,11 @@ import { AppComponent } from '../../app.component';
   styleUrls: ['./tile.component.scss']
 })
 export class TileComponent implements OnInit {
-  @Input() index: number;
+  @HostBinding('attr.data-tile-id') @Input() index: number;
   @Input() letter: string;
 
   public gameID = this.app.gameID;
   public playerID = this.app.playerID;
-  public selectedTiles: any[] = [];
   public displaySwap: boolean = false;
 
   constructor(
@@ -37,23 +36,29 @@ export class TileComponent implements OnInit {
 
   }
 
-  handleClick = e => {
-    this.eventHandler.handleClick(e);
+  @HostBinding('draggable') true;
+
+  @HostListener('click', ['$event'])
+  handleClick = $event => {
+    this.eventHandler.handleClick($event, this.ref.nativeElement);
   }
 
-  handleDoubleClick = e => {
+  @HostListener('dblclick', ['$event'])
+  handleDoubleClick = $event => {
     this.displaySwap = !this.displaySwap;
   }
 
-  handleDragStart = e => {
-    this.eventHandler.handleDragStart(e, this.selectedTiles);
+  @HostListener('dragstart', ['$event'])
+  handleDragStart = $event => {
+    this.eventHandler.handleDragStart($event);
   }
 
-  handleDragEnd = e => {
-    this.eventHandler.handleDragEnd(e);
+  @HostListener('dragend', ['$event'])
+  handleDragEnd = $event => {
+    this.eventHandler.handleDragEnd($event);
   }
 
-  handleSwap = e => {
+  handleSwap = $event => {
     const tiles = this.app.getUserTiles();
     const letter = this.eventHandler.handleSwap(this.index, tiles);
     this.socket.emit("swap", {
@@ -65,5 +70,9 @@ export class TileComponent implements OnInit {
 
   clearSwapButton = () => {
     this.displaySwap = false;
+  }
+
+  handleSpanClick = e => {
+    this.eventHandler.handleClick(e)
   }
 }

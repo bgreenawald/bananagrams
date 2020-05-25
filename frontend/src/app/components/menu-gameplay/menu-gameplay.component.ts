@@ -12,7 +12,7 @@ import { SocketService } from '../../services/socket.service';
   styleUrls: ['./menu-gameplay.component.scss']
 })
 export class MenuGameplayComponent implements OnInit {
-  public gameID: string = this.app.getGameID();
+  public gameID: string;
   public playerID: string = this.app.getPlayerID();
   public tilesRemaining: number;
   private message$ = this.app.getMessages();
@@ -26,6 +26,7 @@ export class MenuGameplayComponent implements OnInit {
 
   ngOnInit(): void {
     this.socketSubscribe();
+    this.gameID = this.app.getGameID();
   }
 
   reset = () => {
@@ -35,16 +36,20 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   peel = () => {
-    if (this.isValidBoard()) {
-      this.socket.emit("peel", {
-        "name": this.gameID
-      })
-    }
-    else this.errorService.displayError('cannot peel')
+    // if (this.isValidBoard()) {
+    this.socket.emit("peel", {
+      "name": this.gameID
+    })
+    // }
+    // else this.errorService.displayError('To peel, your bench must be empty and your board must be valid.')
   }
 
 
   selectAllTiles = () => {
+    const tiles: Element[] = Array.from(document.querySelectorAll('#board .tile'));
+    tiles.forEach(tile => {
+      tile.classList.add('selected');
+    })
 
   }
 

@@ -1,51 +1,66 @@
-import { Injectable } from '@angular/core';
+import { Injectable, TemplateRef } from '@angular/core';
 import { HelperService } from './helper.service';
 import { ErrorService } from './error.service';
+import { Subject } from "rxjs";
+import { AppRoutingModule } from '../app-routing.module';
+import { TileComponent } from '../components/tile/tile.component'
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventHandleService {
-  public selectedTiles = [];
+  // HTMLElement is of type app-tile
+  public selectedTiles: HTMLElement[] = [];
   public tilesToDrag = [];
+  private _removeTile = new Subject();
+  removeTile$ = this._removeTile.asObservable();
 
   constructor(
     private errorService: ErrorService,
     private helperService: HelperService,
   ) { }
 
-  handleClick = e => {
+  handleClick = (e, appTile?) => {
     e.preventDefault();
+    let tile = this.getTile(e.target, appTile);
+
     this.errorService.clearError();
-    let classes = e.target.classList;
-    if (classes.contains('selected')) {
-      classes.remove('selected')
+    this.toggleSelectedClass(tile);
+  }
+
+  getTile = (targetElement, appTile) => {
+    let tile;
+    if (targetElement.tagName === "APP-TILE") {
+      tile = targetElement
     }
-    else {
-      classes.add('selected');
-      this.selectedTiles.push(e.target)
+    else if (appTile) {
+      tile = appTile
+    }
+    return tile;
+  }
+
+  toggleSelectedClass = (tile: HTMLElement) => {
+    if (!!tile) {
+      let classes = tile.classList;
+      if (classes.contains('selected')) {
+        classes.remove('selected')
+      }
+      else {
+        classes.add('selected');
+      }
     }
   }
 
-  handleDragStart = (e, selectedTiles) => {
+  handleDragStart = (e) => {
     const currentTile = e.target;
     if (!this.selectedTiles.includes(currentTile)) {
-      e.target.classList.add("selected")
-      this.selectedTiles.push(e.target)
+      // dataset.tileId is cased by the dom.
+      const tileID = e.target.dataset.tileId;
+      const tile = document.querySelector(`app-tile[data-tile-id='${tileID}'`)
+      tile.classList.add("selected")
+      // this.selectedTiles.push(e.target)
     }
 
-    // };
-    // e.target.classList.contains('selected') ? e.target.classList.remove('selected') : e.target.classList.add('selected')
-    // let selectedTiles = Array.from(document.querySelectorAll('.selected'));
-    // casing of tileId is set by browser parsing
-    this.tilesToDrag = this.selectedTiles.map(tile => {
-      const tileData = {
-        id: tile.dataset.tileId,
-        row: tile.parentElement.parentElement.parentElement.dataset.row || 0,
-        column: tile.parentElement.parentElement.parentElement.dataset.column || 0
-      }
-      return tileData
-    });
     e.target.style.cursor = "grabbing";
     e.dataTransfer.dropEffect = "copy";
     e.dataTransfer.effectAllowed = "move";
@@ -54,7 +69,6 @@ export class EventHandleService {
 
   handleDragEnd = e => {
     e.preventDefault();
-    // e.target.style.opacity = "1";
     this.selectedTiles.forEach(tile => {
       tile.classList.remove('selected')
     })
@@ -92,6 +106,27 @@ export class EventHandleService {
     return false;
   }
 
+  handleSwap = (activeTileID: number, tilesArray: string[]) => {
+    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"`).parentElement;
+    const parentCell = tileToRemove.parentNode;
+    const letter = tileToRemove.children[0].textContent;
+
+    tileToRemove.parentNode.removeChild(tileToRemove);
+    parentCell.parentNode.removeChild(parentCell);
+    // Also remove element from the global tiles array
+    // let index = tilesArray.indexOf(letter);
+    // if (index !== -1) tilesArray.splice(index, 1);
+
+    return letter;
+  }
+
+  clearSelectedTiles = () => {
+    const selectedTiles = Array.from(document.querySelectorAll('app-tile.selected'));
+    selectedTiles.forEach(tile => {
+      tile.classList.remove('selected')
+    })
+  }
+
   handleDrop = e => {
     e.preventDefault();
 
@@ -107,46 +142,27 @@ export class EventHandleService {
       return;
     }
 
-    let primaryTile = document.querySelector(`.tile[data-tile-id="${id}"]`);
+    let primaryTile = document.querySelector(`app-tile[data-tile-id="${id}"]`);
     const [rowChange, columnChange] = this.calculateDistanceChange(primaryTile, primaryDestinationCell);
 
     //move additional cells 
-    if (this.selectedTiles.length > 0) {
-      this.selectedTiles.forEach((tile, i) => {
+    const selectedTiles = Array.from(document.querySelectorAll('app-tile.selected'));
+    if (selectedTiles.length > 0) {
+      selectedTiles.forEach((tile, i) => {
         this.moveTile(tile, rowChange, columnChange);
       })
     }
 
     this.tilesToDrag = [];
     this.clearSelectedTiles();
-    this.helperService.cleanBench();
+    // this.helperService.cleanBench();
     primaryDestinationCell.classList.remove("over");
   }
 
-  handleSwap = (activeTileID: number, tilesArray: string[]) => {
-    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"`).parentElement;
-    const parentCell = tileToRemove.parentNode.parentNode;
-    const letter = tileToRemove.children[0].textContent;
-
-    tileToRemove.parentNode.removeChild(tileToRemove);
-    parentCell.parentNode.removeChild(parentCell);
-    // Also remove element from the global tiles array
-    // let index = tilesArray.indexOf(letter);
-    // if (index !== -1) tilesArray.splice(index, 1);
-
-    return letter;
-  }
-
-  clearSelectedTiles = () => {
-    this.selectedTiles.forEach(tile => {
-      tile.classList.remove('selected')
-    })
-    this.selectedTiles = [];
-  }
 
   calculateDistanceChange = (primaryTile, primaryDestinationCell) => {
-    let sourceRow = Number(primaryTile.parentElement.parentElement.dataset.row);
-    let sourceColumn = Number(primaryTile.parentElement.parentElement.dataset.column);
+    let sourceRow = Number(primaryTile.parentElement.dataset.row);
+    let sourceColumn = Number(primaryTile.parentElement.dataset.column);
 
 
     let destinationRow = Number(primaryDestinationCell.dataset.row);
@@ -159,27 +175,25 @@ export class EventHandleService {
   }
 
   moveTile = (tile, rowChange, columnChange) => {
-    // let parentCell = tile.parentNode.parentNode;
-
-    let sourceRow = Number(tile.parentElement.parentElement.dataset.row);
-    let sourceColumn = Number(tile.parentElement.parentElement.dataset.column);
+    // tile is of type app-tile
+    let sourceRow = Number(tile.parentElement.dataset.row);
+    let sourceColumn = Number(tile.parentElement.dataset.column);
 
     let destinationRow = rowChange + sourceRow;
     let destinationColumn = columnChange + sourceColumn;
 
     let secondaryDestination = document.querySelector(
-      `#board .cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
+      `#board app-cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
     );
 
     // if desired target cell has no tile in it already 
     if (secondaryDestination.children.length === 0) {
-      const tileHostComponent = tile.parentNode;
-      secondaryDestination.appendChild(tileHostComponent);
+      // const tileHostComponent = tile.parentNode;
+      secondaryDestination.appendChild(tile);
       secondaryDestination.classList.add("filled");
       tile.dataset.row = destinationRow;
       tile.dataset.column = destinationColumn;
+      this._removeTile.next(Number(tile.dataset.tileId))
     }
-    // if (parentCell.parentNode ===)
-    // parentCell.parentNode.removeChild(parentCell);
   }
 }

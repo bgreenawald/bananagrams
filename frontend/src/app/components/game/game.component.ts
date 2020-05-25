@@ -10,7 +10,9 @@ import { ErrorService } from '../../services/error.service';
 import { SocketService } from '../../services/socket.service';
 
 import { AppComponent } from '../../app.component';
+import { EventHandleService } from '../../services/event-handle.service';
 
+import { Tile } from '../../models';
 
 @Component({
   selector: 'app-game',
@@ -19,13 +21,13 @@ import { AppComponent } from '../../app.component';
   encapsulation: ViewEncapsulation.None
 })
 export class GameComponent implements OnInit {
-  @HostListener('window:beforeunload', ['$event'])
-  confirmExit($event: any) {
-    $event.preventDefault();
-    // Chrome prevents custom navigate away messages. 
-    $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
-  }
-
+  // @HostListener('window:beforeunload', ['$event'])
+  // confirmExit($event: any) {
+  //   $event.preventDefault();
+  //   // Chrome prevents custom navigate away messages. 
+  //   $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
+  // }
+  public benchTiles: Tile[] = [];
   public error: string;
   public gameID: string; // numerical game id formatted as a string
   public playerJoined: boolean = false;
@@ -34,12 +36,15 @@ export class GameComponent implements OnInit {
   public tiles: string[];
 
   private messages$ = this.app.getMessages();
+  private tileEvent$ = this.eventHandleService.removeTile$;
+
 
   constructor(
     public app: AppComponent,
     private route: ActivatedRoute,
     private router: Router,
     private socket: Socket,
+    private eventHandleService: EventHandleService,
     private errorService: ErrorService,
     private socketService: SocketService
   ) { }
@@ -49,6 +54,8 @@ export class GameComponent implements OnInit {
     this.setGameID();
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
+    this.tileEventListen();
+
   }
 
   setGameID = () => {
@@ -65,10 +72,64 @@ export class GameComponent implements OnInit {
     this.messages$
       .subscribe(value => {
         console.log(value)
-        // this.tiles = value.data.players[this.playerID]
-        this.tiles = ["c", "a", "t"]
+        const tileArray = value.data.players[this.playerID];
+
+        this.setTiles(value.data.players[this.playerID])
+        // this.tiles = ["c", "a", "t"]
       },
         err => this.error = this.errorService.parseError(err)
       )
+  }
+
+  setTiles = (tiles: string[]) => {
+    if (tiles.length <= 0) return;
+    if (this.benchTiles.length <= 0) {
+      this.initializeTiles(tiles);
+    }
+    else {
+      this.updateTiles(tiles);
+    }
+    this.tiles = tiles;
+  }
+
+  findDifference = (updatedTileArray: string[], oldTileArray: string[]) => {
+    const newTiles: string[] = updatedTileArray.slice();
+    for (let letter of oldTileArray) {
+      let index = newTiles.indexOf(letter);
+      if (index > -1) {
+        newTiles.splice(index, 1);
+      }
+    }
+    return newTiles;
+  }
+
+  updateTiles = (tiles) => {
+    const newTiles = this.findDifference(tiles, this.tiles);
+    let lastTileIndex = this.tiles.length - 1;
+    newTiles.forEach(tile => {
+      this.benchTiles.push({
+        letter: tile,
+        id: lastTileIndex++
+      })
+    });
+  }
+
+  tileEventListen = () => {
+    // Listen into observable for events, which give index of tile to remove from bench
+    this.tileEvent$.subscribe((index: number) => {
+      console.log(index)
+      this.benchTiles.splice(index, 1)
+      console.log(this.benchTiles)
+    })
+  }
+
+  initializeTiles = (tiles: string[]) => {
+    let i = 0;
+    tiles.forEach(tile => {
+      this.benchTiles.push({
+        'letter': tile,
+        'id': i++
+      })
+    })
   }
 }

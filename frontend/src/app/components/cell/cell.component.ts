@@ -1,15 +1,18 @@
-import { Component, OnInit, Input, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, HostListener, HostBinding, Directive } from '@angular/core';
 
 import { EventHandleService } from '../../services/event-handle.service';
 
+// @Directive({
+//   selector: '[row]'
+// })
 @Component({
   selector: 'app-cell',
   templateUrl: './cell.component.html',
   styleUrls: ['./cell.component.scss']
 })
 export class CellComponent implements OnInit {
-  @Input() row!: number;
-  @Input() column!: number;
+  @HostBinding('attr.data-row') @Input() row!: number;
+  @HostBinding('attr.data-column') @Input() column!: number;
 
   constructor(
     private ref: ElementRef,
@@ -19,30 +22,32 @@ export class CellComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  handleOnMouseDown = (e) => {
-    // console.log('mouse down')
-    // this.eventHandler.handleOnMouseDown(e);
+  @HostListener('dragenter', ['$event'])
+  handleDragEnter = ($event) => {
+    this.eventHandler.handleDragEnter($event);
   }
 
-  handleDragEnter = (e) => {
-    this.eventHandler.handleDragEnter(e);
+  @HostListener('dragleave', ['$event'])
+  handleDragLeave = ($event) => {
+    this.eventHandler.handleDragLeave($event);
   }
 
-  handleDragLeave = (e) => {
-    this.eventHandler.handleDragLeave(e);
+  @HostListener('dragover', ['$event'])
+  handleDragOver = ($event) => {
+    this.eventHandler.handleDragOver($event);
   }
 
-  handleDragOver = (e) => {
-    this.eventHandler.handleDragOver(e);
+  @HostListener('dragend', ['$event'])
+  handleDragEnd = ($event) => {
+    $event.target.classList.remove('over')
   }
 
-  handleDragEnd = (e) => {
-    e.target.classList.remove('over')
+  @HostListener('drop', ['$event'])
+  handleDrop = ($event) => {
+    this.eventHandler.handleDrop($event);
   }
 
-  handleDrop = (e) => {
-    this.eventHandler.handleDrop(e);
-  }
-
-
+  @HostBinding('class') class = 'cell';
+  // @HostBinding('attr.data-row') 0;
+  // @HostBinding('att.data-column') = this.column;
 }

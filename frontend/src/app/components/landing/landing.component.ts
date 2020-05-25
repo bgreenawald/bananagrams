@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { RenderService } from '../../services/render.service';
 import { ApiService } from '../../services/api.service';
 
 @Component({
@@ -20,7 +19,6 @@ export class LandingComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private http: HttpClient,
-    private renderService: RenderService,
     private route: ActivatedRoute,
     private router: Router,
   ) {
@@ -28,17 +26,20 @@ export class LandingComponent implements OnInit {
 
   ngOnInit(): void {
     this.getIDs()
-    this.generateNewID();
+    this._generateNewID();
     localStorage.clear();
   }
 
-  getIDs = () => {
+  getIDs = (): void => {
     this.apiService.getIDs()
       .subscribe(ids => this.gameIDs = ids);
   }
 
-  generateNewID = () => {
-    this.suggestedID = this.renderService.generateID();
+  private _generateNewID = (): void => {
+    const min = 0;
+    const max = 999999;
+    let random = Math.floor(Math.random() * (+max - +min)) + +min;
+    this.suggestedID = random;
   }
 
   createGame = (id: string) => {

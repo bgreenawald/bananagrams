@@ -35,8 +35,8 @@ export class GameComponent implements OnInit {
   public playersTiles: string[];
   public tiles: string[];
 
-  private messages$ = this.app.getMessages();
-  private tileEvent$ = this.eventHandleService.removeTile$;
+  private _messages$ = this.app.getMessages();
+  private _modifyCell$ = this.eventHandleService.removeCell$;
 
 
   constructor(
@@ -69,7 +69,7 @@ export class GameComponent implements OnInit {
 
   // TODO: refactor
   socketSubscribe = () => {
-    this.messages$
+    this._messages$
       .subscribe(value => {
         console.log(value)
         const tileArray = value.data.players[this.playerID];
@@ -116,9 +116,11 @@ export class GameComponent implements OnInit {
 
   tileEventListen = () => {
     // Listen into observable for events, which give index of tile to remove from bench
-    this.tileEvent$.subscribe((index: number) => {
-      console.log(index)
-      this.benchTiles.splice(index, 1)
+    this._modifyCell$.subscribe((cellIndexArray: number[]) => {
+      if (cellIndexArray.length > 1) cellIndexArray.sort(((a, b) => b - a));
+      cellIndexArray.forEach(index => {
+        this.benchTiles.splice(index, 1)
+      });
       console.log(this.benchTiles)
     })
   }

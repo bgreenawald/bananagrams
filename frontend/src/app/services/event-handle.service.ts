@@ -12,8 +12,9 @@ export class EventHandleService {
   // HTMLElement is of type app-tile
   public selectedTiles: HTMLElement[] = [];
   public tilesToDrag = [];
-  private _removeTile = new Subject();
-  removeTile$ = this._removeTile.asObservable();
+  private _emptyCellColumns: number[] = [];
+  private _removeCells = new Subject();
+  public removeCell$ = this._removeCells.asObservable();
 
   constructor(
     private errorService: ErrorService,
@@ -130,6 +131,7 @@ export class EventHandleService {
   handleDrop = e => {
     e.preventDefault();
 
+    let cellsToClear: number[]; // array with the identifying column numbers of the cells to delete
     let primaryDestinationCell = e.target;
 
     // Get the tile ID and handle the null case
@@ -155,7 +157,7 @@ export class EventHandleService {
 
     this.tilesToDrag = [];
     this.clearSelectedTiles();
-    // this.helperService.cleanBench();
+    this._removeCells.next(this._emptyCellColumns)
     primaryDestinationCell.classList.remove("over");
   }
 
@@ -176,8 +178,9 @@ export class EventHandleService {
 
   moveTile = (tile, rowChange, columnChange) => {
     // tile is of type app-tile
-    let sourceRow = Number(tile.parentElement.dataset.row);
-    let sourceColumn = Number(tile.parentElement.dataset.column);
+    const parentCell = tile.parentElement;
+    let sourceRow = Number(parentCell.dataset.row);
+    let sourceColumn = Number(parentCell.dataset.column);
 
     let destinationRow = rowChange + sourceRow;
     let destinationColumn = columnChange + sourceColumn;
@@ -193,7 +196,7 @@ export class EventHandleService {
       secondaryDestination.classList.add("filled");
       tile.dataset.row = destinationRow;
       tile.dataset.column = destinationColumn;
-      this._removeTile.next(Number(tile.dataset.tileId))
+      this._emptyCellColumns.push(Number(parentCell.dataset.column))
     }
   }
 }

@@ -89,16 +89,23 @@ export class AppComponent implements OnInit {
   socketSubscribe = () => {
     this.getMessages()
       .subscribe(value => {
-        console.log(value)
+        console.log("SOCKET RESPONSE", value)
         switch (value.data.state) {
           case "IDLE":
             this.router.navigate([`/lobby/${this.gameID}`]);
             break;
           case "ACTIVE":
-            this.router.navigate([`/game/${this.gameID}`]);
+            const allPlayers: string[] = Object.keys(value.data.players);
+            console.log("ALLPLAYERS", allPlayers)
+            console.log("playerid", this.playerID)
+            if (allPlayers.includes(this.playerID)) {
+              this.router.navigate([`/game/${this.gameID}`]);
+            }
+            else {
+              // show cannot join game until over
+              this.router.navigate([`**`]);
+            }
             break;
-          case "OVER":
-            this.router.navigate([`/game/${this.gameID}/over`])
           default:
             this.router.navigate([`**`]);
             break;

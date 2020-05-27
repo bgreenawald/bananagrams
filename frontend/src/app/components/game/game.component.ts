@@ -8,6 +8,7 @@ import { catchError, map, tap, first } from 'rxjs/operators';
 
 import { ErrorService } from '../../services/error.service';
 import { SocketService } from '../../services/socket.service';
+import { MessageBusService } from '../../services/message-bus.service';
 
 import { AppComponent } from '../../app.component';
 import { EventHandleService } from '../../services/event-handle.service';
@@ -30,11 +31,17 @@ export class GameComponent implements OnInit {
   public benchTiles: Tile[] = [];
   public error: string;
   public gameID: string; // numerical game id formatted as a string
+  public modal: {
+    message: string
+  }
   public playerJoined: boolean = false;
   public playerID: string = this.app.playerID;
   public playersTiles: string[];
   public tiles: string[];
+  public modalOpen: boolean = false;
+  public confirmMessage: string;
 
+  private openModal$ = this.messageBusService.openModal$;
   private _messages$ = this.app.getMessages();
   private _modifyCell$ = this.eventHandleService.removeCell$;
 
@@ -46,6 +53,7 @@ export class GameComponent implements OnInit {
     private socket: Socket,
     private eventHandleService: EventHandleService,
     private errorService: ErrorService,
+    private messageBusService: MessageBusService,
     private socketService: SocketService
   ) { }
 
@@ -55,12 +63,19 @@ export class GameComponent implements OnInit {
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
     this.tileEventListen();
-
+    this._detectOpenModal();
   }
 
   setGameID = () => {
     const id = +this.route.snapshot.paramMap.get('id');
     this.gameID = id.toString();
+  }
+
+
+  private _detectOpenModal = () => {
+    this.openModal$.subscribe((message: string) => {
+      this.openModal(message);
+    })
   }
 
   _getPlayerID = () => {
@@ -133,5 +148,14 @@ export class GameComponent implements OnInit {
         'id': i++
       })
     })
+  }
+
+  openModal = (message: string) => {
+    this.confirmMessage = message;
+    this.modalOpen = !this.modalOpen
+  }
+
+  reset = () => {
+    this.socketService.reset(this.gameID);
   }
 }

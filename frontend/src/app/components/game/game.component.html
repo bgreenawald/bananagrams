@@ -12,3 +12,10 @@
   <footer>
     <p>Your game ID is. Share your current URL with friends and they can access the game too!</p>
   </footer>
+
+
+  <button (click)="openModal('testing')">test modal open button</button>
+  <div *ngIf="modalOpen" class="modal">{{confirmMessage}}
+    <button (click)="reset()">reset</button>
+    <button></button>
+  </div>

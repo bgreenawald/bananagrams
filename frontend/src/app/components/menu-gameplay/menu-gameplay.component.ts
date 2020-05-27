@@ -4,6 +4,7 @@ import { Socket } from 'ngx-socket-io';
 
 import { AppComponent } from '../../app.component';
 import { ErrorService } from '../../services/error.service';
+import { MessageBusService } from '../../services/message-bus.service';
 import { SocketService } from '../../services/socket.service';
 
 @Component({
@@ -15,11 +16,13 @@ export class MenuGameplayComponent implements OnInit {
   public gameID: string;
   public playerID: string = this.app.getPlayerID();
   public tilesRemaining: number;
+
   private message$ = this.app.getMessages();
 
   constructor(
     private app: AppComponent,
     private errorService: ErrorService,
+    private messageBusService: MessageBusService,
     private socket: Socket,
     private socketService: SocketService
   ) { }
@@ -30,9 +33,7 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   reset = () => {
-    this.socket.emit("reset", {
-      "name": this.gameID
-    });
+    this.messageBusService.openModal("Are you sure you'd like to reset your board?");
   }
 
   peel = () => {

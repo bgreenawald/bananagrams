@@ -34,4 +34,10 @@ export class SocketService {
       })
     })
   }
+
+  reset = (gameID: string) => {
+    this.socket.emit("reset", {
+      "name": gameID
+    });
+  }
 }

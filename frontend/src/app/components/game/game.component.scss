@@ -5,6 +5,7 @@ app-game {
   height: 100%;
   @include flexbox();
   flex-flow: column nowrap;
+  position: relative;
 
   .selected .tile {
     opacity: 0.5;
@@ -33,4 +34,17 @@ app-game {
   align-items: center;
   justify-content: center;
   z-index: 200;
+}
+
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50vw;
+  height: 50vh;
+  background-color: #fff;
+  color: $off-black;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  @include flexbox();
 }

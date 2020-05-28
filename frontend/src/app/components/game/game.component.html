@@ -15,7 +15,14 @@
 
 
   <button (click)="openModal('testing')">test modal open button</button>
-  <div *ngIf="modalOpen" class="modal">{{confirmMessage}}
-    <button (click)="reset()">reset</button>
-    <button></button>
-  </div>
+
+  <ng-container *ngIf="modalOpen">
+    <div class="overlay"></div>
+    <div class="modal">
+      <div class="content">
+        <h3>{{confirmMessage}}</h3>
+        <button (click)="reset()">reset</button>
+        <button (click)="closeModal()">No don't!</button>
+      </div>
+    </div>
+  </ng-container>

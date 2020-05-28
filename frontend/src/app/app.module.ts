@@ -21,6 +21,7 @@ import { BenchComponent } from './components/bench/bench.component';
 import { GameComponent } from './components/game/game.component';
 import { MenuGameplayComponent } from './components/menu-gameplay/menu-gameplay.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ModalComponent } from './components/modal/modal.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
 
@@ -36,7 +37,8 @@ const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
     CellComponent,
     BenchComponent,
     GameComponent,
-    MenuGameplayComponent
+    MenuGameplayComponent,
+    ModalComponent
   ],
   imports: [
     BrowserModule,

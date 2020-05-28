@@ -2,27 +2,38 @@ import { Injectable } from '@angular/core';
 
 import { Subject, Observable } from 'rxjs';
 
+import { Modals } from '../models';
+
 @Injectable({
   providedIn: 'root'
 })
+
 export class MessageBusService {
 
-  private _mySubject = new Subject();
   private _socketMessages = new Subject();
   private _modifyCells = new Subject();
   private _openModal = new Subject<string>();
+  private _closeModal = new Subject();
 
-  mySubject$: Observable<any> = this._mySubject.asObservable();
   socketMessage$: Observable<any> = this._socketMessages.asObservable();
   modifyCell$: Observable<any> = this._modifyCells.asObservable();
   openModal$: Observable<any> = this._openModal.asObservable();
+  closeModal$: Observable<any> = this._closeModal.asObservable();
 
-  mySubject(input: any) {
-    this._mySubject.next(input);
+  socketMessages() {
+    this._socketMessages.next();
+  }
+
+  modifyCells() {
+    this._modifyCells.next();
   }
 
   openModal(message: string) {
     this._openModal.next(message);
+  }
+
+  closeModal() {
+    this._closeModal.next();
   }
 
   constructor() { }

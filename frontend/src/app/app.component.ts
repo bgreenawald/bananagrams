@@ -9,6 +9,7 @@ import { Socket } from 'ngx-socket-io';
 import { SocketService } from './services/socket.service';
 import { HelperService } from './services/helper.service'
 import { ErrorService } from './services/error.service';
+import { MessageBusService } from './services/message-bus.service';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ export class AppComponent implements OnInit {
   public tiles: string[];
   private playersTiles: string[];
   private messages$ = this.socketService.receive();
+  private openModal$ = this.messageBusService.openModal$;
 
   constructor(
     private route: ActivatedRoute,
@@ -30,6 +32,7 @@ export class AppComponent implements OnInit {
     private socket: Socket,
     private errorService: ErrorService,
     private helperService: HelperService,
+    private messageBusService: MessageBusService,
     private socketService: SocketService
   ) { }
 

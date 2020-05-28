@@ -152,10 +152,14 @@ export class GameComponent implements OnInit {
 
   openModal = (message: string) => {
     this.confirmMessage = message;
-    this.modalOpen = !this.modalOpen
+    this.modalOpen = true;
   }
 
   reset = () => {
     this.socketService.reset(this.gameID);
+  }
+
+  closeModal = () => {
+    this.modalOpen = false;
   }
 }

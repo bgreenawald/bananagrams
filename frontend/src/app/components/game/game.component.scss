@@ -46,5 +46,22 @@ app-game {
   color: $off-black;
   transform: translate(-50%, -50%);
   z-index: 50;
+  border-radius: 10px;
+  background-color: $off-white;
   @include flexbox();
+  box-shadow: 20px 20px 30px $off-black;
+
+  .content {
+    @include flexbox();
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: space-around;
+    margin: 0px 30px;
+    text-align: center;
+
+    .buttons {
+      @include flexbox();
+      justify-content: space-between;
+    }
+  }
 }

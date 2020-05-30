@@ -15,9 +15,20 @@
         <button (click)="handleClose()">Continue this Game</button>
       </div>
       <div class="content" id="review" *ngSwitchCase="'review'">
-        <button>win</button>
+        <h2>{{winningPlayer}} has called Bananagrams.</h2>
+        <h3>Verify their board and either continue the game or start a new one!</h3>
+        <table>
+          <tr>
+            <th>Valid word?</th>
+            <th>Word</th>
+          </tr>
+          <tr *ngFor="let word of winningWords">
+            <td> <input type="checkbox" name="" id=""></td>
+            <td>{{word[0]}}</td>
+          </tr>
+        </table>
+        <button (click)="handleGameWin()">win confirm</button>
         <button (click)="handleInvalidReview()">continue</button>
-        <p *ngFor="let word of winningWords">{{word[0]}}</p>
       </div>
       <div class="content" id="lobbyBack" *ngSwitchDefault>
         {{modalType}}

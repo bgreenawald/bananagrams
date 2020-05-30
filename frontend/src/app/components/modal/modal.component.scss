@@ -36,3 +36,16 @@
     }
   }
 }
+
+// ul#winning-words-list {
+//   li {
+//     @include flexbox();
+//     flex-flow: row nowrap;
+//     justify-content: flex-start;
+//   }
+// }
+
+td,
+th {
+  text-align: left;
+}

@@ -18,6 +18,7 @@ export class ModalComponent implements OnInit {
   public modalType: string;
   public gameID: string;
   public winningWords: any[];
+  public winningPlayer: string;
   private _openModal$ = this.messageBusService.openModal$;
   private _globalClick$ = this._helperService.globalClick$;
   public store$: Observable<any>;
@@ -66,6 +67,10 @@ export class ModalComponent implements OnInit {
     this.socketService.continueGame(this.gameID);
   }
 
+  handleGameWin = () => {
+    this.socketService.reset(this.gameID);
+  }
+
   _listenCloseModals = () => {
     this._globalClick$.subscribe(click => {
       if (this.open && (this.modalType !== "over")) this.open = false;
@@ -81,6 +86,7 @@ export class ModalComponent implements OnInit {
         }
         else if (value.data.state === "OVER") {
           this.winningWords = value.data.winning_words
+          this.winningPlayer = value.data.winning_player
         }
       },
     )

@@ -57,7 +57,7 @@ export class EventHandleService {
     if (!this.selectedTiles.includes(currentTile)) {
       // dataset.tileId is casing is determined by the DOM.
       const tileID = e.target.dataset.tileId;
-      const tile = document.querySelector(`app-tile[data-tile-id='${tileID}'`)
+      const tile = document.querySelector(`app-tile[data-tile-id='${tileID}']`)
       tile.classList.add("selected")
     }
 
@@ -107,7 +107,7 @@ export class EventHandleService {
   }
 
   handleSwap = (activeTileID: number, tilesArray: string[]) => {
-    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"`).parentElement;
+    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"]`).parentElement;
     const parentCell = tileToRemove.parentNode;
     const letter = tileToRemove.children[0].textContent;
 
@@ -154,6 +154,7 @@ export class EventHandleService {
     this.tilesToDrag = [];
     this.clearSelectedTiles();
     this._removeCells.next(this._emptyCellColumns)
+    this._emptyCellColumns = [];
     primaryDestinationCell.classList.remove("over");
   }
 

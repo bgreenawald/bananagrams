@@ -51,11 +51,10 @@ export class MenuGameplayComponent implements OnInit {
 
 
   selectAllTiles = () => {
-    const tiles: Element[] = Array.from(document.querySelectorAll('#board .tile'));
+    const tiles: Element[] = Array.from(document.querySelectorAll('app-tile'));
     tiles.forEach(tile => {
       tile.classList.add('selected');
     })
-
   }
 
   bananagrams = () => {
@@ -80,7 +79,7 @@ export class MenuGameplayComponent implements OnInit {
     let board = document.querySelector('#board');
     let bench = document.getElementById('bench')
 
-    const benchTiles = Array.from(document.querySelectorAll('#bench .tile'));
+    const benchTiles = Array.from(document.querySelectorAll('#bench app-tile'));
 
     // Make sure the bench is empty
     if (benchTiles.length > 0) {
@@ -88,7 +87,7 @@ export class MenuGameplayComponent implements OnInit {
     }
 
     // Using a queue, process each tile and make sure we can get to every tile
-    let processTiles = [document.querySelector('.tile')];
+    let processTiles = [document.querySelector('app-tile')];
     let seenTiles = [];
 
     while (processTiles.length > 0) {
@@ -107,7 +106,7 @@ export class MenuGameplayComponent implements OnInit {
     }
     // If we hit every tile, then we have a valid board
 
-    let allTiles = board.querySelectorAll(".tile");
+    let allTiles = board.querySelectorAll("app-tile");
     return seenTiles.length === allTiles.length;
   }
 
@@ -125,7 +124,7 @@ export class MenuGameplayComponent implements OnInit {
     ]
 
     neighborIndices.forEach(neighbor => {
-      const neighborTile = board.querySelector(`.cell[data-row="${neighbor.row}"][data-column="${neighbor.column}"] .tile`);
+      const neighborTile = board.querySelector(`app-cell[data-row="${neighbor.row}"][data-column="${neighbor.column}"] app-tile`);
       if (neighborTile) neighbors.push(neighborTile);
     });
 

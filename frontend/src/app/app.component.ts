@@ -114,6 +114,8 @@ export class AppComponent implements OnInit {
               this.router.navigate([`**`]);
             }
             break;
+          case "ENDGAME":
+            break;
           default:
             this.router.navigate([`**`]);
             break;

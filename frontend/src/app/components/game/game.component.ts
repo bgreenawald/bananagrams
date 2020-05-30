@@ -63,7 +63,7 @@ export class GameComponent implements OnInit {
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
     this.tileEventListen();
-    this._detectOpenModal();
+    // this._detectOpenModal();
   }
 
   setGameID = () => {
@@ -150,13 +150,8 @@ export class GameComponent implements OnInit {
     })
   }
 
-  openModal = (message: string) => {
-    this.confirmMessage = message;
+  openModal = (modalType: string) => {
     this.modalOpen = true;
-  }
-
-  reset = () => {
-    this.socketService.reset(this.gameID);
   }
 
   closeModal = () => {

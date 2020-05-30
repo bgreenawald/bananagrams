@@ -32,8 +32,12 @@ export class MenuGameplayComponent implements OnInit {
     this.gameID = this.app.getGameID();
   }
 
-  reset = () => {
-    this.messageBusService.openModal("Are you sure you'd like to reset your board?");
+  handleStartNewGame = () => {
+    this.messageBusService.openModal("startNewGameConfirm");
+  }
+
+  handleReset = () => {
+    this.messageBusService.openModal("resetConfirm");
   }
 
   peel = () => {

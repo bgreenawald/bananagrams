@@ -28,8 +28,8 @@ export class MessageBusService {
     this._modifyCells.next();
   }
 
-  openModal(message: string) {
-    this._openModal.next(message);
+  openModal(modalType: string) {
+    this._openModal.next(modalType);
   }
 
   closeModal() {

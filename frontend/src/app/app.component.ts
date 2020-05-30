@@ -125,5 +125,8 @@ export class AppComponent implements OnInit {
     if (swapButton && didClickOutsideSwap) {
       this.helperService.globalClick('click')
     }
+    const isModalOpen: boolean = !!document.querySelector('.modal');
+    const didClickOutsideModal: boolean = e.target.classList.contains('overlay');
+    if (isModalOpen && didClickOutsideModal) this.helperService.globalClick('click');
   }
 }

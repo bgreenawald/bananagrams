@@ -1,0 +1,31 @@
+@import '../../../styles.scss';
+
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50vw;
+  height: 50vh;
+  background-color: #fff;
+  color: $off-black;
+  transform: translate(-50%, -50%);
+  z-index: 201;
+  border-radius: 10px;
+  background-color: $off-white;
+  @include flexbox();
+  box-shadow: 20px 20px 30px $off-black;
+
+  .content {
+    @include flexbox();
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: space-around;
+    margin: 0px 30px;
+    text-align: center;
+
+    .buttons {
+      @include flexbox();
+      justify-content: space-between;
+    }
+  }
+}

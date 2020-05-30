@@ -1,6 +1,8 @@
   <div id="buttons">
-    <button class="btn btn-primary" id="reset_button" type="submit" (click)="reset()">Start New Game</button>
-    <button class="btn btn-primary" id="peel_button" type="submit" (click)="peel()">Peel</button>
+    <button class="btn btn-primary" id="new_game_button" type="submit" (click)="handleStartNewGame()">Start New
+      Game</button>
+    <button class="btn btn-primary" id="peel_button" type="submit" (click)="handleReset()">Reset Board</button>
+    <button class="btn btn-primary" id="reset_button" type="submit" (click)="peel()">Peel</button>
     <button class="btn btn-primary" id="select_button" type="submit" (click)="selectAllTiles()">Select All
       Tiles</button>
     <button class="btn btn-primary" id="bananagrams_button" type="submit" (click)="bananagrams()">Bananagrams</button>

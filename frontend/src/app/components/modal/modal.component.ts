@@ -17,9 +17,11 @@ export class ModalComponent implements OnInit {
   public open: boolean;
   public modalType: string;
   public gameID: string;
+  public winningWords: any[];
   private _openModal$ = this.messageBusService.openModal$;
   private _globalClick$ = this._helperService.globalClick$;
   public store$: Observable<any>;
+  private _message$ = this._app.getMessages();
 
   constructor(
     private _app: AppComponent,
@@ -37,6 +39,7 @@ export class ModalComponent implements OnInit {
     this._listenCloseModals();
     this.gameID = this._app.getGameID();
     console.log(this.store$)
+    this.socketSubscribe();
   }
 
   private _listenOpenModals = () => {
@@ -44,7 +47,6 @@ export class ModalComponent implements OnInit {
       this.open = true;
       this.modalType = modalType;
     })
-    this._listenCloseModals();
   }
 
   handleReset = () => {
@@ -60,9 +62,27 @@ export class ModalComponent implements OnInit {
     this.open = false;
   }
 
+  handleInvalidReview = () => {
+    this.socketService.continueGame(this.gameID);
+  }
+
   _listenCloseModals = () => {
     this._globalClick$.subscribe(click => {
-      if (this.open) this.open = false;
+      if (this.open && (this.modalType !== "over")) this.open = false;
     })
+  }
+
+  socketSubscribe = () => {
+    this._message$
+      .subscribe(value => {
+        console.log(value)
+        if (value.message === "Game continued.") {
+          this.open = false;
+        }
+        else if (value.data.state === "OVER") {
+          this.winningWords = value.data.winning_words
+        }
+      },
+    )
   }
 }

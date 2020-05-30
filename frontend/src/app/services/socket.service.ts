@@ -40,4 +40,10 @@ export class SocketService {
       "name": gameID
     });
   }
+
+  continueGame = (gameID: string) => {
+    this.socket.emit("continue_game", {
+      "name": gameID,
+    })
+  }
 }

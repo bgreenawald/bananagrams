@@ -1,7 +1,7 @@
 <ng-container *ngIf="open">
   <div class="overlay"></div>
   <div class="modal">
-    <p>{{store$}}</p>
+    <p *ngFor="let each in store$">each</p>
     <span class="close-button" (click)="handleClose()">x</span>
     <ngTemplate [ngSwitch]="modalType">
       <div class="content" id="resetConfirm" *ngSwitchCase="'resetConfirm'">
@@ -15,7 +15,9 @@
         <button (click)="handleClose()">Continue this Game</button>
       </div>
       <div class="content" id="review" *ngSwitchCase="'review'">
-
+        <button>win</button>
+        <button (click)="handleInvalidReview()">continue</button>
+        <p *ngFor="let word of winningWords">{{word[0]}}</p>
       </div>
       <div class="content" id="lobbyBack" *ngSwitchDefault>
         {{modalType}}

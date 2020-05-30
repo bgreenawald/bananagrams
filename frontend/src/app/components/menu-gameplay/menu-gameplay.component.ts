@@ -140,7 +140,7 @@ export class MenuGameplayComponent implements OnInit {
     for (let r = minRow; r <= maxRow; r++) {
       let curWord = "";
       for (let c = minColumn; c <= maxColumn + 1; c++) {
-        var curTile = document.querySelectorAll(`#board .cell[data-row="${r}"][data-column="${c}"] .tile`);
+        var curTile = document.querySelectorAll(`#board app-cell[data-row="${r}"][data-column="${c}"] .tile`);
 
         if (curTile.length > 0) {
           curWord += curTile[0].textContent;
@@ -157,7 +157,7 @@ export class MenuGameplayComponent implements OnInit {
     for (let c = minColumn; c <= maxColumn; c++) {
       let curWord = "";
       for (let r = minRow; r <= maxRow + 1; r++) {
-        var curCell = document.querySelectorAll(`#board .cell[data-row="${r}"][data-column="${c}"]`)[0];
+        var curCell = document.querySelectorAll(`#board app-cell[data-row="${r}"][data-column="${c}"]`)[0];
         if (curCell.children.length > 0) {
           curWord += curCell.querySelector('.tile').textContent;
         } else {
@@ -172,7 +172,7 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   findFilledArea = (): number[] => {
-    let allTiles: any[] = Array.from(document.querySelectorAll('#board .tile'));
+    let allTiles: any[] = Array.from(document.querySelectorAll('#board app-tile'));
     let occupiedColumns = allTiles.map((tile: any) => tile.dataset.column);
     let occupiedRows = allTiles.map((tile: any) => tile.dataset.row);
 

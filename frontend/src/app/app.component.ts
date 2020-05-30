@@ -116,6 +116,9 @@ export class AppComponent implements OnInit {
             break;
           case "ENDGAME":
             break;
+          case "OVER":
+            this.messageBusService.openModal('review')
+            break;
           default:
             this.router.navigate([`**`]);
             break;

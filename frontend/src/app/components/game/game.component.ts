@@ -79,7 +79,6 @@ export class GameComponent implements OnInit {
   socketSubscribe = () => {
     this._messages$
       .subscribe(value => {
-        console.log(value)
         const tileArray = value.data.players[this.playerID];
 
         this.setTiles(value.data.players[this.playerID])

@@ -55,7 +55,6 @@ export class ModalComponent implements OnInit {
   }
 
   handleStartNewGame = () => {
-    console.log('game id', this.gameID)
     this.socketService.reset(this.gameID);
   }
 
@@ -80,7 +79,6 @@ export class ModalComponent implements OnInit {
   socketSubscribe = () => {
     this._message$
       .subscribe(value => {
-        console.log(value)
         if (value.message === "Game continued.") {
           this.open = false;
         }

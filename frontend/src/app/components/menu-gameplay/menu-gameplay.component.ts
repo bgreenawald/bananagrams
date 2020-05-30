@@ -188,7 +188,6 @@ export class MenuGameplayComponent implements OnInit {
   socketSubscribe = () => {
     this.message$.
       subscribe(value => {
-        console.log(value.data)
         if (value.data.tiles_remaining) {
           this.tilesRemaining = value.data.tiles_remaining
         }

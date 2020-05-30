@@ -104,8 +104,6 @@ export class AppComponent implements OnInit {
             break;
           case "ACTIVE":
             const allPlayers: string[] = Object.keys(value.data.players);
-            console.log("ALLPLAYERS", allPlayers)
-            console.log("playerid", this.playerID)
             if (allPlayers.includes(this.playerID)) {
               this.router.navigate([`/game/${this.gameID}`]);
             }

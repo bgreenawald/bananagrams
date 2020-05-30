@@ -22,9 +22,12 @@
             <th>Valid word?</th>
             <th>Word</th>
           </tr>
-          <tr *ngFor="let word of winningWords">
-            <td> <input type="checkbox" name="" id=""></td>
-            <td>{{word[0]}}</td>
+          <tr *ngFor="let word of winningWords; index as i ">
+            <div class="word-validation-buttons">
+              <button (click)="setWordStatus(i, true)">Y</button>
+              <button (click)="setWordStatus(i, false)">N</button>
+            </div>
+            <td [class]="word[1] ? 'valid word' : 'invalid word'">{{word[0]}}</td>
           </tr>
         </table>
         <button (click)="handleGameWin()">win confirm</button>

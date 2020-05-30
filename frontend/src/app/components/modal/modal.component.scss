@@ -49,3 +49,18 @@ td,
 th {
   text-align: left;
 }
+
+.word-validation-buttons {
+  @include flexbox();
+  flex-flow: row nowrap;
+}
+
+.word {
+  &.invalid {
+    color: red;
+  }
+
+  &.valid {
+    color: green;
+  }
+}

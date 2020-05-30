@@ -70,6 +70,10 @@ export class ModalComponent implements OnInit {
     this.socketService.reset(this.gameID);
   }
 
+  setWordStatus = (index: number, status: boolean) => {
+    this.winningWords[index][1] = status;
+  }
+
   _listenCloseModals = () => {
     this._globalClick$.subscribe(click => {
       if (this.open && (this.modalType !== "over")) this.open = false;

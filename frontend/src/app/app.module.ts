@@ -4,10 +4,13 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
+import { reducer } from './app.reducer';
 
 
 import { LobbyComponent } from './components/lobby/lobby.component';
@@ -20,7 +23,6 @@ import { CellComponent } from './components/cell/cell.component';
 import { BenchComponent } from './components/bench/bench.component';
 import { GameComponent } from './components/game/game.component';
 import { MenuGameplayComponent } from './components/menu-gameplay/menu-gameplay.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ModalComponent } from './components/modal/modal.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
@@ -46,7 +48,11 @@ const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
     HttpClientModule,
     SocketIoModule.forRoot(config),
     BrowserAnimationsModule,
-    DragDropModule
+    DragDropModule,
+    StoreModule.forRoot({
+      bananagrams: reducer
+    }, {}),
+    StoreDevtoolsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

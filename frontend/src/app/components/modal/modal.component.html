@@ -1,6 +1,7 @@
 <ng-container *ngIf="open">
   <div class="overlay"></div>
   <div class="modal">
+    <p>{{store$}}</p>
     <span class="close-button" (click)="handleClose()">x</span>
     <ngTemplate [ngSwitch]="modalType">
       <div class="content" id="resetConfirm" *ngSwitchCase="'resetConfirm'">

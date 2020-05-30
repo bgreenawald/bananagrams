@@ -5,6 +5,8 @@ import { HelperService } from './../../services/helper.service';
 import { Observable } from 'rxjs';
 import { skip, take } from 'rxjs/operators';
 import { AppComponent } from '../../app.component';
+import { Store, select } from '@ngrx/store';
+import { AppState } from './../../app.state';
 
 @Component({
   selector: 'app-modal',
@@ -17,20 +19,24 @@ export class ModalComponent implements OnInit {
   public gameID: string;
   private _openModal$ = this.messageBusService.openModal$;
   private _globalClick$ = this._helperService.globalClick$;
+  public store$: Observable<any>;
 
   constructor(
     private _app: AppComponent,
     private _helperService: HelperService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
-    private _ref: ElementRef
+    private _ref: ElementRef,
+    private store: Store<AppState>
   ) {
+    this.store$ = store.pipe(select('bananagrams'));
   }
 
   ngOnInit(): void {
     this._listenOpenModals();
     this._listenCloseModals();
     this.gameID = this._app.getGameID();
+    console.log(this.store$)
   }
 
   private _listenOpenModals = () => {

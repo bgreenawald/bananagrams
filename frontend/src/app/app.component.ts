@@ -4,6 +4,9 @@ import { Router, NavigationEnd, ActivatedRoute, RouterState } from '@angular/rou
 import { Observable, of, fromEvent, throwError } from 'rxjs';
 import { catchError, map, tap, first } from 'rxjs/operators';
 
+import { Store, select } from '@ngrx/store';
+import { updateStore } from './app.actions';
+
 
 import { Socket } from 'ngx-socket-io';
 import { SocketService } from './services/socket.service';
@@ -22,6 +25,7 @@ export class AppComponent implements OnInit {
   public playerID: string;
   public playersInLobby: string[];
   public tiles: string[];
+  public store$: Observable<any>;
   private playersTiles: string[];
   private messages$ = this.socketService.receive();
   private openModal$ = this.messageBusService.openModal$;
@@ -33,8 +37,9 @@ export class AppComponent implements OnInit {
     private errorService: ErrorService,
     private helperService: HelperService,
     private messageBusService: MessageBusService,
-    private socketService: SocketService
-  ) { }
+    private socketService: SocketService,
+    private _store: Store<{ bananagrams: any }>
+  ) { this.store$ = _store.pipe(select('bananagrams')) }
 
   ngOnInit() {
     this.detectIDChange();

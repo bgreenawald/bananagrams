@@ -103,7 +103,7 @@ class Game(object):
 
         # General game fields
         self.state = State.IDLE
-        self.num_players = len(self.players)
+        self.num_players = None
         self.tiles_remaining = len(self.tiles)
 
         # Date created
@@ -317,5 +317,7 @@ class Game(object):
                 )
             else:
                 self.state = State.ENDGAME
+                self.winning_player = None
+                self.winning_words = None
         finally:
             self.lock.release()

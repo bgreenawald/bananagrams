@@ -15,6 +15,13 @@
   @include flexbox();
   box-shadow: 20px 20px 30px $off-black;
 
+  .close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 30px;
+  }
+
   .content {
     @include flexbox();
     flex-flow: column nowrap;

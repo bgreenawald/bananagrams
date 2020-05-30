@@ -22,12 +22,13 @@ import { Tile } from '../../models';
   encapsulation: ViewEncapsulation.None
 })
 export class GameComponent implements OnInit {
-  // @HostListener('window:beforeunload', ['$event'])
-  // confirmExit($event: any) {
-  //   $event.preventDefault();
-  //   // Chrome prevents custom navigate away messages. 
-  //   $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
-  // }
+  @HostListener('window:beforeunload', ['$event'])
+  confirmExit($event: any) {
+    console.log("event", $event)
+    $event.preventDefault();
+    // Chrome prevents custom navigate away messages. 
+    $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
+  }
   public benchTiles: Tile[] = [];
   public error: string;
   public gameID: string; // numerical game id formatted as a string
@@ -63,19 +64,11 @@ export class GameComponent implements OnInit {
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
     this.tileEventListen();
-    // this._detectOpenModal();
   }
 
   setGameID = () => {
     const id = +this.route.snapshot.paramMap.get('id');
     this.gameID = id.toString();
-  }
-
-
-  private _detectOpenModal = () => {
-    this.openModal$.subscribe((message: string) => {
-      this.openModal(message);
-    })
   }
 
   _getPlayerID = () => {
@@ -148,13 +141,5 @@ export class GameComponent implements OnInit {
         'id': i++
       })
     })
-  }
-
-  openModal = (modalType: string) => {
-    this.modalOpen = true;
-  }
-
-  closeModal = () => {
-    this.modalOpen = false;
   }
 }

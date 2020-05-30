@@ -1,16 +1,16 @@
 <ng-container *ngIf="open">
   <div class="overlay"></div>
   <div class="modal">
-    <span class="close-button"></span>
+    <span class="close-button" (click)="handleClose()">x</span>
     <ngTemplate [ngSwitch]="modalType">
       <div class="content" id="resetConfirm" *ngSwitchCase="'resetConfirm'">
-        <h3>Would you like to erase your current board? </h3>
-        <button (click)="reset()">reset</button>
-        <button (click)="handleClose()">No don't!</button>
+        <h3>Are you sure you'd like to erase your current board? </h3>
+        <button (click)="handleReset()">Yes, reset</button>
+        <button (click)="handleClose()">No, go back!</button>
       </div>
       <div class="content" id="startNewGameConfirm" *ngSwitchCase="'startNewGameConfirm'">
         <h3>Would you like to end this game and start a new one?</h3>
-        <button (click)="reset()">End Current Game</button>
+        <button (click)="handleStartNewGame()">End Current Game</button>
         <button (click)="handleClose()">Continue this Game</button>
       </div>
       <div class="content" id="review" *ngSwitchCase="'review'">

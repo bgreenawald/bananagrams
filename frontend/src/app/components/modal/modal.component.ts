@@ -4,6 +4,7 @@ import { SocketService } from './../../services/socket.service';
 import { HelperService } from './../../services/helper.service';
 import { Observable } from 'rxjs';
 import { skip, take } from 'rxjs/operators';
+import { AppComponent } from '../../app.component';
 
 @Component({
   selector: 'app-modal',
@@ -18,6 +19,7 @@ export class ModalComponent implements OnInit {
   private _globalClick$ = this._helperService.globalClick$;
 
   constructor(
+    private _app: AppComponent,
     private _helperService: HelperService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
@@ -28,6 +30,7 @@ export class ModalComponent implements OnInit {
   ngOnInit(): void {
     this._listenOpenModals();
     this._listenCloseModals();
+    this.gameID = this._app.getGameID();
   }
 
   private _listenOpenModals = () => {
@@ -38,7 +41,12 @@ export class ModalComponent implements OnInit {
     this._listenCloseModals();
   }
 
-  reset = () => {
+  handleReset = () => {
+    location.reload();
+  }
+
+  handleStartNewGame = () => {
+    console.log('game id', this.gameID)
     this.socketService.reset(this.gameID);
   }
 

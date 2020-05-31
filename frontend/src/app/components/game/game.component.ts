@@ -24,9 +24,7 @@ import { Tile } from '../../models';
 export class GameComponent implements OnInit {
   @HostListener('window:beforeunload', ['$event'])
   confirmExit($event: any) {
-    console.log("event", $event)
     $event.preventDefault();
-    // Chrome prevents custom navigate away messages. 
     $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
   }
   public benchTiles: Tile[] = [];
@@ -80,10 +78,11 @@ export class GameComponent implements OnInit {
     this._messages$
       .subscribe(value => {
         const tileArray = value.data.players[this.playerID];
-        if (value.message === "Game loaded.") {
+        if (value.message === "Game loaded." && !this.tiles) {
           this.initializeTiles(tileArray);
         }
         else this.updateTiles(tileArray);
+        this.tiles = tileArray;
       },
         err => this.error = this.errorService.parseError(err)
       )

@@ -64,6 +64,7 @@ export class ModalComponent implements OnInit {
 
   handleInvalidReview = () => {
     this.socketService.continueGame(this.gameID);
+    this.handleClose();
   }
 
   handleGameWin = () => {

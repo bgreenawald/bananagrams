@@ -109,12 +109,13 @@ export class EventHandleService {
   }
 
   handleSwap = (activeTileID: number, tilesArray: string[]) => {
-    const tileToRemove = document.querySelector(`.tile[data-tile-id="${activeTileID}"]`).parentElement;
-    const parentCell = tileToRemove.parentNode;
+    const tileToRemove = document.querySelector(`app-tile[data-tile-id="${activeTileID}"]`);
+    const parentCell = tileToRemove.parentElement;
     const letter = tileToRemove.children[0].textContent;
 
-    tileToRemove.parentNode.removeChild(tileToRemove);
-    parentCell.parentNode.removeChild(parentCell);
+    this.clearParentCell(parentCell);
+    this._removeCells.next(this._emptyCellColumns)
+    this._emptyCellColumns = [];
 
     return letter;
   }
@@ -206,18 +207,22 @@ export class EventHandleService {
       this._messageBusService.addChildTile(
         newChildTile, destinationCell);
       // if bench cell, remove
-      if (parentCell.parentElement.id === "bench") {
-        this._emptyCellColumns.push(Number(parentCell.dataset.column))
-      }
-      // else, clear child tile
-      else {
-        this._messageBusService.removeChildTile({
-          row: sourceRow,
-          column: sourceColumn
-        })
-      }
+      this.clearParentCell(parentCell);
       tile.dataset.row = destinationRow;
       tile.dataset.column = destinationColumn;
+    }
+  }
+
+  clearParentCell = (parentCell: HTMLElement) => {
+    if (parentCell.parentElement.id === "bench") {
+      this._emptyCellColumns.push(Number(parentCell.dataset.column))
+    }
+    // else, clear child tile
+    else {
+      this._messageBusService.removeChildTile({
+        row: parseInt(parentCell.dataset.row),
+        column: parseInt(parentCell.dataset.column)
+      })
     }
   }
 }

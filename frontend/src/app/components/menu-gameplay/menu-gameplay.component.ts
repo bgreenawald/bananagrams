@@ -51,7 +51,7 @@ export class MenuGameplayComponent implements OnInit {
 
 
   selectAllTiles = () => {
-    const tiles: Element[] = Array.from(document.querySelectorAll('app-tile'));
+    const tiles: Element[] = Array.from(document.querySelectorAll('#board app-tile'));
     tiles.forEach(tile => {
       tile.classList.add('selected');
     })

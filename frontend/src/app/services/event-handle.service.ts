@@ -3,7 +3,8 @@ import { HelperService } from './helper.service';
 import { ErrorService } from './error.service';
 import { Subject } from "rxjs";
 import { AppRoutingModule } from '../app-routing.module';
-import { TileComponent } from '../components/tile/tile.component'
+import { TileComponent } from '../components/tile/tile.component';
+import { MessageBusService } from '../services/message-bus.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ export class EventHandleService {
   constructor(
     private errorService: ErrorService,
     private helperService: HelperService,
+    private _messageBusService: MessageBusService
   ) { }
 
   handleClick = (e, appTile?) => {
@@ -174,6 +176,15 @@ export class EventHandleService {
   }
 
   moveTile = (tile, rowChange, columnChange) => {
+    const tileID = tile.dataset.tileId;
+    const currentTile = document.querySelector(`app-tile[data-tile-id="${tileID}"]`);
+    const letter = currentTile.querySelector('span').textContent;
+
+    const newChildTile = {
+      id: tileID,
+      letter: letter
+    }
+
     // tile is of type app-tile
     const parentCell = tile.parentElement;
     let sourceRow = Number(parentCell.dataset.row);
@@ -185,14 +196,29 @@ export class EventHandleService {
     let secondaryDestination = document.querySelector(
       `#board app-cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
     );
+    const destinationCell = {
+      row: destinationRow,
+      column: destinationColumn
+    };
 
     // if desired target cell has no tile in it already 
     if (secondaryDestination.children.length === 0) {
-      secondaryDestination.appendChild(tile);
+      this._messageBusService.addChildTile(
+        newChildTile, destinationCell);
+      // if bench cell, remove
+      if (parentCell.parentElement.id === "bench") {
+        this._emptyCellColumns.push(Number(parentCell.dataset.column))
+      }
+      // else, clear child tile
+      else {
+        this._messageBusService.removeChildTile({
+          row: sourceRow,
+          column: sourceColumn
+        })
+      }
       secondaryDestination.classList.add("filled");
       tile.dataset.row = destinationRow;
       tile.dataset.column = destinationColumn;
-      this._emptyCellColumns.push(Number(parentCell.dataset.column))
     }
   }
 }

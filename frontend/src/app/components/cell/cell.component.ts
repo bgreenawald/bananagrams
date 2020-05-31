@@ -2,6 +2,9 @@ import { Component, OnInit, Input, ElementRef, HostListener, HostBinding, Direct
 
 import { EventHandleService } from '../../services/event-handle.service';
 
+import { Tile } from './../../models';
+import { MessageBusService } from '../../services/message-bus.service';
+
 // @Directive({
 //   selector: '[row]'
 // })
@@ -13,13 +16,20 @@ import { EventHandleService } from '../../services/event-handle.service';
 export class CellComponent implements OnInit {
   @HostBinding('attr.data-row') @Input() row!: number;
   @HostBinding('attr.data-column') @Input() column!: number;
+  // public childTile: Tile;
+  @Input('tile') childTile: Tile;
+  private _moveCell$ = this.messageBusService.moveChildTile$;
+  private _removeTile$ = this.messageBusService.removeChildTile$;
 
   constructor(
     private ref: ElementRef,
-    private eventHandler: EventHandleService
+    private eventHandler: EventHandleService,
+    private messageBusService: MessageBusService
   ) { }
 
   ngOnInit(): void {
+    this.listenMoveCell();
+    this.removeChildTile();
   }
 
   @HostListener('dragenter', ['$event'])
@@ -48,6 +58,28 @@ export class CellComponent implements OnInit {
   }
 
   @HostBinding('class') class = 'cell';
-  // @HostBinding('attr.data-row') 0;
-  // @HostBinding('att.data-column') = this.column;
+
+  @HostListener('click', ['$event'])
+  handleClick = ($event) => {
+    console.log('cell clicked!')
+  }
+
+  listenMoveCell = () => {
+    this._moveCell$.subscribe(data => {
+      if ((data.row === this.row) && (data.column == this.column)) {
+        this.childTile = {
+          id: data.id,
+          letter: data.letter
+        }
+      }
+    })
+  }
+
+  removeChildTile = () => {
+    this._removeTile$.subscribe(originCell => {
+      if ((originCell.row === this.row) && (originCell.column === this.column)) {
+        this.childTile = null;
+      }
+    })
+  }
 }

@@ -1,8 +1,7 @@
   <app-menu-gameplay></app-menu-gameplay>
 
   <div id="bench" *ngIf="benchTiles">
-    <app-cell *ngFor=" let tile of benchTiles; let i=index" [row]="0" [column]="i">
-      <app-tile [letter]="tile.letter" [index]="tile.id"></app-tile>
+    <app-cell *ngFor=" let tile of benchTiles; let i=index" [row]="0" [column]="i" [tile]="tile">
     </app-cell>
   </div>
 

@@ -1,2 +1,3 @@
-<span class="tile" [attr.data-tile-id]="index" [ngClass]="{'active': displaySwap}">{{letter}}</span>
+<span class="tile" (click)="handleSpanClick($event)" [attr.data-tile-id]="index"
+  [ngClass]="{'active': displaySwap}">{{letter}}</span>
 <button *ngIf="displaySwap" class="swap" (click)="handleSwap($event)">swap</button>

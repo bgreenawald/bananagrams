@@ -107,13 +107,16 @@ export class MenuGameplayComponent implements OnInit {
     // If we hit every tile, then we have a valid board
 
     let allTiles = board.querySelectorAll("app-tile");
+    console.log(seenTiles)
+    console.log(allTiles)
     return seenTiles.length === allTiles.length;
   }
 
   getTileNeighbors = (tile): any[] => {
     let neighbors = [];
-    let tileRow = parseInt(tile.getAttribute("data-row"));
-    let tileColumn = parseInt(tile.getAttribute("data-column"));
+    const parentCell = tile.parentElement;
+    let tileRow = parseInt(parentCell.getAttribute("data-row"));
+    let tileColumn = parseInt(parentCell.getAttribute("data-column"));
     var board = document.querySelector("#board");
 
     const neighborIndices = [

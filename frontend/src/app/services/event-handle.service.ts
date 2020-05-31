@@ -216,7 +216,6 @@ export class EventHandleService {
           column: sourceColumn
         })
       }
-      secondaryDestination.classList.add("filled");
       tile.dataset.row = destinationRow;
       tile.dataset.column = destinationColumn;
     }

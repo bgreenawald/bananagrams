@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ElementRef, HostListener, HostBinding, Directive } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, HostListener, HostBinding, Directive, Host, ChangeDetectorRef } from '@angular/core';
 
 import { EventHandleService } from '../../services/event-handle.service';
 
@@ -22,6 +22,7 @@ export class CellComponent implements OnInit {
   private _removeTile$ = this.messageBusService.removeChildTile$;
 
   constructor(
+    private cdRef: ChangeDetectorRef,
     private ref: ElementRef,
     private eventHandler: EventHandleService,
     private messageBusService: MessageBusService
@@ -58,6 +59,7 @@ export class CellComponent implements OnInit {
   }
 
   @HostBinding('class') class = 'cell';
+  @HostBinding('class.filled') get filledClass() { return !!this.childTile; }
 
   @HostListener('click', ['$event'])
   handleClick = ($event) => {

@@ -80,9 +80,10 @@ export class GameComponent implements OnInit {
     this._messages$
       .subscribe(value => {
         const tileArray = value.data.players[this.playerID];
-
-        this.setTiles(value.data.players[this.playerID])
-        // this.tiles = ["c", "a", "t"]
+        if (value.message === "Game loaded.") {
+          this.initializeTiles(tileArray);
+        }
+        else this.updateTiles(tileArray);
       },
         err => this.error = this.errorService.parseError(err)
       )
@@ -99,9 +100,10 @@ export class GameComponent implements OnInit {
     this.tiles = tiles;
   }
 
-  findDifference = (updatedTileArray: string[], oldTileArray: string[]) => {
-    const newTiles: string[] = updatedTileArray.slice();
-    for (let letter of oldTileArray) {
+  findDifference = (tiles: string[]) => {
+    const oldTiles = this.tiles.slice();
+    const newTiles = tiles.slice();
+    for (let letter of oldTiles) {
       let index = newTiles.indexOf(letter);
       if (index > -1) {
         newTiles.splice(index, 1);
@@ -111,7 +113,7 @@ export class GameComponent implements OnInit {
   }
 
   updateTiles = (tiles) => {
-    const newTiles = this.findDifference(tiles, this.tiles);
+    const newTiles = this.findDifference(tiles);
     let lastTileIndex = this.tiles.length - 1;
     newTiles.forEach(tile => {
       this.benchTiles.push({

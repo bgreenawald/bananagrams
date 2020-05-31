@@ -22,13 +22,13 @@ import { Tile } from '../../models';
   encapsulation: ViewEncapsulation.None
 })
 export class GameComponent implements OnInit {
-  // @HostListener('window:beforeunload', ['$event'])
-  // confirmExit($event: any) {
-  //   console.log("event", $event)
-  //   $event.preventDefault();
-  //   // Chrome prevents custom navigate away messages. 
-  //   $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
-  // }
+  @HostListener('window:beforeunload', ['$event'])
+  confirmExit($event: any) {
+    console.log("event", $event)
+    $event.preventDefault();
+    // Chrome prevents custom navigate away messages. 
+    $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
+  }
   public benchTiles: Tile[] = [];
   public error: string;
   public gameID: string; // numerical game id formatted as a string

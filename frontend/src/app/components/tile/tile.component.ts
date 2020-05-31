@@ -61,21 +61,9 @@ export class TileComponent implements OnInit {
   handleSwap = $event => {
     const tiles = this.app.getUserTiles();
     const letter = this.eventHandler.handleSwap(this.index, tiles);
-    let swaps = 10;
-    for (let i = 0; i < swaps; i++) {
-      this.socket.emit("swap", {
-        name: this.gameID,
-        "letter": this.letter,
-        "player_id": this.playerID
-      })
-    }
   }
 
   clearSwapButton = () => {
     this.displaySwap = false;
-  }
-
-  handleSpanClick = e => {
-    this.eventHandler.handleClick(e)
   }
 }

@@ -41,12 +41,12 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   peel = () => {
-    // if (this.isValidBoard()) {
-    this.socket.emit("peel", {
-      "name": this.gameID
-    })
-    // }
-    // else this.errorService.displayError('To peel, your bench must be empty and your board must be valid.')
+    if (this.isValidBoard()) {
+      this.socket.emit("peel", {
+        "name": this.gameID
+      })
+    }
+    else this.errorService.displayError('To peel, your bench must be empty and your board must be valid.')
   }
 
 

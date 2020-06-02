@@ -29,3 +29,6 @@ htmlcov/
 # Ignore compiled CSS
 *.css
 *.css.map
+
+# Node modules
+*/node_modules/

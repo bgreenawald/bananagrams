@@ -1,0 +1,41 @@
+<ng-container *ngIf="open">
+  <div class="overlay"></div>
+  <div class="modal">
+    <p *ngFor="let each in store$">each</p>
+    <span class="close-button" (click)="handleClose()">x</span>
+    <ngTemplate [ngSwitch]="modalType">
+      <div class="content" id="resetConfirm" *ngSwitchCase="'resetConfirm'">
+        <h3>Are you sure you'd like to erase your current board? </h3>
+        <button (click)="handleReset()">Yes, reset</button>
+        <button (click)="handleClose()">No, go back!</button>
+      </div>
+      <div class="content" id="startNewGameConfirm" *ngSwitchCase="'startNewGameConfirm'">
+        <h3>Would you like to end this game and start a new one?</h3>
+        <button (click)="handleStartNewGame()">End Current Game</button>
+        <button (click)="handleClose()">Continue this Game</button>
+      </div>
+      <div class="content" id="review" *ngSwitchCase="'review'">
+        <h2>{{winningPlayer}} has called Bananagrams.</h2>
+        <h3>Verify their board and either continue the game or start a new one!</h3>
+        <table>
+          <tr>
+            <th>Valid word?</th>
+            <th>Word</th>
+          </tr>
+          <tr *ngFor="let word of winningWords; index as i ">
+            <div class="word-validation-buttons">
+              <button (click)="setWordStatus(i, true)">Y</button>
+              <button (click)="setWordStatus(i, false)">N</button>
+            </div>
+            <td [class]="word[1] ? 'valid word' : 'invalid word'">{{word[0]}}</td>
+          </tr>
+        </table>
+        <button (click)="handleGameWin()">win confirm</button>
+        <button (click)="handleInvalidReview()">continue</button>
+      </div>
+      <div class="content" id="lobbyBack" *ngSwitchDefault>
+        {{modalType}}
+      </div>
+    </ngTemplate>
+  </div>
+</ng-container>

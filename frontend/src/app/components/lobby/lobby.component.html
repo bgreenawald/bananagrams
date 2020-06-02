@@ -1,0 +1,34 @@
+<header class="lobby">
+  <div class="lobby-content">
+    <div class='error-container'>
+      <p class='error-content'>
+        {{error}}
+      </p>
+    </div>
+    <div id=" join_game" *ngIf="!playerID">
+      <p>First things first, enter your username to join the game.</p>
+      <input #playerID id="player_id" type="text" placeholder="Enter your username"
+        (keydown)="playerJoin(playerID.value)">
+      <button id="player_id_submit" class="btn btn-primary" type="submit" (click)="playerJoin(playerID.value)">
+        Join the Game
+      </button>
+    </div>
+    <div id="options" *ngIf="playerID">
+      <div id="players-in-lobby">
+        <h2>Players in Lobby:</h2>
+        <ul id="players">
+          <div class="player" *ngFor="let player of playersInLobby">
+            <img src="https://www.svgrepo.com/show/58475/bird-hand-drawn-animal-toy.svg" alt="" class="player-icon">
+            <h3>{{player}}</h3>
+
+          </div>
+
+        </ul>
+      </div>
+      <p class=" lobby-wait-message">Waiting for other players. Hit "Start" when everyone has joined.</p>
+      <button class="btn btn-primary" id="start_game_button" type="submit" (click)="startGame()">Start</button>
+    </div>
+    <div id="game_info"></div>
+    <p>Your game ID is. Share your current URL with friends and they can access the game too!</p>
+  </div>
+</header>

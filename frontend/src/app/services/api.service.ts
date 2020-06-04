@@ -4,11 +4,13 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Socket } from 'ngx-socket-io';
 
+import { environment } from "../../environments/environment";
+
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseURL: string = 'http://localhost:5000/api/';
+  private baseURL: string = environment.backendUrl + '/api/';
 
   constructor(
     private http: HttpClient,

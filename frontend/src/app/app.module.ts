@@ -25,7 +25,9 @@ import { GameComponent } from './components/game/game.component';
 import { MenuGameplayComponent } from './components/menu-gameplay/menu-gameplay.component';
 import { ModalComponent } from './components/modal/modal.component';
 
-const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
+import { environment } from "../environments/environment";
+
+const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
 
 @NgModule({
   declarations: [

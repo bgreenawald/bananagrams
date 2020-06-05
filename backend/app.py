@@ -22,9 +22,6 @@ app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app)
 socketio.init_app(app, cors_allowed_origins="*")
 
-# Add Sass
-Scss(app, static_dir="static/styles/css", asset_dir="static/styles/scss")
-
 # Initialize CORS
 CORS(app)
 
@@ -50,17 +47,6 @@ test = False
 # ---------------------------------------
 # App routes
 # ---------------------------------------
-
-
-@app.route("/")
-def return_index() -> str:
-    return render_template("index.html")
-
-
-@app.route("/game/<int:id>")
-def return_game(id: str) -> str:
-    return render_template("game.html", id=id)
-
 
 @app.route("/api/get_names")
 def get_names() -> Response:

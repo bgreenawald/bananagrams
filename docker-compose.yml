@@ -5,8 +5,6 @@ services:
     backend:
         build: ./backend
         container_name: backend
-        ports:
-        - 5000:5000
     frontend:
         build: ./frontend
         container_name: frontend

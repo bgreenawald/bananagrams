@@ -1,6 +1,6 @@
 # Bananagrams
 
-An online version of the game Bananagrams.
+An online version of the game Bananagrams. The frontend and the backend are seperated in the *frontend* and *backend* directories respectively, so make sure to change into the proper directory before completing the following steps.
 
 ## Setup - Backend
 

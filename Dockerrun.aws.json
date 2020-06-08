@@ -1,0 +1,26 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [
+        {
+            "name": "backend",
+            "image": "512324380783.dkr.ecr.us-east-1.amazonaws.com/chalkful_backend",
+            "essential": true,
+            "memory": 128
+        },
+        {
+            "name": "frontend",
+            "image": "512324380783.dkr.ecr.us-east-1.amazonaws.com/chalkful_frontend",
+            "essential": true,
+            "memory": 128,
+            "portMappings": [
+                {
+                    "hostPort": 80,
+                    "containerPort": 80
+                }
+            ],
+            "links": [
+                "backend"
+            ]
+        }
+    ]
+}

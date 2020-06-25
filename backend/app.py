@@ -7,9 +7,8 @@ from typing import Any, Dict
 
 import simplejson
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask, json, render_template, request, Response
+from flask import Flask, json, request, Response
 from flask_cors import CORS
-from flask_scss import Scss
 from flask_socketio import emit, join_room, SocketIO
 from jsonschema import validate, ValidationError
 
@@ -18,7 +17,7 @@ from game import Game, GameException
 # Initialize the application
 app = Flask(__name__, static_url_path="", static_folder="static")
 app.debug = True
-app.config["SECRET_KEY"] = "secret!"
+app.config["SECRET_KEY"] = "secret!"  # NOQA: S105
 socketio = SocketIO(app)
 socketio.init_app(app, cors_allowed_origins="*")
 
@@ -47,6 +46,7 @@ test = False
 # ---------------------------------------
 # App routes
 # ---------------------------------------
+
 
 @app.route("/api/get_names")
 def get_names() -> Response:
@@ -461,5 +461,5 @@ atexit.register(lambda: scheduler.shutdown())
 
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True)  # NOQA: S201
     test = True

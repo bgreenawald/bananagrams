@@ -3,7 +3,7 @@ name: Test backend
 on: [push]
 
 jobs:
-    build_and_deploy:
+    test:
         runs-on: ubuntu-latest
         env:
             working-directory: ./backend

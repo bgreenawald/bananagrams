@@ -39,7 +39,7 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      working-directory: ${{env.frontend-directory}}
+      working-directory: ${{ env.frontend-directory }}
 
     - name: Frontend build and deploy to ECR
       env:
@@ -49,7 +49,7 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      working-directory: ${{env.frontend-directory}}
+      working-directory: ${{ env.frontend-directory }}
 
     # Generate deployment package for Elastic beanstalk and deploy
     - name: Generate deployment package
@@ -58,12 +58,12 @@ jobs:
     - name: Beanstalk Deploy my app
       uses: einaregilsson/beanstalk-deploy@v4
       with:
-        aws_access_key: ${{secrets.AWS_ACCESS_KEY}}
-        aws_secret_key: ${{secrets.AWS_SECRET_KEY}}
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
         application_name: chalkful
         environment_name: chalkful-env
         region: us-east-1
-        version_label: "chalkful-${{ github.sha }}" // Using timestamp create on step #
+        version_label: chalkful-${{ github.sha }}
         deployment_package: deploy.zip
 
     # Log out of ECR

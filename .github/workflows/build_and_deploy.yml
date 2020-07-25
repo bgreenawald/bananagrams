@@ -15,29 +15,35 @@ jobs:
     env:
       backend-directory: ./backend
       frontend-directory: ./frontend
+      python_version: 3.7.0
+      poetry_version: 1.0
 
     steps:
     - uses: actions/checkout@v2
-        # Test the backend
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v2
+    # Test the backend
+    - name: Install
+      uses: abatilo/actions-poetry@v1.5.0
       with:
-        python-version: 3.7
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      working-directory: ${{ env.backend-directory }}
+        python_version: ${{ env.python_version }}
+        poetry_version: ${{ env.poetry_version }}
+        working_directory: ${{ env.backend-directory }}
+        args: install
     - name: Lint with flake8
-      run: |
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: ${{ env.python_version }}
+        poetry_version: ${{ env.poetry_version }}
+        working_directory: ${{ env.backend-directory }}
         # stop the build if there are Python syntax errors or undefined names
-        flake8 .
-      working-directory: ${{ env.backend-directory }}
+        args: run flake8 .
     - name: Test with pytest
-      run: |
-        pytest
-      working-directory: ${{ env.backend-directory }}
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: ${{ env.python_version }}
+        poetry_version: ${{ env.poetry_version }}
+        working_directory: ${{ env.backend-directory }}
+        # stop the build if there are Python syntax errors or undefined names
+        args: run pytest
 
     # Configure AWS credentials and login to the ECR
     - name: Configure AWS credentials
@@ -58,7 +64,7 @@ jobs:
         ECR_REPOSITORY: chalkful_frontend
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY
       working-directory: ${{ env.frontend-directory }}
 
@@ -69,7 +75,7 @@ jobs:
         ECR_REPOSITORY: chalkful_backend
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY
       working-directory: ${{ env.backend-directory }}
 

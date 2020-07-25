@@ -22,14 +22,14 @@ jobs:
       with:
         python_version: ${{ env.python_version }}
         poetry_version: ${{ env.poetry_version }}
-        working-directory: ${{ env.backend-directory }}
+        working_directory: ${{ env.backend-directory }}
         args: install
     - name: Lint with flake8
       uses: abatilo/actions-poetry@v1.5.0
       with:
         python_version: ${{ env.python_version }}
         poetry_version: ${{ env.poetry_version }}
-        working-directory: ${{ env.backend-directory }}
+        working_directory: ${{ env.backend-directory }}
         # stop the build if there are Python syntax errors or undefined names
         args: run flake8 .
     - name: Test with pytest
@@ -37,6 +37,6 @@ jobs:
       with:
         python_version: ${{ env.python_version }}
         poetry_version: ${{ env.poetry_version }}
-        working-directory: ${{ env.backend-directory }}
+        working_directory: ${{ env.backend-directory }}
         # stop the build if there are Python syntax errors or undefined names
         args: run pytest

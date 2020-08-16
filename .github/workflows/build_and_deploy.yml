@@ -62,10 +62,14 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: chalkful_frontend
+        IMAGE_NAME: chalkful_frontend
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY
+        docker build -t $IMAGE_NAME .
+        docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       working-directory: ${{ env.frontend-directory }}
 
     # Build and deploy the backend docker image
@@ -73,26 +77,16 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: chalkful_backend
+        IMAGE_NAME: chalkful_backend
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY
+        docker build -t $IMAGE_NAME .
+        docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       working-directory: ${{ env.backend-directory }}
 
-    # Generate deployment package for Elastic beanstalk and deploy
-    - name: Generate deployment package
-      run: zip -g deploy.zip Dockerrun.aws.json
-
-    - name: Beanstalk Deploy my app
-      uses: einaregilsson/beanstalk-deploy@v4
-      with:
-        aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-        aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-        application_name: chalkful
-        environment_name: chalkful-env
-        region: us-east-1
-        version_label: chalkful-${{ github.sha }}
-        deployment_package: deploy.zip
 
     # Log out of ECR
     - name: Logout of Amazon ECR

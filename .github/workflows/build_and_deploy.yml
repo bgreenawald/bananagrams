@@ -1,49 +1,46 @@
 name: Build and Deploy
 
-on:
+# on:
   # Trigger the workflow on push or pull request,
   # but only for the master branch
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+#  push:
+#    branches:
+#      - master
+#  pull_request:
+#    branches:
+#      - master
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     env:
       backend-directory: ./backend
       frontend-directory: ./frontend
-      python_version: 3.7.0
-      poetry_version: 1.0
 
     steps:
     - uses: actions/checkout@v2
+
     # Test the backend
-    - name: Install
-      uses: abatilo/actions-poetry@v1.5.0
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
       with:
-        python_version: ${{ env.python_version }}
-        poetry_version: ${{ env.poetry_version }}
-        working_directory: ${{ env.backend-directory }}
-        args: install
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+        source $HOME/.poetry/env
+        poetry export -f requirements.txt --dev > requirements.txt
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      working-directory: ${{ env.backend-directory }}
     - name: Lint with flake8
-      uses: abatilo/actions-poetry@v1.5.0
-      with:
-        python_version: ${{ env.python_version }}
-        poetry_version: ${{ env.poetry_version }}
-        working_directory: ${{ env.backend-directory }}
+      run: |
         # stop the build if there are Python syntax errors or undefined names
-        args: run flake8 .
+        flake8 .
+      working-directory: ${{ env.backend-directory }}
     - name: Test with pytest
-      uses: abatilo/actions-poetry@v1.5.0
-      with:
-        python_version: ${{ env.python_version }}
-        poetry_version: ${{ env.poetry_version }}
-        working_directory: ${{ env.backend-directory }}
-        # stop the build if there are Python syntax errors or undefined names
-        args: run pytest
+      run: |
+        pytest
+      working-directory: ${{ env.backend-directory }}
 
     # Configure AWS credentials and login to the ECR
     - name: Configure AWS credentials

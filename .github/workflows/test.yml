@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-        PATH="${PATH}:/root/.poetry/bin"
+        source $HOME/.poetry/env
         poetry export -f requirements.txt --dev > requirements.txt
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi

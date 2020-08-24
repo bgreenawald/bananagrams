@@ -69,7 +69,7 @@ class BaseVPCStack(core.Stack):
             )
 
         # Frontend service to backend services on 3000
-        self.services_3000_sec_group = aws_ec2.SecurityGroup(
+        self.services_sec_group = aws_ec2.SecurityGroup(
             self,
             f"{PROJECT_NAME}FrontendToBackendSecurityGroup",
             allow_all_outbound=True,
@@ -78,14 +78,14 @@ class BaseVPCStack(core.Stack):
         )
 
         # Allow inbound 3000 from ALB to Frontend Service
-        self.sec_grp_ingress_self_3000 = aws_ec2.CfnSecurityGroupIngress(
+        self.sec_grp_ingress_self_80 = aws_ec2.CfnSecurityGroupIngress(
             self,
             "InboundSecGrp3000",
             ip_protocol="TCP",
-            source_security_group_id=self.services_3000_sec_group.security_group_id,
-            from_port=3000,
-            to_port=3000,
-            group_id=self.services_3000_sec_group.security_group_id,
+            source_security_group_id=self.services_sec_group.security_group_id,
+            from_port=80,
+            to_port=80,
+            group_id=self.services_sec_group.security_group_id,
         )
 
         # All Outputs required for other stacks to build
@@ -110,7 +110,7 @@ class BaseVPCStack(core.Stack):
         core.CfnOutput(
             self,
             f"{PROJECT_NAME}FE2BESecGrp",
-            value=self.services_3000_sec_group.security_group_id,
+            value=self.services_sec_group.security_group_id,
             export_name=f"{PROJECT_NAME}SecGrpId",
         )
         core.CfnOutput(
@@ -128,7 +128,7 @@ class BaseVPCStack(core.Stack):
         core.CfnOutput(
             self,
             f"{PROJECT_NAME}ServicesSecGrp",
-            value=self.services_3000_sec_group.security_group_id,
+            value=self.services_sec_group.security_group_id,
             export_name=f"{PROJECT_NAME}ServicesSecGrp",
         )
         core.CfnOutput(

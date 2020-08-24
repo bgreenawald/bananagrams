@@ -5,8 +5,6 @@ from aws_cdk import (
     aws_ec2,
     aws_ecr,
     aws_ecs,
-    aws_ecs_patterns,
-    aws_iam,
     aws_servicediscovery,
     core,
 )
@@ -17,13 +15,13 @@ from os import getenv
 PROJECT_NAME = "Chalkful"
 
 
-# Creating a construct that will populate the required objects created in the platform repo such as vpc, ecs cluster, and service discovery namespace
+# Creating a construct that will populate the required objects created in the platform repo such as vpc, ecs cluster, and service discovery namespace  # NOQA: B950
 class BasePlatform(core.Construct):
     def __init__(self, scope: core.Construct, id: str, **kwargs):
         super().__init__(scope, id, **kwargs)
         self.environment_name = PROJECT_NAME
 
-        # The base platform stack is where the VPC was created, so all we need is the name to do a lookup and import it into this stack for use
+        # The base platform stack is where the VPC was created, so all we need is the name to do a lookup and import it into this stack for use  # NOQA: B950
         self.vpc = aws_ec2.Vpc.from_lookup(
             self, "VPC", vpc_name=f"{self.environment_name}/BaseVPC"
         )

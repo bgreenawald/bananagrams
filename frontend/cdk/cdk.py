@@ -53,7 +53,6 @@ class BasePlatform(core.Construct):
 
 
 class AngularService(core.Stack):
-
     def __init__(self, scope: core.Stack, id: str, **kwargs):
         super().__init__(scope, id, **kwargs)
 
@@ -70,20 +69,26 @@ class AngularService(core.Stack):
         )
 
         self.fargate_load_balanced_service = aws_ecs_patterns.ApplicationLoadBalancedFargateService(
-            self, f"{PROJECT_NAME}FrontendFargateLBService",
-            service_name=f'{PROJECT_NAME.lower()}-frontend',
+            self,
+            f"{PROJECT_NAME}FrontendFargateLBService",
+            service_name=f"{PROJECT_NAME.lower()}-frontend",
             cluster=self.base_platform.ecs_cluster,
             cpu=256,
             memory_limit_mib=512,
             desired_count=1,
             public_load_balancer=True,
             cloud_map_options=self.base_platform.sd_namespace,
-            task_image_options=self.fargate_task_image
+            task_image_options=self.fargate_task_image,
         )
 
         self.fargate_load_balanced_service.service.connections.allow_to(
             self.base_platform.services_sec_grp,
-            port_range=aws_ec2.Port(protocol=aws_ec2.Protocol.TCP, string_representation=f"{PROJECT_NAME.lower()}frontendtobackend", from_port=5000, to_port=5000)
+            port_range=aws_ec2.Port(
+                protocol=aws_ec2.Protocol.TCP,
+                string_representation=f"{PROJECT_NAME.lower()}frontendtobackend",
+                from_port=5000,
+                to_port=5000,
+            ),
         )
 
 

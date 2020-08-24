@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  backendUrl: "http://chalkful.us-east-1.elasticbeanstalk.com"
+  backendUrl: "http://chalkful_backend.service:5000"
 };

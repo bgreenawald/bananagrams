@@ -15,18 +15,18 @@ from os import getenv
 PROJECT_NAME = "Chalkful"
 
 
-# Creating a construct that will populate the required objects created in the platform repo such as vpc, ecs cluster, and service discovery namespace  # NOQA: B950
+# Creating a construct that will populate the required objects created in the platform repo such as vpc, ecs cluster, and service discovery namespace  # NOQA: E501
 class BasePlatform(core.Construct):
     def __init__(self, scope: core.Construct, id: str, **kwargs):
         super().__init__(scope, id, **kwargs)
         self.environment_name = PROJECT_NAME
 
-        # The base platform stack is where the VPC was created, so all we need is the name to do a lookup and import it into this stack for use  # NOQA: B950
+        # The base platform stack is where the VPC was created, so all we need is the name to do a lookup and import it into this stack for use  # NOQA: E501
         self.vpc = aws_ec2.Vpc.from_lookup(
             self, "VPC", vpc_name=f"{self.environment_name}/BaseVPC"
         )
 
-        self.sd_namespace = aws_servicediscovery.PrivateDnsNamespace.from_private_dns_namespace_attributes(
+        self.sd_namespace = aws_servicediscovery.PrivateDnsNamespace.from_private_dns_namespace_attributes(  # NOQA: E501
             self,
             "SDNamespace",
             namespace_name=core.Fn.import_value(f"{PROJECT_NAME}NSNAME"),

@@ -1,18 +1,15 @@
 name: Build and Deploy
 
 on:
-  push:
-    branches-ignore:
-      - master
-# on:
   # Trigger the workflow on push or pull request,
   # but only for the master branch
-#  push:
-#    branches:
-#      - master
-#  pull_request:
-#    branches:
-#      - master
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -88,6 +85,20 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       working-directory: ${{ env.backend-directory }}
 
+    # Generate deployment package for Elastic beanstalk and deploy
+    - name: Generate deployment package
+      run: zip -g deploy.zip Dockerrun.aws.json
+
+    - name: Beanstalk Deploy my app
+      uses: einaregilsson/beanstalk-deploy@v4
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+        application_name: chalkful
+        environment_name: chalkful-env
+        region: us-east-1
+        version_label: chalkful-${{ github.sha }}
+        deployment_package: deploy.zip
 
     # Log out of ECR
     - name: Logout of Amazon ECR

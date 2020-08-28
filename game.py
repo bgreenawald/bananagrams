@@ -48,7 +48,6 @@ class GameException(Exception):
 class Game(object):
     """
     A class representing an entire game.
-
     Attributes:
         id (str): Id of a game.
         tiles (List[str]): The list of tiles for a game.
@@ -59,7 +58,6 @@ class Game(object):
         winning_words (List[Tuple[str, bool]]): List of words from the (potentially) winning player
         winning_player (str): ID of the (potentially) winning player
         lock (threading.Lock): A lock to keep the game state synchronized.
-
     """
 
     def __init__(self, id: str):
@@ -103,7 +101,7 @@ class Game(object):
 
         # General game fields
         self.state = State.IDLE
-        self.num_players = len(self.players)
+        self.num_players = None
         self.tiles_remaining = len(self.tiles)
 
         # Date created
@@ -144,7 +142,6 @@ class Game(object):
 
     def join_game(self, player_id: str):
         """Add a player to the players roster.
-
         Args:
             player_id (str): The ID of the player to add.
         """
@@ -181,7 +178,6 @@ class Game(object):
 
     def _divy_out_tiles(self):
         """Divy out the correct number of tiles to each player.
-
         Raises:
             GameException: Invalid number of players.
         """
@@ -204,7 +200,6 @@ class Game(object):
     def peel(self, test: bool = False):
         """
         Give a new tile to each player.
-
         Args:
             test (bool): Bypasses the time restriction for testing, defaults to False.
         """
@@ -242,11 +237,9 @@ class Game(object):
 
     def swap(self, letter, player):
         """Swap a given tile for three tiles for a player.
-
         Args:
             letter (str): The tile to put back into the pile.
             player (str): The ID of the player to perform the swap.
-
         Raises:
             GameException: The player does not have an instance of that tile.
         """
@@ -283,7 +276,6 @@ class Game(object):
     def bananagrams(self, player_id: str, word_list: List[str]):
         """
         End the game (someone has bananagrams)
-
         Args:
             player_id (str): The ID of the potentially winning player.
             word_list (List[str]): The list of the winning words.
@@ -317,5 +309,7 @@ class Game(object):
                 )
             else:
                 self.state = State.ENDGAME
+                self.winning_player = None
+                self.winning_words = None
         finally:
             self.lock.release()

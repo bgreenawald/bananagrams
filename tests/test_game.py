@@ -291,7 +291,9 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test winning player after game over."):
             self.assertEqual(g.winning_player, "winning_player")
         with self.subTest("Test winning tiles after game over."):
-            self.assertEqual(g.winning_words, [("winning", True), ("words", True), ("xdefx", False)])
+            self.assertEqual(
+                g.winning_words, [("winning", True), ("words", True), ("xdefx", False)]
+            )
 
     def test_continue(self):
         g = Game("")

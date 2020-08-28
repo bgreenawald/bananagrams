@@ -7,7 +7,7 @@ from typing import Any, Dict
 
 import simplejson
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask, json, request, Response
+from flask import Flask, json, render_template, request, Response
 from flask_cors import CORS
 from flask_socketio import emit, join_room, SocketIO
 from jsonschema import validate, ValidationError
@@ -46,6 +46,16 @@ test = False
 # ---------------------------------------
 # App routes
 # ---------------------------------------
+
+
+@app.route("/")
+def return_index() -> str:
+    return render_template("index.html")
+
+
+@app.route("/game/<int:id>")
+def return_game(id: str) -> str:
+    return render_template("game.html", id=id)
 
 
 @app.route("/api/get_names")

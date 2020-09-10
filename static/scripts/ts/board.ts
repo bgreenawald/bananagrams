@@ -68,7 +68,7 @@ var handleDragStart = function (e) {
     if (!e.target.classList.contains('selected')) {
         e.target.classList.add("selected");
     }
-    ;
+
     var selectedTiles = Array.from(document.querySelectorAll('.selected'));
     // casing of tileId is set by browser parsing
     tilesToDrag = selectedTiles.map(function (tile) {

@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Schoolbell&display=swap'); 
+  html, body {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%; }
+
+    body {
+      min-height: 100%;
+      background: url('../../chalkboard-background.jpg');
+      background-size: cover;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+            "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale; }
+
+      .pos-a {
+        position: absolute; }
+
+        .pos-r {
+          position: relative; }
+
+          .flex {
+            display: flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center; }
+
+            @font-face {
+              font-family: 'eraser';
+              src: url("../../fonts/EraserRegular-DO1D.ttf");
+              font-style: 'normal';
+              font-weight: 'normal'; }
+
+              @font-face {
+                font-family: 'eraser';
+                src: url("../../fonts/EraserDust-p70d.ttf");
+                font-style: 'italic';
+                font-weight: 'normal'; }
+
+                @font-face {
+                  font-family: 'ten-thousand-reasons';
+                  src: url("../../fonts/KgTenThousandReasons-R1ll.ttf");
+                  font-style: 'normal';
+                  font-weight: 'normal'; }
+
+                  @font-face {
+                    font-family: 'stamp';
+                    src: url("../../fonts/KGThankYouStamp.ttf");
+                    font-style: 'normal';
+                    font-weight: 'normal'; }
+
+                    h1 {
+                      font-family: 'eraser', arial, sans-serif;
+                      font-size: 5em;
+                      letter-spacing: 0.15em;
+                      margin: 0px;
+                      text-align: center;
+                      font-weight: normal; }
+
+                      p {
+                        font-family: 'gaegu', arial, sans-serif;
+                        font-size: 1.5em;
+                        text-align: center;
+                        font-weight: normal; }
+
+                        p.caption {
+                          font-size: 1.4em; }

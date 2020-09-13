@@ -1,0 +1,244 @@
+@import url("https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Schoolbell&display=swap");
+html, body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: url("../../chalkboard-background.jpg");
+  background-size: cover;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.pos-a {
+  position: absolute;
+}
+
+.pos-r {
+  position: relative;
+}
+
+.flex {
+  display: flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+@font-face {
+  font-family: "eraser";
+  src: url("../../fonts/EraserRegular-DO1D.ttf");
+  font-style: "normal";
+  font-weight: "normal";
+}
+@font-face {
+  font-family: "eraser";
+  src: url("../../fonts/EraserDust-p70d.ttf");
+  font-style: "italic";
+  font-weight: "normal";
+}
+@font-face {
+  font-family: "ten-thousand-reasons";
+  src: url("../../fonts/KgTenThousandReasons-R1ll.ttf");
+  font-style: "normal";
+  font-weight: "normal";
+}
+@font-face {
+  font-family: "stamp";
+  src: url("../../fonts/KGThankYouStamp.ttf");
+  font-style: "normal";
+  font-weight: "normal";
+}
+h1 {
+  font-family: "eraser", arial, sans-serif;
+  font-size: 5em;
+  letter-spacing: 0.15em;
+  margin: 0px;
+  text-align: center;
+  font-weight: normal;
+}
+
+p {
+  font-family: "gaegu", arial, sans-serif;
+  font-size: 1.5em;
+  text-align: center;
+  font-weight: normal;
+}
+
+p.caption {
+  font-size: 1.4em;
+}
+
+#gameplay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column nowrap;
+}
+#gameplay .game-menu {
+  flex-grow: 1;
+  width: 100%;
+}
+#gameplay #bench {
+  border-radius: 20px;
+  display: flex;
+  flex-flow: row wrap;
+  padding: 30px;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+#gameplay #bench .cell {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 1px;
+  margin: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+#gameplay #board-viewport {
+  position: relative;
+  height: 70%;
+  width: 96%;
+  overflow: scroll;
+  margin: 0 auto;
+  flex-grow: 2;
+}
+#gameplay #board-viewport #board {
+  display: grid;
+  grid-template-columns: repeat(35, 40px);
+  grid-template-rows: repeat(35, 40px);
+  box-sizing: border-box;
+}
+#gameplay #board-viewport #board .cell {
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+#gameplay .cell {
+  z-index: 50;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+#gameplay .tile {
+  background-color: transparent;
+  z-index: 1;
+  color: white;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 20px;
+  height: 20px;
+  padding: 5px;
+  text-align: center;
+  margin: 1px;
+  z-index: 999;
+  font-family: "stamp";
+  font-size: 40px;
+  margin: 4px 0px 0px -6px;
+  text-align: left;
+  line-height: 15px;
+}
+#gameplay .tile.selected {
+  opacity: 0.5;
+}
+#gameplay .tile.swap {
+  color: red;
+}
+#gameplay .cell.over {
+  opacity: 0.2;
+  background-color: #e9a74f;
+}
+#gameplay .menu {
+  display: none;
+}
+#gameplay #buttons {
+  display: flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+#gameplay #buttons button {
+  padding: 6px 30px;
+  font-size: 20px;
+}
+#gameplay footer {
+  flex-grow: 1;
+  padding: 12px 5px;
+}
+#gameplay footer p {
+  margin: 0;
+}
+
+.lobby {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: url("../../chalkboard-background.jpg");
+  background-size: cover;
+  box-sizing: border-box;
+  padding: 10px;
+}
+.lobby label {
+  font-family: "Gaegu";
+}
+.lobby input {
+  font-size: 20px;
+}
+.lobby #join_game {
+  display: flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column nowrap;
+}
+
+#options {
+  display: flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column nowrap;
+}
+
+#game-over {
+  text-align: -webkit-center;
+  padding: 15%;
+}
+
+/*# sourceMappingURL=game.css.map */

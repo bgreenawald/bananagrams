@@ -26,12 +26,5 @@ htmlcov/
 # Ignore style files
 *.map
 
-# Ignore compiled CSS
-*.css
-*.css.map
-
-# Ignore compiled JS
-/static/scripts/js
-
 # Node modules
 /static/scripts/node_modules

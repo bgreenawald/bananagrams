@@ -53,9 +53,21 @@ def return_index() -> str:
     return render_template("index.html")
 
 
+@app.route("/game/DEV_GAME")
+def return_game_test() -> str:
+    id_ = "DEV_GAME"
+    cur_game = Game(id_)
+    cur_game.join_game("dev_p1")
+    cur_game.join_game("dev_p2")
+    cur_game.tiles = cur_game.tiles[:50]
+    cur_game.start_game()
+    all_games[id_] = cur_game
+    return render_template("game.html", id=id_, dev=True)
+
+
 @app.route("/game/<int:id>")
 def return_game(id: str) -> str:
-    return render_template("game.html", id=id)
+    return render_template("game.html", id=id, dev=False)
 
 
 @app.route("/api/get_names")

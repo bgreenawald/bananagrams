@@ -10,6 +10,18 @@
 
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/styles.css') }}" />
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/game.css') }}" />
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='styles/css/loading.css') }}" />
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script>
+        $( window ).on( "load", function() {
+            show('css3-background-texture', true);
+            show('loading', false);
+        });
+
+        function show(id, value) {
+            document.getElementById(id).style.display = value ? 'block' : 'none';
+        }
+    </script>
 
 </head>
 
@@ -17,9 +29,17 @@
     crossorigin="anonymous"></script>
 
 <body>
-    <div class="game-container" id="css3-background-texture">
+    <div class="loading" id="loading">
+        <div class='uil-ring-css' style='transform:scale(0.79);'>
+            <div></div>
+        </div>
+    </div>
+    <div class="game-container" id="css3-background-texture" style="display: none;">
         <header class="lobby">
             <div class="lobby-content">
+                {% if dev %}
+                    <h4 style="color: red;">DEV</h4>
+                {% endif %}
                 <div id="error"></div>
                 <div id="join_game">
                     <p>First things first, enter your username to join the game.</p>
@@ -27,6 +47,10 @@
                     <input id="player_id" type="text" placeholder="Enter your username">
                     <button id="player_id_submit" class="btn btn-primary" type="submit" onclick="player_join()">Join the Game
                     </button>
+                    {% if dev %}
+                        <button id="player_id_submit_test" class="btn btn-primary" type="submit" onclick="dev_join()">(DEV) Start the Game
+                        </button>
+                    {% endif %}
                 </div>
                 <div id="game_info"></div>
                 <p>Your game ID is {{id}}. Share your current URL with friends and they can access the game too!</p>
@@ -45,9 +69,9 @@
                 <div id="buttons">
                     <button class="btn btn-primary" id="reset_button" type="submit" onclick="reset()">Start New Game</button>
                     <button class="btn btn-primary" id="peel_button" type="submit" onclick="peel()">Peel</button>
+                    <button class="menu" id="swap_button" onclick="swap()">Swap Tile</button>
                     <button class="btn btn-primary" id="select_button" type="submit" onclick="selectAllTiles()">Select All Tiles</button>
                     <button class="btn btn-primary" id="bananagrams_button" type="submit" onclick="bananagrams()">Bananagrams</button>
-                    <button class="menu" onclick="swap()">Swap Tile</button>
                     <div id="tiles_remaining">
                         <p>Tiles Remaining</p>
                         <p id="tiles_remaining_count"></p>
@@ -79,14 +103,13 @@
                 <div id="winning_words" style=></div>
             </div>
         </div>
-        <script type="module" src="{{url_for('static', filename='scripts/js/board.js')}}"></script>
-        <script type="module" src="{{url_for('static', filename='scripts/js/socket.js')}}"></script>
     </div>
 </body>
 
 </html>
 
-
+<script src="{{url_for('static', filename='scripts/js/board.js')}}"></script>
+<script src="{{url_for('static', filename='scripts/js/socket.js')}}"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous">
     </script>

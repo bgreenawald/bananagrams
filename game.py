@@ -250,6 +250,10 @@ class Game(object):
                     f"Cannot swap, game state is {self.state}. Should be 'ACTIVE' or 'ENDGAME'"
                 )
             else:
+                if self.tiles_remaining < 3:
+                    raise GameException(
+                        f"Cannot swap, not enough tiles remaining."
+                    )
                 if letter not in self.players[player]:
                     raise GameException("Player does not have this letter to remove.")
 

@@ -22,16 +22,6 @@ var handleDragStart = function (e) {
         e.target.classList.add("selected");
     }
 
-    var selectedTiles = Array.from(document.querySelectorAll('.selected'));
-    // casing of tileId is set by browser parsing
-    tilesToDrag = selectedTiles.map(function (tile) {
-        var tileData = {
-            id: (tile as HTMLElement).dataset.tileId,
-            row: tile.parentElement.dataset.row,
-            column: tile.parentElement.dataset.column
-        };
-        return tileData;
-    });
     e.target.style.cursor = "grabbing";
     e.dataTransfer.dropEffect = "copy";
     e.dataTransfer.effectAllowed = "move";
@@ -44,14 +34,19 @@ var handleDragEnd = function (e) {
 
 var handleDoubleClick = function (e) {
     e.preventDefault();
-    menu.setAttribute("active-tile-id", e.target.getAttribute("data-tile-id"));
-    // Set the position for the menu
-    var origin = {
-        left: e.pageX,
-        top: e.pageY
-    };
-    setPosition(origin);
-    return false;
+    // Always remove selected class on double click
+    if (e.target.classList.contains("selected")) {
+        e.target.classList.remove("selected");
+    }
+
+    // Toggle the selected swap label
+    if (e.target.classList.contains("swap")) {
+        menu.setAttribute("active-tile-id", null);
+        e.target.classList.remove("swap");
+    } else {
+        menu.setAttribute("active-tile-id", e.target.getAttribute("data-tile-id"));
+        e.target.classList.add("swap");
+    }
 };
 
 var handleDragEnter = function (e) {
@@ -100,6 +95,18 @@ var handleDrop = function (e) {
     var rowChange = Number(destinationRow) - Number(sourceRow);
     var columnChange = Number(destinationColumn) - Number(sourceColumn);
     var queueLength = null;
+
+    var selectedTiles = Array.from(document.querySelectorAll('.selected'));
+
+    // casing of tileId is set by browser parsing
+    tilesToDrag = selectedTiles.map(function (tile) {
+        var tileData = {
+            id: (tile as HTMLElement).dataset.tileId,
+            row: tile.parentElement.dataset.row,
+            column: tile.parentElement.dataset.column
+        };
+        return tileData;
+    });
     // Continuously try and move tiles one by one until no progress is made.
     while (queueLength != tilesToDrag.length) {
         queueLength = tilesToDrag.length;

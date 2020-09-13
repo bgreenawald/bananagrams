@@ -3,22 +3,26 @@
  */
 
 import { cleanBench } from './events';
-import { getAllWords, isValidBoard, findDifference } from "./helpers";
+import { getAllWords, isValidBoard } from "./helpers";
 import { render_game, showError } from "./render";
 
-var href_parts = window.location.href.split("/");
-var game_name = href_parts[href_parts.length - 1];
-var player_id = null;
-var tiles = [];
-var players = null;
-var game_state = null;
-var menu = document.querySelector(".menu");
+var socket_state = {
+    "player_id": null,
+    "game_state": null,
+    "dev": false,
+};
+
+let tiles = [];
+let players = null;
+const href_parts = window.location.href.split("/");
+const game_name = href_parts[href_parts.length - 1];
+const menu = document.querySelector(".menu");
 
 // Whether the current client has already joined the game
-var hasJoined = false;
+let hasJoined = false;
 
 // @ts-ignore
-var socket = io();
+const socket = io();
 
 // Join the necessary room
 socket.on("connect", function () {
@@ -36,9 +40,9 @@ socket.on("render_game", function (resp) {
     }
     else {
         if (resp["status_code"] == 200) {
-            game_state = JSON.parse(resp.payload);
+            socket_state.game_state = JSON.parse(resp.payload);
             // Do not render the game if the client has not joined the game
-            players = game_state["players"];
+            players = socket_state.game_state["players"];
             var player_list_1 = document.getElementById("players");
             player_list_1.innerHTML = "";
             Object.entries(players).forEach(function (player) {
@@ -48,7 +52,7 @@ socket.on("render_game", function (resp) {
                 return;
             }
             else {
-                tiles = render_game(game_state, player_id, tiles);
+                tiles = render_game(socket_state.game_state,socket_state.player_id, tiles);
             }
         }
         else {
@@ -69,13 +73,20 @@ function load_game() {
 }
 // Join the game
 function player_join() {
-    player_id = (<HTMLInputElement>document.getElementById("player_id")).value;
-    localStorage.setItem("player_id", player_id);
+    socket_state.player_id = (<HTMLInputElement>document.getElementById("player_id")).value;
+    localStorage.setItem("player_id", socket_state.player_id);
     socket.emit("player_join", {
         "name": game_name,
-        "player_id": player_id
+        "player_id": socket_state.player_id
     });
     hasJoined = true;
+}
+
+function dev_join() {
+    socket_state.player_id = "dev_p1"
+    socket_state.dev = true;
+    hasJoined = true;
+    load_game();
 }
 
 // Start the game
@@ -95,7 +106,7 @@ function split() {
 // Perform the peel action
 function peel() {
     // Make sure the board is valid
-    if (!isValidBoard()) {
+    if (!socket_state.dev && !isValidBoard()) {
         alert("Your bench must be empty and your board must be valid.");
         return;
     }
@@ -106,9 +117,19 @@ function peel() {
 
 // Perform a swap
 function swap() {
+    if (socket_state.game_state["tiles_remaining"] < 3) {
+        alert("Less that 3 tiles remaining, cannot swap.");
+        return;
+    }
+
     var active_tile_id = menu.getAttribute("active-tile-id");
     var tileToRemove = document.querySelector(".tile[data-tile-id=\"" + active_tile_id + "\"]");
-    var letter = tileToRemove.textContent;
+    try {
+        var letter = tileToRemove.textContent;
+    } catch (TypeError) {
+        alert("No tile selected for swapping, double click a tile to select!");
+        return;
+    }
     tileToRemove.parentNode.removeChild(tileToRemove);
     // Also remove element from the global tiles array
     var index = tiles.indexOf(letter);
@@ -117,7 +138,7 @@ function swap() {
     socket.emit("swap", {
         "name": game_name,
         "letter": letter,
-        "player_id": player_id
+        "player_id": socket_state.player_id
     });
     cleanBench();
 }
@@ -125,14 +146,14 @@ function swap() {
 // Bananagrams
 function bananagrams() {
     // Make sure the board is valid
-    if (!isValidBoard()) {
+    if (!socket_state.dev && !isValidBoard()) {
         alert("Your bench must be empty and your board must be valid.");
         return;
     }
     var words = getAllWords();
     socket.emit("bananagrams", {
         "name": game_name,
-        "player_id": player_id,
+        "player_id": socket_state.player_id,
         "words": words
     });
 }
@@ -157,6 +178,7 @@ function reset() {
 }
 
 export {
+    dev_join,
     player_join,
     load_game,
     start_game,
@@ -166,4 +188,5 @@ export {
     bananagrams,
     continue_game,
     swap,
+    socket_state,
 }

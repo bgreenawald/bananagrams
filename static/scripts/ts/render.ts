@@ -61,6 +61,7 @@ function render_game(resp, player_id, tiles) {
         hideButtons();
         $("#options").show();
         $("#peel_button").show();
+        $("#swap_button").show();
         $("#select_button").show();
         $("#tiles_remaining").show();
         // Update the count
@@ -78,6 +79,7 @@ function render_game(resp, player_id, tiles) {
         $(".lobby").hide();
         $("#game_over").hide();
         $("#options").show();
+        $("#swap_button").show();
         $("#bananagrams_button").show();
         $("#select_button").show();
         // Render only the new tiles
@@ -123,6 +125,7 @@ function hideButtons() {
     $("#start_game_button").hide();
     $("#split_button").hide();
     $("#peel_button").hide();
+    $("#swap_button").hide();
     $("#select_button").hide();
     $("#bananagrams_button").hide();
     $("#continue_game_button").hide();

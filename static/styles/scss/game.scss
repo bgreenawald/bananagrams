@@ -91,6 +91,10 @@ $cell-dimension: 40px;
     opacity: 0.5;
   }
 
+  .tile.swap {
+    color: red;
+  }
+
   .cell.over {
     opacity: 0.2;
     background-color: darken(antiquewhite, 30%);

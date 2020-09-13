@@ -18,6 +18,7 @@ import { columns, rows } from './helpers';
 
 const menu = document.querySelector(".menu");
 
+
 document.addEventListener("drop", function () {
     resetModifiers('tile');
 }, options);
@@ -91,6 +92,7 @@ init_board();
 populateBoard();
 
 export {
+    selectAllTiles,
     rows,
     columns
 };

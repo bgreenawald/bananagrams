@@ -62,7 +62,7 @@ var centerBoard = function () {
 
 var init_board = function () {// Initially hide everything
     document.getElementById("gameplay").style.display = "none";
-    document.getElementById("game_over").style.display = "none";
+    document.getElementById("game-over").style.display = "none";
 
     // Warn user before leaving
     window.onbeforeunload = function () {

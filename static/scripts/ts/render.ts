@@ -77,7 +77,7 @@ function render_game(resp, player_id, tiles) {
         enableDragging();
         $("#gameplay").show();
         $(".lobby").hide();
-        $("#game_over").hide();
+        $("#game-over").hide();
         $("#options").show();
         $("#swap_button").show();
         $("#bananagrams_button").show();
@@ -91,7 +91,7 @@ function render_game(resp, player_id, tiles) {
     else if (resp["state"] == "OVER") {
         hideButtons();
         disableDragging();
-        $("#game_over").show();
+        $("#game-over").show();
         $("#gameplay").hide();
         $(".lobby").hide();
         $("#options").show();
@@ -99,14 +99,14 @@ function render_game(resp, player_id, tiles) {
         // Display the winning content
         document.getElementById("winning_player").textContent = resp["winning_player"] + " has called Bananagrams. Verify their board and either continue the game or start a new one!";
         // Check each winning word's validity and color accordingly
-        var winning_words_list = document.getElementById("winning_words");
-        winning_words_list.innerHTML = "";
+        var winningWordsList = document.getElementById("winning-words");
+        winningWordsList.innerHTML = "";
         resp["winning_words"].forEach(function (word_pair) {
             if (word_pair[1]) {
-                winning_words_list.innerHTML += "<p style=\"color: green\">" + word_pair[0] + "</p>";
+                winningWordsList.innerHTML += "<p style=\"color: green\">" + word_pair[0] + "</p>";
             }
             else {
-                winning_words_list.innerHTML += "<p style=\"color: red\">" + word_pair[0] + "</p>";
+                winningWordsList.innerHTML += "<p style=\"color: red\">" + word_pair[0] + "</p>";
             }
         });
     } // Unknown state

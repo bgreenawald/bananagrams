@@ -155,3 +155,9 @@ $cell-dimension: 40px;
   align-items: center;
   flex-flow: column nowrap;
 }
+
+// Game over
+#game-over {
+  text-align: -webkit-center;
+  padding: 15%;
+}

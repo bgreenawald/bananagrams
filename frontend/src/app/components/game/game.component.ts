@@ -13,7 +13,7 @@ import { MessageBusService } from '../../services/message-bus.service';
 import { AppComponent } from '../../app.component';
 import { EventHandleService } from '../../services/event-handle.service';
 
-import { Tile } from '../../models';
+import { Tile } from '../../../models/models';
 
 @Component({
   selector: 'app-game',

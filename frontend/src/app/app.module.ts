@@ -10,7 +10,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import { reducer } from './app.reducer';
+import { gameReducer } from './reducers/game.reducer';
 
 
 import { LobbyComponent } from './components/lobby/lobby.component';
@@ -52,7 +52,7 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
     BrowserAnimationsModule,
     DragDropModule,
     StoreModule.forRoot({
-      bananagrams: reducer
+      bananagrams: gameReducer
     }, {}),
     StoreDevtoolsModule
   ],

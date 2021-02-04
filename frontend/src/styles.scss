@@ -11,6 +11,13 @@ $off-white: lighten(antiquewhite, 10%);
 $off-black: darken(antiquewhite, 95%);
 
 // ********** NORMALIZE ********** //
+* {
+  &:focus {
+    outline: none;
+    box-shadow: 0px 0px 2px 2px white;
+  }
+}
+
 html,
 body {
   padding: 0px;

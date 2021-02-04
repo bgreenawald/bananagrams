@@ -2,7 +2,7 @@ import { Component, OnInit, Input, ElementRef, HostListener, HostBinding, Direct
 
 import { EventHandleService } from '../../services/event-handle.service';
 
-import { Tile } from './../../../models/models';
+import { Tile } from './../../models/models';
 import { MessageBusService } from '../../services/message-bus.service';
 
 // @Directive({

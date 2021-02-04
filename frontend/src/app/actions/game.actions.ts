@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Action, createAction, props } from '@ngrx/store';
-import { Tile, UserData } from './../../models/models';
+import { Tile, UserData } from './../models/models';
 
 export const UPDATE_STORE = 'Add'
 export const UPDATE_USER_DATA = 'Update User Data'

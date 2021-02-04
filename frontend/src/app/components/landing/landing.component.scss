@@ -24,14 +24,6 @@
   z-index: 100;
 }
 
-// .rules-container {
-//     position: absolute;
-//     transform: rotate(-90deg);
-//     top: 40px;
-//     left: 0%;
-//     box-shadow: 0px 3px 10px darken(black, 10%);
-// }
-
 .landing,
 .lobby-content {
   @include flexbox();
@@ -47,7 +39,7 @@ input {
   margin: 5px;
   padding: 20px 0px;
   background-color: transparent;
-  // border: 1px solid $off-white;
+  border: 1px solid $off-white;
   color: $off-white;
   font-family: 'Gaegu';
   border-radius: 10px;
@@ -64,26 +56,37 @@ button {
   display: block;
   font-family: 'Gaegu';
   font-size: 26px;
-
+  transform: scale(1);
 
   &.primary {
-    background-color: $primary-yellow;
+    background-color: $off-white;
     color: $off-black;
     transition: background-color 0.2s cubic-bezier(0.77, 0.2, 0.05, 1);
 
     &:hover {
-      background-color: lighten($primary-yellow, 10%);
+      background-color: lighten($off-white, .05);
+    }
+    &:active {
+      outline: none;
+      transform: scale(.95);
+      background-color: darken($off-white, .05);
     }
   }
 
   &.secondary {
     background-color: transparent;
-    color: white;
+    color: darken($off-white, .1);
     transition: all 0.2s cubic-bezier(0.77, 0.2, 0.05, 1);
 
     &:hover {
-      background-color: white;
+      background-color: ligthen($off-white, .2);
       color: $off-black;
+    }
+
+    &:focus {
+      outline: none;
+      transform: scale(.95);
+      background-color: darken($off-white, .05);
     }
   }
 }

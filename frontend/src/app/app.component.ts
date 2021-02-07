@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
     this.detectIDChange();
     this.setLocalData();
     this.socketSubscribe();
-    this._store.select<any>('loaded').subscribe(state => {
+    this._store.select(fromStore.getGameState).subscribe(state => {
       console.log('the state', state)
     })
   }

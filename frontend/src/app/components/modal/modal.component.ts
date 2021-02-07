@@ -32,7 +32,7 @@ export class ModalComponent implements OnInit {
     private _ref: ElementRef,
     private store: Store<AppState>
   ) {
-    this.store$ = store.pipe(select('bananagrams'));
+    this.store$ = store.pipe(select('game'));
   }
 
   ngOnInit(): void {

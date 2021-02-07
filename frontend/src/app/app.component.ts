@@ -5,8 +5,6 @@ import { Observable, of, fromEvent, throwError } from 'rxjs';
 import { catchError, map, tap, first } from 'rxjs/operators';
 
 import { Store, select } from '@ngrx/store';
-// import { updateStore } from './app.actions';
-
 
 import { Socket } from 'ngx-socket-io';
 import { SocketService } from './services/socket.service';
@@ -19,6 +17,7 @@ import { MessageBusService } from './services/message-bus.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
+
 export class AppComponent implements OnInit {
   title = 'frontend';
   public gameID: string; // numerical game id formatted as a string
@@ -94,6 +93,7 @@ export class AppComponent implements OnInit {
     )
   }
 
+  // ROUTING
   socketSubscribe = () => {
     this.getMessages()
       .subscribe(value => {

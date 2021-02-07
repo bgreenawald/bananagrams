@@ -38,3 +38,9 @@ export interface GameData {
     // example data:
     // payload: "{"id": "827663", "state": "IDLE", "num_players": null, "tiles_remaining": 144, "players": {}, "winning_words": null, "winning_player": null}"
 }
+
+export interface GameState {
+    GameData;
+    loaded: boolean;
+    loading: boolean;
+}

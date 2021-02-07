@@ -5,6 +5,7 @@ import { Observable, of, fromEvent, throwError } from 'rxjs';
 import { catchError, map, tap, first } from 'rxjs/operators';
 
 import { Store, select } from '@ngrx/store';
+import * as fromStore from './store';
 
 import { Socket } from 'ngx-socket-io';
 import { SocketService } from './services/socket.service';
@@ -37,19 +38,22 @@ export class AppComponent implements OnInit {
     private helperService: HelperService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
-    private _store: Store<{ bananagrams: any }>
+    private _store: Store<any>
   ) { this.store$ = _store.pipe(select('bananagrams')) }
 
   ngOnInit() {
     this.detectIDChange();
-    this.setPlayerID();
-    this.setGameID();
+    this.setLocalData();
     this.socketSubscribe();
+    this._store.select<any>('loaded').subscribe(state => {
+      console.log('the state', state)
+    })
   }
 
   detectIDChange = () => {
     this.router.events.subscribe(e => {
       if (e instanceof NavigationEnd) {
+        // gameID as typed into the URL
         const gameID = this.helperService.getGameID();
         if (this.gameID !== gameID && !!gameID) {
           this.gameID = gameID;
@@ -58,6 +62,11 @@ export class AppComponent implements OnInit {
         }
       }
     })
+  }
+
+  setLocalData = () => {
+    this.setPlayerID();
+    this.setGameID();
   }
 
   setGameID = () => {
@@ -69,8 +78,6 @@ export class AppComponent implements OnInit {
     this.playerID = localStorage.getItem("player_id");
   }
 
-  getPlayerID = (): string => this.playerID;
-
   getGameID = (): string => this.gameID;
 
   getPlayers = (): string[] => this.playersTiles;
@@ -78,12 +85,16 @@ export class AppComponent implements OnInit {
   getUserTiles = () => this.tiles;
 
   // TODO: refactor
+  // better name for this is, listen to socket events server observable and parse response data
+  // better named getSocketResponseData or socketResponseData$
   getMessages = (): Observable<any> => {
+    // send off different actions in response to different socket messages? 
     return this.messages$.pipe(
       map(resp => {
         if (resp.status_code !== 200) throw `error: ${resp.message}`
         const value = {
-          ...resp,
+          "message": resp.message,
+          "status_code": resp.status_code,
           "data": JSON.parse(resp.payload)
         };
         return value;
@@ -95,6 +106,7 @@ export class AppComponent implements OnInit {
 
   // ROUTING
   socketSubscribe = () => {
+    // changes UI as necessary
     this.getMessages()
       .subscribe(value => {
         console.log("SOCKET RESPONSE", value)

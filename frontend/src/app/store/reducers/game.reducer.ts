@@ -64,3 +64,7 @@ export interface GameState {
     loading: boolean;
     // other data
 }
+
+export const getGameDataLoading = (state: GameState) => state.loading;
+export const getGameLoadedState = (state: GameState) => state.loaded;
+// export const getGameData = (state: GameState) => state.gameData;

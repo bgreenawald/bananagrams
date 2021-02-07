@@ -27,6 +27,7 @@ export class SocketService {
     })
   }
 
+  // listens for any incoming socket messages from the server
   receive = (): Observable<any> => {
     return Observable.create(observer => {
       this.socket.on("render_game", resp => {

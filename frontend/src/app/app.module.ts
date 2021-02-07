@@ -51,9 +51,11 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
     SocketIoModule.forRoot(config),
     BrowserAnimationsModule,
     DragDropModule,
+    // lazy load this? need separate module
     StoreModule.forRoot({
       game: gameReducer
     }, {}),
+    // StoreModule.forFeature('game', gameReducer),
     StoreDevtoolsModule
   ],
   providers: [],

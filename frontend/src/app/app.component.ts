@@ -13,6 +13,9 @@ import { HelperService } from './services/helper.service'
 import { ErrorService } from './services/error.service';
 import { MessageBusService } from './services/message-bus.service';
 
+import * as GameActions from './store/actions';
+import { SocketSuccessResponses } from './constants';
+
 import * as Models from "./models/models";
 
 @Component({
@@ -49,12 +52,9 @@ export class AppComponent implements OnInit {
     this.socketSubscribe();
     this._state$ = this._store.select(fromStore.getGameState);
     this._store.dispatch(new fromStore.LoadUser());
-    this._store.dispatch(new fromStore.OpenSocket());
+    this.openSocket();
   }
 
-  openSocket = () => {
-
-  }
   detectIDChange = () => {
     this.router.events.subscribe(e => {
       if (e instanceof NavigationEnd) {
@@ -94,6 +94,8 @@ export class AppComponent implements OnInit {
   // TODO: refactor
   // better name for this is, listen to socket events server observable and parse response data
   // better named getSocketResponseData or socketResponseData$
+
+
   getMessages = (): Observable<any> => {
     // send off different actions in response to different socket messages? 
     return this.messages$.pipe(
@@ -108,6 +110,20 @@ export class AppComponent implements OnInit {
       }
       ),
       catchError(errorMessage => throwError(errorMessage))
+    )
+  }
+
+  openSocket = (): void => {
+    this.messages$.subscribe(response => {
+
+      console.log("SUBSCRIBE TO SOCKET", response)
+      if (response.status_code !== 200) this._store.dispatch(new fromStore.LoadGameFail(response.message));
+
+      switch (response.message) {
+        case (SocketSuccessResponses.GameLoaded):
+          this._store.dispatch(new fromStore.UpdateSocketData(response.message, JSON.parse(response.payload)));
+      }
+    }
     )
   }
 
@@ -143,6 +159,8 @@ export class AppComponent implements OnInit {
       },
         err => this.errorService.displayError(err)
       )
+    // this.router.navigate([`/game/${this.gameID}`]);
+
   }
 
   handleClick = (e) => {

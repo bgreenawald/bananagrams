@@ -20,6 +20,8 @@ export const LOADING = '[Landing Component] Load Game Data';
 export const LOAD_USER = '[Landing Component] Load User Data';
 export const LOAD_GAME_SUCCESS = '[Landing Component] Load Game Data Success';
 export const LOAD_GAME_FAIL = '[Landing Component] Load Game Data Fail';
+export const OPEN_SOCKET = '[Any Component] Connect to Socket Server';
+export const UPDATE_SOCKET_DATA = '[Any Component] Received Data from Socket Server';
 
 export class Loading implements Action {
     readonly type = LOADING;
@@ -37,4 +39,13 @@ export class LoadGameSuccess implements Action {
     constructor(public payload: any) { }
 }
 
-export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess;
+export class OpenSocket implements Action {
+    readonly type = OPEN_SOCKET;
+}
+
+export class UpdateSocketData implements Action {
+    readonly type = UPDATE_SOCKET_DATA;
+    constructor(public message: string, public payload: any) { }
+}
+
+export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData;

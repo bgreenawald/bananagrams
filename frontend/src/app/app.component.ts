@@ -48,14 +48,12 @@ export class AppComponent implements OnInit {
     this.setLocalData();
     this.socketSubscribe();
     this._state$ = this._store.select(fromStore.getGameState);
-    this.stateTest();
     this._store.dispatch(new fromStore.LoadUser());
+    this._store.dispatch(new fromStore.OpenSocket());
   }
 
-  stateTest = () => {
-    this._state$.subscribe(data => {
-      console.log("STATE", data)
-    })
+  openSocket = () => {
+
   }
   detectIDChange = () => {
     this.router.events.subscribe(e => {
@@ -84,6 +82,8 @@ export class AppComponent implements OnInit {
   setPlayerID = () => {
     this.playerID = localStorage.getItem("player_id");
   }
+
+  getPlayerID = (): string => this.playerID;
 
   getGameID = (): string => this.gameID;
 

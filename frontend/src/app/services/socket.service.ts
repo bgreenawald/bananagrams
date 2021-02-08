@@ -12,6 +12,7 @@ export class SocketService {
   ) { }
 
   playerJoin = (gameID: string, username: string) => {
+    console.log('player joining')
     this.socket.emit("player_join", {
       "name": gameID,
       "player_id": username
@@ -27,7 +28,8 @@ export class SocketService {
     })
   }
 
-  // listens for any incoming socket messages from the server
+  // listens and receives all incoming socket messages from the server
+  // TODO: why does game loaded fire four times? from here.  But only fires once from the app component?
   receive = (): Observable<any> => {
     return Observable.create(observer => {
       this.socket.on("render_game", resp => {
@@ -35,6 +37,8 @@ export class SocketService {
       })
     })
   }
+
+
 
   reset = (gameID: string) => {
     this.socket.emit("reset", {

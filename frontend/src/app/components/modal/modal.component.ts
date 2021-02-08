@@ -30,16 +30,13 @@ export class ModalComponent implements OnInit {
     private messageBusService: MessageBusService,
     private socketService: SocketService,
     private _ref: ElementRef,
-    private store: Store<AppState>
   ) {
-    this.store$ = store.pipe(select('game'));
   }
 
   ngOnInit(): void {
     this._listenOpenModals();
     this._listenCloseModals();
     this.gameID = this._app.getGameID();
-    console.log(this.store$)
     this.socketSubscribe();
   }
 

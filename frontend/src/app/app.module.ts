@@ -57,7 +57,7 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
       game: gameReducer
     }, {}),
     // StoreModule.forFeature('game', gameReducer),
-    StoreDevtoolsModule,
+    StoreDevtoolsModule.instrument(),
     EffectsModule.forRoot(effects)
   ],
   providers: [],

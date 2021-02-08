@@ -15,13 +15,6 @@ export class UpdateUserData implements Action {
     constructor(public payload: UserData) { }
 };
 
-export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess;
-
-// export const updateStore = createAction('Update', props<{ payload: any }>());
-// export const updateUserData = createAction('UpdateUserData', props<{ payload: any }>());
-
-
-
 // load pizzas
 export const LOADING = '[Landing Component] Load Game Data';
 export const LOAD_USER = '[Landing Component] Load User Data';
@@ -34,7 +27,6 @@ export class Loading implements Action {
 }
 export class LoadUser implements Action {
     readonly type = LOAD_USER;
-    constructor(public payload: any) { }
 }
 export class LoadGameFail implements Action {
     readonly type = LOAD_GAME_FAIL;
@@ -44,3 +36,5 @@ export class LoadGameSuccess implements Action {
     readonly type = LOAD_GAME_SUCCESS;
     constructor(public payload: any) { }
 }
+
+export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess;

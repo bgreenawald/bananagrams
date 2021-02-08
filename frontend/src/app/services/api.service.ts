@@ -17,7 +17,7 @@ export class ApiService {
     private socket: Socket
   ) { }
 
-  getIDs(): Observable<any> {
+  getIDs(): Observable<String[]> {
     return this.http.get<any>(this.baseURL + "get_names")
       .pipe(
         map(resp => resp.ids),

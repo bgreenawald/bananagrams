@@ -31,6 +31,7 @@ export function gameReducer(state: any = initialState, action: Actions.GameActio
                 ...action.payload
             }
         case Actions.LOAD_GAME_SUCCESS:
+            console.log("LOAD GAME SUCCESS DATA", action.payload)
             return {
                 ...state,
                 loading: false,

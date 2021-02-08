@@ -13,6 +13,8 @@ import { HelperService } from './services/helper.service'
 import { ErrorService } from './services/error.service';
 import { MessageBusService } from './services/message-bus.service';
 
+import * as Models from "./models/models";
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -25,10 +27,11 @@ export class AppComponent implements OnInit {
   public playerID: string;
   public playersInLobby: string[];
   public tiles: string[];
-  public store$: Observable<any>;
   private playersTiles: string[];
   private messages$ = this.socketService.receive();
   private openModal$ = this.messageBusService.openModal$;
+  private _state$: Observable<Models.GameState>
+
 
   constructor(
     private route: ActivatedRoute,
@@ -38,18 +41,22 @@ export class AppComponent implements OnInit {
     private helperService: HelperService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
-    private _store: Store<any>
-  ) { this.store$ = _store.pipe(select('bananagrams')) }
+    private _store: Store<Models.GameState>) { }
 
   ngOnInit() {
     this.detectIDChange();
     this.setLocalData();
     this.socketSubscribe();
-    this._store.select(fromStore.getGameState).subscribe(state => {
-      console.log('the state', state)
-    })
+    this._state$ = this._store.select(fromStore.getGameState);
+    this.stateTest();
+    this._store.dispatch(new fromStore.LoadUser());
   }
 
+  stateTest = () => {
+    this._state$.subscribe(data => {
+      console.log("STATE", data)
+    })
+  }
   detectIDChange = () => {
     this.router.events.subscribe(e => {
       if (e instanceof NavigationEnd) {

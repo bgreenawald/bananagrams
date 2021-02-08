@@ -8,9 +8,11 @@ import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { gameReducer } from './store/reducers/game.reducer';
+import { reducers, effects } from './store';
 
 
 import { LobbyComponent } from './components/lobby/lobby.component';
@@ -51,12 +53,12 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
     SocketIoModule.forRoot(config),
     BrowserAnimationsModule,
     DragDropModule,
-    // lazy load this? need separate module
     StoreModule.forRoot({
       game: gameReducer
     }, {}),
     // StoreModule.forFeature('game', gameReducer),
-    StoreDevtoolsModule
+    StoreDevtoolsModule,
+    EffectsModule.forRoot(effects)
   ],
   providers: [],
   bootstrap: [AppComponent]

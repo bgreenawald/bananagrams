@@ -10,6 +10,13 @@ import { SocketService } from '../../services/socket.service';
 import { ErrorService } from '../../services/error.service';
 import { AppComponent } from '../../app.component';
 
+
+import * as Models from './../../models';
+
+import { Store, select } from '@ngrx/store';
+import * as fromStore from './../../store';
+import { take } from 'rxjs/operators';
+
 @Component({
   selector: 'app-lobby',
   templateUrl: './lobby.component.html',
@@ -18,7 +25,7 @@ import { AppComponent } from '../../app.component';
 export class LobbyComponent implements OnInit {
   public gameID: string; // numerical game id formatted as a string
   public playerJoined: boolean = false;
-  public playerID: string = this.app.playerID;
+  public playerID: string;
   public playersInLobby: string[] = [];
   public error: string;
   private messages$ = this.app.getMessages();
@@ -30,13 +37,22 @@ export class LobbyComponent implements OnInit {
     private router: Router,
     private socket: Socket,
     private socketService: SocketService,
+    private _store: Store<Models.GameState>
   ) { }
 
   ngOnInit(): void {
     this.setGameID();
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
-    this.autoJoin();
+  }
+
+  listenToStore = () => {
+    this._store.select(fromStore.getPlayerIDSelector).subscribe(id => {
+      console.log(id)
+      this.playerID = id;
+      this.autoJoin();
+    })
+    this._store.select(fromStore.getGameIDSelector).pipe(take(1)).subscribe(id => this.gameID = id)
   }
 
   autoJoin = () => {
@@ -48,10 +64,10 @@ export class LobbyComponent implements OnInit {
     if (!playerID) return; //if the id input is empty, stop function execution here. 
     // TODO: disable join the game button if input is empty
 
-    this.playerID = playerID;
+    this._store.dispatch(new fromStore.SetPlayerId(playerID));
     localStorage.setItem("player_id", playerID.toString());
 
-    this.socketService.playerJoin(this.gameID, this.playerID);
+    // this.socketService.playerJoin(this.gameID, playerID);
   }
 
   startGame = (): void => {

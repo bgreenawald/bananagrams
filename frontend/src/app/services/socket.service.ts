@@ -38,8 +38,6 @@ export class SocketService {
     })
   }
 
-
-
   reset = (gameID: string) => {
     this.socket.emit("reset", {
       "name": gameID
@@ -49,6 +47,14 @@ export class SocketService {
   continueGame = (gameID: string) => {
     this.socket.emit("continue_game", {
       "name": gameID,
+    })
+  }
+
+  userCallBananagrams = (gameID: string, playerID: string, words: string[]) => {
+    this.socket.emit("bananagrams", {
+      "name": gameID,
+      "player_id": playerID,
+      "words": words
     })
   }
 }

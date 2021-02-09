@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Subject, Observable } from 'rxjs';
 
-import { Cell, Modals, Tile } from '../../models/models';
+import { Cell, Modals, Tile } from './../models';
 
 @Injectable({
   providedIn: 'root'

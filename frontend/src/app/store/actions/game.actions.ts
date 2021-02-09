@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Action, createAction, props } from '@ngrx/store';
-import { Tile, UserData } from './../../models/models';
+import { Tile, UserData } from './../../models';
 
 export const UPDATE_STORE = 'Add'
 export const UPDATE_USER_DATA = 'Update User Data'
@@ -22,6 +22,7 @@ export const LOAD_GAME_SUCCESS = '[Landing Component] Load Game Data Success';
 export const LOAD_GAME_FAIL = '[Landing Component] Error received from socket server';
 export const OPEN_SOCKET = '[Any Component] Connect to Socket Server';
 export const UPDATE_SOCKET_DATA = '[Any Component] Received Data from Socket Server';
+export const SET_PLAYER_ID = '[Lobby Component] Set Player ID';
 
 export class Loading implements Action {
     readonly type = LOADING;
@@ -48,4 +49,9 @@ export class UpdateSocketData implements Action {
     constructor(public message: string, public payload: any) { }
 }
 
-export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData;
+export class SetPlayerId implements Action {
+    readonly type = SET_PLAYER_ID;
+    constructor(public playerName: string) { }
+}
+
+export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId;

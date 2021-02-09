@@ -11,7 +11,6 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import { gameReducer } from './store/reducers/game.reducer';
 import { reducers, effects } from './store';
 
 
@@ -53,9 +52,7 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
     SocketIoModule.forRoot(config),
     BrowserAnimationsModule,
     DragDropModule,
-    StoreModule.forRoot({
-      game: gameReducer
-    }, {}),
+    StoreModule.forRoot(reducers, {}),
     // StoreModule.forFeature('game', gameReducer),
     StoreDevtoolsModule.instrument(),
     EffectsModule.forRoot(effects)

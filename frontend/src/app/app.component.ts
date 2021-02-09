@@ -16,7 +16,7 @@ import { MessageBusService } from './services/message-bus.service';
 import * as GameActions from './store/actions';
 import { SocketSuccessResponses } from './constants';
 
-import * as Models from "./models/models";
+import * as Models from "./models";
 
 @Component({
   selector: 'app-root',
@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
     this.detectIDChange();
     this.setLocalData();
     this.socketSubscribe();
-    this._state$ = this._store.select(fromStore.getGameState);
+    this._state$ = this._store.select(fromStore.getGameStateSelector);
     this._store.dispatch(new fromStore.LoadUser());
     this.openSocket();
   }
@@ -80,10 +80,10 @@ export class AppComponent implements OnInit {
   }
 
   setPlayerID = () => {
-    this.playerID = localStorage.getItem("player_id");
+    this._store.dispatch(new GameActions.SetPlayerId(localStorage.getItem("player_id")));
   }
 
-  getPlayerID = (): string => this.playerID;
+  // getPlayerID = (): string => this.playerID;
 
   getGameID = (): string => this.gameID;
 

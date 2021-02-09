@@ -37,7 +37,7 @@ export class GameEffects {
         ofType(GameActions.OPEN_SOCKET)
     )
         .pipe(
-            switchMap(_ => {
+            switchMap(action => {
                 return this.socketService.receive().pipe(
                     map(response => {
                         if (response.status_code !== 200) throw `error: ${response.message}`

@@ -7,6 +7,12 @@ import { ErrorService } from '../../services/error.service';
 import { MessageBusService } from '../../services/message-bus.service';
 import { SocketService } from '../../services/socket.service';
 
+import * as Models from './../../models';
+
+import { Store, select } from '@ngrx/store';
+import * as fromStore from './../../store';
+import { take } from 'rxjs/operators';
+
 @Component({
   selector: 'app-menu-gameplay',
   templateUrl: './menu-gameplay.component.html',
@@ -14,8 +20,8 @@ import { SocketService } from '../../services/socket.service';
 })
 export class MenuGameplayComponent implements OnInit {
   public gameID: string;
-  public playerID: string = this.app.getPlayerID();
   public tilesRemaining: number;
+  public playerID: string;
 
   private message$ = this.app.getMessages();
 
@@ -24,12 +30,19 @@ export class MenuGameplayComponent implements OnInit {
     private errorService: ErrorService,
     private messageBusService: MessageBusService,
     private socket: Socket,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private _store: Store<Models.GameState>
   ) { }
 
   ngOnInit(): void {
     this.socketSubscribe();
-    this.gameID = this.app.getGameID();
+
+    this.listenToStore();
+  }
+
+  listenToStore = () => {
+    this._store.select(fromStore.getPlayerIDSelector).pipe(take(1)).subscribe(id => this.playerID = id)
+    this._store.select(fromStore.getGameIDSelector).pipe(take(1)).subscribe(id => this.gameID = id)
   }
 
   handleStartNewGame = () => {
@@ -57,14 +70,16 @@ export class MenuGameplayComponent implements OnInit {
     })
   }
 
+  // create call bananagrams action
   bananagrams = () => {
     if (this.isValidBoard()) {
       const words: string[] = this.getAllWords();
-      this.socket.emit("bananagrams", {
-        "name": this.gameID,
-        "player_id": this.playerID,
-        "words": words
-      })
+      // this.socket.emit("bananagrams", {
+      //   "name": this.gameID,
+      //   "player_id": this.playerID,
+      //   "words": words
+      // })
+      this._store.dispatch(new fromStore.CallBananagrams(this.gameID, this.playerID, words))
     }
     else this.errorService.displayError('Cannot call bananagrams.  Board is invalid.')
   }

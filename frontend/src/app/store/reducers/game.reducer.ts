@@ -1,13 +1,13 @@
 import { Action, createReducer, on, ActionsSubject } from '@ngrx/store';
 import * as Actions from './../actions/game.actions';
-import { UserData } from '../../models/models';
+import { UserData } from '../../models';
 
 const initialState: any = {
-    gameID: 'testing',
     selectedTiles: [],
     playerID: '',
     loaded: false,
-    loading: false
+    loading: false,
+    gameData: {}
 }
 
 export function gameReducer(state: any = initialState, action: Actions.GameActions): any {
@@ -33,15 +33,18 @@ export function gameReducer(state: any = initialState, action: Actions.GameActio
                 ...state,
                 loading: false,
                 loaded: true,
-                ...action.payload
+                error: action.errorMessage
             }
         case Actions.UPDATE_SOCKET_DATA:
             console.log('Socket message received:', action.message)
             return {
                 ...state,
-                loading: false,
-                loaded: true,
                 gameData: action.payload
+            }
+        case Actions.SET_PLAYER_ID:
+            return {
+                ...state,
+                playerID: action.playerName
             }
         default:
             return state;

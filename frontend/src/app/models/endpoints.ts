@@ -1,34 +1,7 @@
-export interface Tile {
-    letter: string;
-    id: number;
-}
-
-export enum Modals {
-    startNewGameConfirm = "startNewGameConfirm",
-    resetConfirm = "resetConfirm"
-}
-
-export interface Cell {
-    row: number;
-    column: number;
-}
-
-export interface UserData {
-    name: string;
-    id: string;
-    tiles: Tile[];
-}
-
-// how to model this?
-export interface players {
-    // player 1: tile[]
-    // player 2 : tile[]
-}
-
 // for message: 'Game loaded.'
 // data that comes back from the socket endpoint for player join. 
 export interface GameData {
-    id: string;
+    id: string; // gameID
     num_players: number;
     players: any;  // object of player: tile[]
     state: string; // enum??
@@ -43,4 +16,5 @@ export interface GameState {
     GameData;
     loaded: boolean;
     loading: boolean;
+    playerID: string;
 }

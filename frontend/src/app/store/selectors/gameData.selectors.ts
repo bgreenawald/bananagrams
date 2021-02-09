@@ -3,16 +3,16 @@
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as Models from './../../models';
 
-export const getGameStateSelector = createFeatureSelector<Models.GameState>('game');
+export const getGameStateSelector = createFeatureSelector<any>('game');
 
 export const getGameDataSelector = createSelector(
     getGameStateSelector,
-    (state: Models.GameState) => state.GameData
+    (state: Models.GameState) => state ? state.GameData : null
 );
 
 export const getGameIDSelector = createSelector(
     getGameDataSelector,
-    (state: Models.GameData) => state.id
+    (state: Models.GameData) => state ? state.id : null
 )
 
 export const selectLoadedStatus = createSelector(
@@ -27,5 +27,5 @@ export const selectLoadingStatus = createSelector(
 
 export const getPlayerIDSelector = createSelector(
     getGameStateSelector,
-    (state: Models.GameState) => state.playerID
+    (state: Models.GameState) => state ? state.playerID : null
 )

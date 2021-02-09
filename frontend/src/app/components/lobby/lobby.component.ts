@@ -10,6 +10,11 @@ import { SocketService } from '../../services/socket.service';
 import { ErrorService } from '../../services/error.service';
 import { AppComponent } from '../../app.component';
 
+import * as Selectors from '../../store/selectors';
+
+import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
+
+
 
 import * as Models from './../../models';
 
@@ -44,11 +49,14 @@ export class LobbyComponent implements OnInit {
     this.setGameID();
     this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
+    this.listenToStore();
   }
 
   listenToStore = () => {
-    this._store.select(fromStore.getPlayerIDSelector).subscribe(id => {
-      console.log(id)
+    console.log(this._store)
+    // this._store.select(createFeatureSelector<any>('gameReducer')).subscribe(data => console.log("STATE CHANGE", data))
+    this._store.pipe(select(fromStore.getPlayerIDSelector)).subscribe(id => {
+      console.log("THE ID", id)
       this.playerID = id;
       this.autoJoin();
     })
@@ -56,7 +64,6 @@ export class LobbyComponent implements OnInit {
   }
 
   autoJoin = () => {
-    console.log(this.playerID)
     if (this.playerID) this.playerJoin(this.playerID);
   }
 

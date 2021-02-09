@@ -52,7 +52,9 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
     SocketIoModule.forRoot(config),
     BrowserAnimationsModule,
     DragDropModule,
-    StoreModule.forRoot(reducers, {}),
+    StoreModule.forRoot({
+      game: reducers.gameReducer
+    }, {}),
     // StoreModule.forFeature('game', gameReducer),
     StoreDevtoolsModule.instrument(),
     EffectsModule.forRoot(effects)

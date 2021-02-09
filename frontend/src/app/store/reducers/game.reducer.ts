@@ -1,6 +1,6 @@
 import { Action, createReducer, on, ActionsSubject } from '@ngrx/store';
 import * as Actions from './../actions/game.actions';
-import { UserData } from '../../models';
+import * as Models from './../../models';
 
 const initialState: any = {
     selectedTiles: [],
@@ -10,7 +10,7 @@ const initialState: any = {
     gameData: {}
 }
 
-export function gameReducer(state: any = initialState, action: Actions.GameActions): any {
+export function gameReducer(state: Models.GameState = initialState, action: Actions.GameActions): any {
     switch (action.type) {
         case Actions.UPDATE_STORE:
             return { ...state, ...action.payload };
@@ -50,15 +50,3 @@ export function gameReducer(state: any = initialState, action: Actions.GameActio
             return state;
     }
 }
-
-// a slice of the state from the entire state tree that the reducer manages
-// <TODO: type the entire data object>
-export interface GameState {
-    loaded: boolean;
-    loading: boolean;
-    // other data
-}
-
-export const getGameDataLoading = (state: GameState) => state.loading;
-export const getGameLoadedState = (state: GameState) => state.loaded;
-// export const getGameData = (state: GameState) => state.gameData;

@@ -23,6 +23,7 @@ export const LOAD_GAME_FAIL = '[Landing Component] Error received from socket se
 export const OPEN_SOCKET = '[Any Component] Connect to Socket Server';
 export const UPDATE_SOCKET_DATA = '[Any Component] Received Data from Socket Server';
 export const SET_PLAYER_ID = '[Lobby Component] Set Player ID';
+export const SET_GAME_ID = '[App Component] Set Game ID';
 
 export class Loading implements Action {
     readonly type = LOADING;
@@ -54,4 +55,9 @@ export class SetPlayerId implements Action {
     constructor(public playerName: string) { }
 }
 
-export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId;
+export class SetGameID implements Action {
+    readonly type = SET_GAME_ID;
+    constructor(public gameID: string) { }
+}
+
+export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID;

@@ -62,6 +62,7 @@ export class AppComponent implements OnInit {
         const gameID = this.helperService.getGameID();
         if (this.gameID !== gameID && !!gameID) {
           this.gameID = gameID;
+          this._store.dispatch(new GameActions.SetGameID(gameID));
           this.socketService.loadOrCreateGame(this.gameID);
           this.socketService.receive();
         }
@@ -71,13 +72,15 @@ export class AppComponent implements OnInit {
 
   setLocalData = () => {
     this.setPlayerID();
-    this.setGameID();
+    // this.setGameID();
   }
 
-  setGameID = () => {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.gameID = id;
-  }
+  // can probably delete this because it's already in the lobby component?
+  // setGameID = () => {
+  //   const id = this.route.snapshot.paramMap.get('id');
+  //   this.gameID = id;
+  //   this._store.dispatch(new GameActions.SetGameID(id));
+  // }
 
   setPlayerID = () => {
     this._store.dispatch(new GameActions.SetPlayerId(localStorage.getItem("player_id")));

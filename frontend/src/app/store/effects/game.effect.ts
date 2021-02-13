@@ -40,7 +40,10 @@ export class GameEffects {
             switchMap(action => {
                 return this.socketService.receive().pipe(
                     map(response => {
-                        if (response.status_code !== 200) throw `error: ${response.message}`
+                        if (response.status_code !== 200) {
+                            console.log('error from socket server', response)
+                            throw `error: ${response.message}`
+                        }
 
                         switch (response.message) {
                             case (SocketSuccessResponses.GameLoaded):

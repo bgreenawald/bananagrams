@@ -53,14 +53,12 @@ export class LobbyComponent implements OnInit {
   }
 
   listenToStore = () => {
-    console.log(this._store)
-    // this._store.select(createFeatureSelector<any>('gameReducer')).subscribe(data => console.log("STATE CHANGE", data))
     this._store.pipe(select(fromStore.getPlayerIDSelector)).subscribe(id => {
-      console.log("THE ID", id)
       this.playerID = id;
       this.autoJoin();
     })
-    this._store.select(fromStore.getGameIDSelector).pipe(take(1)).subscribe(id => this.gameID = id)
+    this._store.pipe(select(fromStore.getGameIDSelector)).subscribe(gameID => this.gameID = gameID);
+    this._store.pipe(select(fromStore.getGameDataSelector)).subscribe(gameData => this.playersInLobby = gameData.players)
   }
 
   autoJoin = () => {
@@ -68,11 +66,11 @@ export class LobbyComponent implements OnInit {
   }
 
   playerJoin = (playerID: string): void => {
-    if (!playerID) return; //if the id input is empty, stop function execution here. 
+    if (!playerID) return;
     // TODO: disable join the game button if input is empty
 
     this._store.dispatch(new fromStore.SetPlayerId(playerID));
-    localStorage.setItem("player_id", playerID.toString());
+    localStorage.setItem("player_id", playerID);
 
     // this.socketService.playerJoin(this.gameID, playerID);
   }
@@ -85,7 +83,7 @@ export class LobbyComponent implements OnInit {
 
   setGameID = () => {
     const id = this.route.snapshot.paramMap.get('id');
-    this.gameID = id;
+    this._store.dispatch(new fromStore.SetGameID(id));
   }
 
 

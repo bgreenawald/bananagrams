@@ -13,7 +13,7 @@ export interface GameData {
 }
 
 export interface GameState {
-    GameData;
+    gameData: GameData;
     loaded: boolean;
     loading: boolean;
     playerID: string;

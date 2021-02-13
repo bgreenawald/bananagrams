@@ -7,12 +7,12 @@ export const getGameStateSelector = createFeatureSelector<any>('game');
 
 export const getGameDataSelector = createSelector(
     getGameStateSelector,
-    (state: Models.GameState) => state ? state.GameData : null
+    (state: Models.GameState) => state.gameData
 );
 
 export const getGameIDSelector = createSelector(
     getGameDataSelector,
-    (state: Models.GameData) => state ? state.id : null
+    (state: Models.GameData) => state.id
 )
 
 export const selectLoadedStatus = createSelector(
@@ -27,5 +27,5 @@ export const selectLoadingStatus = createSelector(
 
 export const getPlayerIDSelector = createSelector(
     getGameStateSelector,
-    (state: Models.GameState) => state ? state.playerID : null
+    (state: Models.GameState) => state.playerID
 )

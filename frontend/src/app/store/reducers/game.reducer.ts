@@ -46,6 +46,14 @@ export function gameReducer(state: Models.GameState = initialState, action: Acti
                 ...state,
                 playerID: action.playerName
             }
+        case Actions.SET_GAME_ID:
+            return {
+                ...state,
+                gameData: {
+                    ...state.gameData,
+                    id: action.gameID
+                }
+            }
         default:
             return state;
     }

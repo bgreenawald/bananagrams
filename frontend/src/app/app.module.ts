@@ -12,6 +12,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { reducers, effects } from './store';
+import * as routerReducer from './router-store';
+import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router-store';
 
 
 import { LobbyComponent } from './components/lobby/lobby.component';
@@ -43,7 +45,7 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
     BenchComponent,
     GameComponent,
     MenuGameplayComponent,
-    ModalComponent
+    ModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -53,13 +55,14 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
     BrowserAnimationsModule,
     DragDropModule,
     StoreModule.forRoot({
-      game: reducers.gameReducer
+      game: reducers.gameReducer,
+      router: routerReducer.routerReducers.routerReducer
     }, {}),
-    // StoreModule.forFeature('game', gameReducer),
     StoreDevtoolsModule.instrument(),
-    EffectsModule.forRoot(effects)
+    EffectsModule.forRoot(effects),
+    StoreRouterConnectingModule.forRoot({ serializer: routerReducer.CustomSerializer }),
   ],
-  providers: [],
+  providers: [{ provide: RouterStateSerializer, useClass: routerReducer.CustomSerializer }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

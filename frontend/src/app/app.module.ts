@@ -56,7 +56,8 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
     DragDropModule,
     StoreModule.forRoot({
       game: reducers.gameReducer,
-      router: routerReducer.routerReducers.routerReducer
+      router: routerReducer.routerReducers.routerReducer,
+      user: reducers.userReducer
     }, {}),
     StoreDevtoolsModule.instrument(),
     EffectsModule.forRoot(effects),

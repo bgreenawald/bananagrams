@@ -3,6 +3,8 @@
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as Models from './../../models';
 
+import * as fromRouterStore from './../../../app/router-store';
+
 export const getGameStateSelector = createFeatureSelector<any>('game');
 
 export const getGameDataSelector = createSelector(
@@ -28,4 +30,12 @@ export const selectLoadingStatus = createSelector(
 export const getPlayerIDSelector = createSelector(
     getGameStateSelector,
     (state: Models.GameState) => state.playerID
+)
+
+export const getGameID = createSelector(
+    getGameStateSelector,
+    fromRouterStore.getRouterState,
+    (entities, router) => {
+        return router.state && entities[router.state.params.id]
+    }
 )

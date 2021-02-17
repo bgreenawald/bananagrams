@@ -2,10 +2,12 @@ import { Action, createReducer, on, ActionsSubject } from '@ngrx/store';
 import * as Actions from './../actions/game.actions';
 import * as Models from './../../models';
 
+
+// The game state syncs it's data with the server.
 const initialState: any = {
     selectedTiles: [],
     playerID: '',
-    loaded: false,
+    loaded: false,  // TODO move the loading booleans into the user reducers ?
     loading: false,
     gameData: {}
 }

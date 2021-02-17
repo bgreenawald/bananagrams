@@ -13,7 +13,7 @@ export interface Cell {
     column: number;
 }
 
-export interface UserData {
+export interface UserData { // TODO: Can remove??
     name: string;
     id: string;
     tiles: Tile[];

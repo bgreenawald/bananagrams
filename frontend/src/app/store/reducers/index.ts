@@ -6,5 +6,5 @@ import { ActionReducerMap } from '@ngrx/store';
 
 export const reducers: ActionReducerMap<any> = {
     gameReducer: GameReducers.gameReducer,
-    // userReducer: UserReducers.userReducer
+    userReducer: UserReducers.userReducer
 }

@@ -40,4 +40,11 @@ export class GameEffects {
     //                 )
     //             })
     //         )
+
+    // @Effect()
+    // resetGame$ = this.actions$.pipe(
+    //     ofType(ChalkfulActions.RESET_GAME)
+    // ).subscribe(
+    //     withLatestFrom()
+    // )
 }

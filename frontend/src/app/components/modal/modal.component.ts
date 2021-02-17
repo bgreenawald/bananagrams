@@ -8,6 +8,10 @@ import { AppComponent } from '../../app.component';
 import { Store, select } from '@ngrx/store';
 import { AppState } from './../../app.state';
 
+import * as fromStore from './../../store';
+import * as Models from './../../models';
+
+
 @Component({
   selector: 'app-modal',
   templateUrl: './modal.component.html',
@@ -21,7 +25,7 @@ export class ModalComponent implements OnInit {
   public winningPlayer: string;
   private _openModal$ = this.messageBusService.openModal$;
   private _globalClick$ = this._helperService.globalClick$;
-  public store$: Observable<any>;
+  public store$: Observable<any>; // REMOVE
   private _message$ = this._app.getMessages();
 
   constructor(
@@ -30,6 +34,7 @@ export class ModalComponent implements OnInit {
     private messageBusService: MessageBusService,
     private socketService: SocketService,
     private _ref: ElementRef,
+    private _store: Store<Models.GameState>  // better name is _store$?
   ) {
   }
 
@@ -38,6 +43,7 @@ export class ModalComponent implements OnInit {
     this._listenCloseModals();
     this.gameID = this._app.getGameID();
     this.socketSubscribe();
+    this._listenStore();
   }
 
   private _listenOpenModals = () => {
@@ -47,12 +53,19 @@ export class ModalComponent implements OnInit {
     })
   }
 
+  private _listenStore = () => {
+    // this._store.pipe(select(fromStore.getGameStateSelector))
+    // I don't think I need this actually TODO
+  }
+
   handleReset = () => {
     location.reload();
   }
 
   handleStartNewGame = () => {
     this.socketService.reset(this.gameID);
+    // ADD here
+    this._store.dispatch(new fromStore.ResetGame(this.gameID)); // update with a ref to the gameID from the store. 
   }
 
   handleClose = () => {

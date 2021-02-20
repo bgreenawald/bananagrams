@@ -18,7 +18,7 @@ import * as Models from './../../models';
 
 
 @Injectable()
-export class GameEffects {
+export class UserEffects {
     selectors = this._store
     constructor(
         private actions$: Actions,
@@ -41,10 +41,20 @@ export class GameEffects {
     //             })
     //         )
 
-    // @Effect()
-    // resetGame$ = this.actions$.pipe(
-    //     ofType(ChalkfulActions.RESET_GAME)
-    // ).subscribe(
-    //     withLatestFrom()
-    // )
+    @Effect()
+    resetGame$ = this.actions$.pipe(
+        ofType(ChalkfulActions.RESET_GAME)
+    ).pipe(
+        // withLatestFrom(this._store.pipe(select(Selectors.getGameStateSelector))),
+        switchMap(_ => {
+            this.socketService.reset('gameid') // Question: How to exactly verify if the socket service was successful?
+            return of('game successfully reset')
+            // Should I just comment this all out b/c the socketService doesn't return a response?    
+            // .pipe(
+            //     // QUESTION: Where to put the params - in service call or in effects??  
+            //     map(resp => new ChalkfulActions.LoadGameSuccess(resp)),
+            //     catchError(error => of(new ChalkfulActions.LoadGameFail(error)))
+            // )
+        })
+    )
 }

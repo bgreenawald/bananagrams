@@ -3,8 +3,8 @@ import * as GameActions from '../actions/game.actions';
 import * as endpointServices from '../../services/api.service';
 import * as SocketServices from '../../services/socket.service';
 
-import { Effect, Actions, ofType } from '@ngrx/effects';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { Effect, Actions, ofType, createEffect } from '@ngrx/effects';
+import { switchMap, map, catchError, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs';
 
@@ -21,7 +21,7 @@ export class GameEffects {
     ) { }
 
     @Effect()
-    loadGame$ = this.actions$.pipe(
+    loadUser$ = this.actions$.pipe(
         ofType(GameActions.LOAD_USER)
     )
         .pipe(
@@ -32,6 +32,20 @@ export class GameEffects {
                 )
             })
         )
+
+
+    // loadGames$ = createEffect(() =>
+    //     this.actions$.pipe(
+    //         ofType(GameActions.LOAD_GAME),
+    //         mergeMap(() => {
+    //             this.socketService.loadOrCreateGame('4923839')
+    //             return of(true)
+    //             //  .pipe(
+    //             //         map(resp => new GameActions.LoadGameSuccess(resp)),
+    //             //         catchError(err => throwError(err))
+    //             //     )
+    //         })
+    //     ))
 
     openSocket$ = this.actions$.pipe(
         ofType(GameActions.OPEN_SOCKET)

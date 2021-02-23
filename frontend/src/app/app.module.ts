@@ -12,8 +12,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { reducers, effects } from './store';
-import * as routerReducer from './router-store';
-import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router-store';
+import * as selectors from './store/selectors';
+import { StoreRouterConnectingModule, RouterStateSerializer, routerReducer } from '@ngrx/router-store';
 
 
 import { LobbyComponent } from './components/lobby/lobby.component';
@@ -27,25 +27,34 @@ import { BenchComponent } from './components/bench/bench.component';
 import { GameComponent } from './components/game/game.component';
 import { MenuGameplayComponent } from './components/menu-gameplay/menu-gameplay.component';
 import { ModalComponent } from './components/modal/modal.component';
+import * as fromComponents from './components';
 
 import { environment } from "../environments/environment";
+import { Routes, RouterModule } from '@angular/router';
+import { CustomSerializer } from './store/selectors/router.selectors';
 
 const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
+
+export const ROUTES: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    component: LandingComponent
+  },
+  {
+    path: 'lobby/:gameID',
+    component: LobbyComponent
+  },
+  {
+    path: 'game/:gameID',
+    component: BoardComponent
+  }
+]
 
 @NgModule({
   declarations: [
     AppComponent,
-    LobbyComponent,
-    BoardComponent,
-    LandingComponent,
-    GameoverComponent,
-    PageNotFoundComponent,
-    TileComponent,
-    CellComponent,
-    BenchComponent,
-    GameComponent,
-    MenuGameplayComponent,
-    ModalComponent,
+    ...fromComponents.components
   ],
   imports: [
     BrowserModule,
@@ -56,14 +65,15 @@ const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
     DragDropModule,
     StoreModule.forRoot({
       game: reducers.gameReducer,
-      router: routerReducer.routerReducers.routerReducer,
-      user: reducers.userReducer
+      user: reducers.userReducer,
+      router: routerReducer
     }, {}),
     StoreDevtoolsModule.instrument(),
     EffectsModule.forRoot(effects),
-    StoreRouterConnectingModule.forRoot({ serializer: routerReducer.CustomSerializer }),
+    StoreRouterConnectingModule.forRoot({ serializer: CustomSerializer }),
+    RouterModule.forChild(ROUTES)
   ],
-  providers: [{ provide: RouterStateSerializer, useClass: routerReducer.CustomSerializer }],
+  providers: [{ provide: RouterStateSerializer, useClass: CustomSerializer }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd, ActivatedRoute, RouterState } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute, RouterState, ActivationEnd } from '@angular/router';
 
 import { Observable, of, fromEvent, throwError } from 'rxjs';
-import { catchError, map, tap, first } from 'rxjs/operators';
+import { catchError, map, tap, first, filter, takeUntil, finalize, switchMap } from 'rxjs/operators';
 
 import { Store, select } from '@ngrx/store';
 import * as fromStore from './store';
@@ -26,7 +26,8 @@ import * as Models from "./models";
 
 export class AppComponent implements OnInit {
   title = 'frontend';
-  public gameID: string; // numerical game id formatted as a string
+  public gameID$: Observable<string>;
+  public gameID: string; // TO REMOVE
   public playerID: string;
   public playersInLobby: string[];
   public tiles: string[];
@@ -44,7 +45,8 @@ export class AppComponent implements OnInit {
     private helperService: HelperService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
-    private _store: Store<Models.GameState>) { }
+    private _store: Store<Models.GameState>,
+    private _routerStore: Store<any>) { }
 
   ngOnInit() {
     this.detectIDChange();
@@ -53,20 +55,24 @@ export class AppComponent implements OnInit {
     this._state$ = this._store.select(fromStore.getGameStateSelector);
     this._store.dispatch(new fromStore.LoadUser());
     this.openSocket();
+    // this.route.paramMap.subscribe(params => {
+    //   console.log("GAME ID", params.get('id'))
+    //   this.gameID = params['id']
+    // })
+    this.route.params.subscribe(() => {
+      console.log('testing')
+    })
   }
 
+  // listen for game id from router store
   detectIDChange = () => {
-    this.router.events.subscribe(e => {
-      if (e instanceof NavigationEnd) {
-        // gameID as typed into the URL
-        const gameID = this.helperService.getGameID();
-        if (this.gameID !== gameID && !!gameID) {
-          this.gameID = gameID;
-          this._store.dispatch(new GameActions.SetGameID(gameID));
-          this.socketService.loadOrCreateGame(this.gameID);
-          this.socketService.receive();
-        }
-      }
+    this.router.events.pipe(
+      filter(event => event instanceof ActivationEnd),
+      map(e => e instanceof ActivationEnd ? e.snapshot.params.id : {})
+    ).subscribe(id => {
+      if (!id) return;
+      this._store.dispatch(new GameActions.SetGameID(id));
+      this._store.dispatch(new GameActions.LoadGame(id))
     })
   }
 
@@ -74,13 +80,6 @@ export class AppComponent implements OnInit {
     this.setPlayerID();
     // this.setGameID();
   }
-
-  // can probably delete this because it's already in the lobby component?
-  // setGameID = () => {
-  //   const id = this.route.snapshot.paramMap.get('id');
-  //   this.gameID = id;
-  //   this._store.dispatch(new GameActions.SetGameID(id));
-  // }
 
   setPlayerID = () => {
     this._store.dispatch(new GameActions.SetPlayerId(localStorage.getItem("player_id")));
@@ -103,6 +102,7 @@ export class AppComponent implements OnInit {
     // send off different actions in response to different socket messages? 
     return this.messages$.pipe(
       map(resp => {
+        console.log(resp.message)
         if (resp.status_code !== 200) throw `error: ${resp.message}`
         const value = {
           "message": resp.message,

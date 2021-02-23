@@ -1,7 +1,15 @@
 import { ActivatedRouteSnapshot, RouterStateSnapshot, Params, RouterState } from '@angular/router';
-import { ActionReducerMap, createFeatureSelector } from '@ngrx/store';
-
+import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as coreRouterStore from '@ngrx/router-store';
+
+import * as fromStore from './../index';
+
+export const selectRouter = createFeatureSelector<coreRouterStore.RouterReducerState>('router');
+
+export const {
+    selectRouteParams,
+    selectRouteParam
+} = coreRouterStore.getSelectors(selectRouter);
 
 export interface RouterStateUrl {
     url: string;
@@ -21,6 +29,11 @@ export const routerReducers: ActionReducerMap<State> = {
 export const getRouterState = createFeatureSelector<
     coreRouterStore.RouterReducerState<RouterStateUrl>
     >('routerReducer');
+
+export const getGameID = createSelector(
+    getRouterState,
+    (routerState: any) => routerState.state.params.gameID
+)
 
 export class CustomSerializer
     implements coreRouterStore.RouterStateSerializer<RouterStateUrl>{

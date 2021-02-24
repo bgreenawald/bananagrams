@@ -26,7 +26,6 @@ import * as Models from "./models";
 
 export class AppComponent implements OnInit {
   title = 'frontend';
-  public gameID$: Observable<string>;
   public gameID: string; // TO REMOVE
   public playerID: string;
   public playersInLobby: string[];
@@ -50,11 +49,11 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.detectIDChange();
-    this.setLocalData();
+    this.setCachedData();
     this.socketSubscribe();
     this._state$ = this._store.select(fromStore.getGameStateSelector);
-    this._store.dispatch(new fromStore.LoadUser());
     this.openSocket();
+    this._store.dispatch(new fromStore.LoadReservedGameIDs())
     // this.route.paramMap.subscribe(params => {
     //   console.log("GAME ID", params.get('id'))
     //   this.gameID = params['id']
@@ -76,16 +75,10 @@ export class AppComponent implements OnInit {
     })
   }
 
-  setLocalData = () => {
-    this.setPlayerID();
-    // this.setGameID();
+  setCachedData = () => {
+    const cachedPlayerID = localStorage.getItem("player_id");
+    this._store.dispatch(new GameActions.SetPlayerId(cachedPlayerID));
   }
-
-  setPlayerID = () => {
-    this._store.dispatch(new GameActions.SetPlayerId(localStorage.getItem("player_id")));
-  }
-
-  // getPlayerID = (): string => this.playerID;
 
   getGameID = (): string => this.gameID;
 

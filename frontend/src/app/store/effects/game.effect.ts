@@ -11,7 +11,6 @@ import { throwError } from 'rxjs';
 import { SocketSuccessResponses } from './../../constants';
 
 
-
 @Injectable()
 export class GameEffects {
     constructor(
@@ -20,17 +19,30 @@ export class GameEffects {
         private socketService: SocketServices.SocketService
     ) { }
 
+    // CHANGE TO PLAYER JOIN
+    // @Effect()
+    // loadUser$ = this.actions$.pipe(
+    //     ofType(GameActions.LOAD_USER)
+    // )
+    //     .pipe(
+    //         switchMap(() => {
+    //             return this.endpointService.getIDs().pipe(
+    //                 map(userData => new GameActions.LoadGameSuccess(userData)),
+    //                 catchError(err => of(new GameActions.LoadGameFail(err)))
+    //             )
+    //         })
+    //     )
+
     @Effect()
-    loadUser$ = this.actions$.pipe(
-        ofType(GameActions.LOAD_USER)
-    )
-        .pipe(
-            switchMap(() => {
-                return this.endpointService.getIDs().pipe(
-                    map(userData => new GameActions.LoadGameSuccess(userData)),
-                    catchError(err => of(new GameActions.LoadGameFail(err)))
+    loadUnavailableGameIDs$ =
+        this.actions$.pipe(
+            ofType(GameActions.LOAD_RESERVED_GAME_IDS),
+            mergeMap(() => this.endpointService.getIDs()
+                .pipe(
+                    map(gameIDs => (new GameActions.SetReservedGameIDs(gameIDs))),
+                    catchError(err => throwError(err))
                 )
-            })
+            )
         )
 
 
@@ -47,6 +59,7 @@ export class GameEffects {
     //         })
     //     ))
 
+    @Effect()
     openSocket$ = this.actions$.pipe(
         ofType(GameActions.OPEN_SOCKET)
     )

@@ -2,8 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 
+import * as fromStore from './../../store';
+import * as Models from './../../models';
 import { ApiService } from '../../services/api.service';
+import { ofType } from '@ngrx/effects';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-landing',
@@ -11,7 +16,7 @@ import { ApiService } from '../../services/api.service';
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent implements OnInit {
-  public gameIDs: any;
+  public reservedGameIDs: any;
   public suggestedID: number;
   public error: string;
   private baseURL = "http://localhost:5000/api/";
@@ -21,18 +26,19 @@ export class LandingComponent implements OnInit {
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
+    private _store: Store<Models.GameState>
   ) {
   }
 
   ngOnInit(): void {
-    this.getIDs()
+    this._store.dispatch(new fromStore.LoadReservedGameIDs())
     this._generateNewID();
     localStorage.clear();
+    this._getReservedIDsFromStore();
   }
 
-  getIDs = (): void => {
-    this.apiService.getIDs()
-      .subscribe(ids => this.gameIDs = ids);
+  private _getReservedIDsFromStore = () => {
+    this._store.select(fromStore.getReservedGameIDs).subscribe(gameIDs => this.reservedGameIDs = gameIDs)
   }
 
   private _generateNewID = (): void => {
@@ -42,18 +48,17 @@ export class LandingComponent implements OnInit {
     this.suggestedID = random;
   }
 
-  createGame = (id: string) => {
+  public createGame = (id: string) => {
     let submittedID: number = Number(id.trim());
     if (!id) { return; }
     if (this.isIDUnique(submittedID)) {
       this.router.navigate([`/lobby/${submittedID}`]);
     }
-    else {
-      this.error = "ID not available.  Please choose a different room."
-    }
+    this.error = "ID not available.  Please choose a different room."
   }
 
   private isIDUnique = (id: number): boolean => {
-    return !this.gameIDs.includes(id);
+    console.log(this.reservedGameIDs)
+    return !this.reservedGameIDs.includes(id);
   }
 }

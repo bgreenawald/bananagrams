@@ -56,6 +56,14 @@ export function gameReducer(state: Models.GameState = initialState, action: Acti
                     id: action.gameID
                 }
             }
+        case Actions.SET_RESERVED_GAME_IDS:
+            return {
+                ...state,
+                gameData: {
+                    ...state.gameData,
+                    unavailableIDs: action.gameIDs
+                }
+            }
         default:
             return state;
     }

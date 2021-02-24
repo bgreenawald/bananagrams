@@ -10,6 +10,7 @@ export interface GameData {
     tiles_remaining: number;
     winning_player: string;
     winning_words: string; // ?
+    unavailableIDs: string[];
     // example data:
     // payload: "{"id": "827663", "state": "IDLE", "num_players": null, "tiles_remaining": 144, "players": {}, "winning_words": null, "winning_player": null}"
 }

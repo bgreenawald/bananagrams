@@ -24,7 +24,9 @@ export const OPEN_SOCKET = '[Any] Connect to Socket Server';
 export const UPDATE_SOCKET_DATA = '[Any] Received Data from Socket Server';
 export const SET_PLAYER_ID = '[Lobby] Set Player ID';
 export const SET_GAME_ID = '[App] Set Game ID';
-export const LOAD_GAME = '[Lobby] Load Game from socket server'
+export const LOAD_GAME = '[Lobby] Load Game from socket server';
+export const LOAD_RESERVED_GAME_IDS = '[Landing] Get all game IDs in use by server';
+export const SET_RESERVED_GAME_IDS = '[Effects via Landing] Response received: data of reserved game IDs'
 
 export class Loading implements Action {
     readonly type = LOADING;
@@ -66,4 +68,13 @@ export class LoadGame implements Action {
     constructor(public GameID: string) { }
 }
 
-export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID;
+export class LoadReservedGameIDs implements Action {
+    readonly type = LOAD_RESERVED_GAME_IDS;
+}
+
+export class SetReservedGameIDs implements Action {
+    readonly type = SET_RESERVED_GAME_IDS;
+    constructor(public gameIDs: string[]) { }
+}
+
+export type GameActions = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID | LoadReservedGameIDs | SetReservedGameIDs;

@@ -42,7 +42,7 @@ export class MenuGameplayComponent implements OnInit {
 
   listenToStore = () => {
     this._store.select(fromStore.getPlayerIDSelector).pipe(take(1)).subscribe(id => this.playerID = id)
-    this._store.select(fromStore.getGameIDSelector).pipe(take(1)).subscribe(id => this.gameID = id)
+    this._store.select(fromStore.selectGameID).pipe(take(1)).subscribe(id => this.gameID = id)
   }
 
   handleStartNewGame = () => {

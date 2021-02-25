@@ -13,11 +13,6 @@ export const getGameDataSelector = createSelector(
     (state: Models.GameState) => state.gameData
 );
 
-export const getGameIDSelector = createSelector(
-    getGameDataSelector,
-    (state: Models.GameData) => state.id
-)
-
 export const selectLoadedStatus = createSelector(
     getGameStateSelector,
     (state: Models.GameState) => state.loaded

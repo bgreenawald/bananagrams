@@ -4,7 +4,7 @@ import * as endpointServices from '../../services/api.service';
 import * as SocketServices from '../../services/socket.service';
 
 import { Effect, Actions, ofType, createEffect } from '@ngrx/effects';
-import { switchMap, map, catchError, mergeMap } from 'rxjs/operators';
+import { switchMap, map, catchError, mergeMap, mapTo } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs';
 
@@ -14,7 +14,7 @@ import { SocketSuccessResponses } from './../../constants';
 @Injectable()
 export class GameEffects {
     constructor(
-        private actions$: Actions,
+        private actions$: Actions<GameActions.GameActionTypes>,
         private endpointService: endpointServices.ApiService,
         private socketService: SocketServices.SocketService
     ) { }
@@ -33,8 +33,7 @@ export class GameEffects {
     //         })
     //     )
 
-    @Effect()
-    loadUnavailableGameIDs$ =
+    loadUnavailableGameIDs$ = createEffect(() =>
         this.actions$.pipe(
             ofType(GameActions.LOAD_RESERVED_GAME_IDS),
             mergeMap(() => this.endpointService.getIDs()
@@ -44,42 +43,49 @@ export class GameEffects {
                 )
             )
         )
-
-
-    // loadGames$ = createEffect(() =>
-    //     this.actions$.pipe(
-    //         ofType(GameActions.LOAD_GAME),
-    //         mergeMap(() => {
-    //             this.socketService.loadOrCreateGame('4923839')
-    //             return of(true)
-    //             //  .pipe(
-    //             //         map(resp => new GameActions.LoadGameSuccess(resp)),
-    //             //         catchError(err => throwError(err))
-    //             //     )
-    //         })
-    //     ))
-
-    @Effect()
-    openSocket$ = this.actions$.pipe(
-        ofType(GameActions.OPEN_SOCKET)
     )
-        .pipe(
-            switchMap(action => {
-                return this.socketService.receive().pipe(
-                    map(response => {
-                        if (response.status_code !== 200) {
-                            console.log('error from socket server', response)
-                            throw `error: ${response.message}`
-                        }
 
-                        switch (response.message) {
-                            case (SocketSuccessResponses.GameLoaded):
-                                new GameActions.UpdateSocketData(response.message, JSON.parse(response.payload));
-                        }
-                    }
-                    ),
-                    catchError(errorMessage => throwError(errorMessage))
-                )
-            })
+
+    loadOrCreateGame$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(GameActions.LOAD_OR_CREATE_GAME),
+        )).subscribe(action =>
+            this.socketService.loadOrCreateGame(action.gameID)
         )
+
+    openSocket$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(GameActions.OPEN_SOCKET)
+        )
+            .pipe(
+                switchMap(action => {
+                    return this.socketService.receive().pipe(
+                        map(response => {
+                            if (response.status_code !== 200) {
+                                console.log('error from socket server', response)
+                                throw `error: ${response.message}`
+                            }
+
+                            switch (response.message) {
+                                case (SocketSuccessResponses.GameLoaded):
+                                    new GameActions.UpdateSocketData(response.message, JSON.parse(response.payload));
+                            }
+                        }
+                        ),
+                        catchError(errorMessage => throwError(errorMessage))
+                    )
+                })
+            )
+    )
+
+
+    // @Effect()
+    // loadOrCreateGame$ = this.actions$.pipe(
+    //     ofType(GameActions.LOAD_OR_CREATE_GAME),
+    // )
+    // .pipe(
+    //     switchMap(action => {
+    //         return this.socketService.loadOrCreateGame(action.gameID)
+    //     })
+    // )
 }

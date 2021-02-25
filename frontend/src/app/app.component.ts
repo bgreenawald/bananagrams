@@ -48,7 +48,7 @@ export class AppComponent implements OnInit {
     private _routerStore: Store<any>) { }
 
   ngOnInit() {
-    this.detectIDChange();
+    // this.detectIDChange();
     this.setCachedData();
     this.socketSubscribe();
     this._state$ = this._store.select(fromStore.getGameStateSelector);
@@ -63,24 +63,11 @@ export class AppComponent implements OnInit {
     })
   }
 
-  // listen for game id from router store
-  detectIDChange = () => {
-    this.router.events.pipe(
-      filter(event => event instanceof ActivationEnd),
-      map(e => e instanceof ActivationEnd ? e.snapshot.params.id : {})
-    ).subscribe(id => {
-      if (!id) return;
-      this._store.dispatch(new GameActions.SetGameID(id));
-      this._store.dispatch(new GameActions.LoadGame(id))
-    })
-  }
 
   setCachedData = () => {
     const cachedPlayerID = localStorage.getItem("player_id");
     this._store.dispatch(new GameActions.SetPlayerId(cachedPlayerID));
   }
-
-  getGameID = (): string => this.gameID;
 
   getPlayers = (): string[] => this.playersTiles;
 
@@ -129,32 +116,32 @@ export class AppComponent implements OnInit {
     this.getMessages()
       .subscribe(value => {
         console.log("SOCKET RESPONSE", value)
-        switch (value.data.state) {
-          case "IDLE":
-            this.router.navigate([`/lobby/${this.gameID}`]);
-            break;
-          case "ACTIVE":
-            const allPlayers: string[] = Object.keys(value.data.players);
-            if (allPlayers.includes(this.playerID)) {
-              this.router.navigate([`/game/${this.gameID}`]);
-            }
-            else {
-              // show cannot join game until over
-              this.router.navigate([`**`]);
-            }
-            break;
-          case "ENDGAME":
-            break;
-          case "OVER":
-            this.messageBusService.openModal('review')
-            break;
-          default:
-            this.router.navigate([`**`]);
-            break;
-        }
-      },
-        err => this.errorService.displayError(err)
-      )
+        //   switch (value.data.state) {
+        //     case "IDLE":
+        //       this.router.navigate([`/lobby/${this.gameID}`]);
+        //       break;
+        //     case "ACTIVE":
+        //       const allPlayers: string[] = Object.keys(value.data.players);
+        //       if (allPlayers.includes(this.playerID)) {
+        //         this.router.navigate([`/game/${this.gameID}`]);
+        //       }
+        //       else {
+        //         // show cannot join game until over
+        //         this.router.navigate([`**`]);
+        //       }
+        //       break;
+        //     case "ENDGAME":
+        //       break;
+        //     case "OVER":
+        //       this.messageBusService.openModal('review')
+        //       break;
+        //     default:
+        //       this.router.navigate([`**`]);
+        //       break;
+        //   }
+        // },
+        //   err => this.errorService.displayError(err)
+      })
     // this.router.navigate([`/game/${this.gameID}`]);
 
   }

@@ -28,11 +28,11 @@ export const routerReducers: ActionReducerMap<State> = {
 // selector for getting router state
 export const getRouterState = createFeatureSelector<
     coreRouterStore.RouterReducerState<RouterStateUrl>
-    >('routerReducer');
+    >('router');
 
-export const getGameID = createSelector(
+export const selectGameID = createSelector(
     getRouterState,
-    (routerState: any) => routerState.state.params.gameID
+    (routerState: any) => routerState && routerState.state.params.id
 )
 
 export class CustomSerializer

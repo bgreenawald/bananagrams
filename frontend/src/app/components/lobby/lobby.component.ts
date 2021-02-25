@@ -46,18 +46,20 @@ export class LobbyComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.setGameID();
     this.socketSubscribe();
-    this.socketService.loadOrCreateGame(this.gameID);
-    this.listenToStore();
+    this.listenToStore();  // probably need to destroy this??
   }
 
   listenToStore = () => {
     this._store.pipe(select(fromStore.getPlayerIDSelector)).subscribe(id => {
       this.playerID = id;
-      this.autoJoin();
+      // this.autoJoin();
     })
-    this._store.pipe(select(fromStore.getGameIDSelector)).subscribe(gameID => this.gameID = gameID);
+    this._store.pipe(select(fromStore.selectGameID)).subscribe(gameID => {
+      console.log(gameID)
+      this.gameID = gameID;
+      this._store.dispatch(new fromStore.LoadOrCreateGame(gameID));
+    });
     this._store.pipe(select(fromStore.getGameDataSelector)).subscribe(gameData => this.playersInLobby = gameData.players)
   }
 
@@ -81,12 +83,6 @@ export class LobbyComponent implements OnInit {
     })
   }
 
-  setGameID = () => {
-    const id = this.route.snapshot.paramMap.get('id');
-    this._store.dispatch(new fromStore.SetGameID(id));
-  }
-
-
   // TODO: refactor
   socketSubscribe = () => {
     this.messages$
@@ -99,7 +95,7 @@ export class LobbyComponent implements OnInit {
         }
       },
         // err => this.error = this.errorService.parseError(err)
-        err => console.log(err)
+        err => console.log("ERROR", err)
       )
   }
 }

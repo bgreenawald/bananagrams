@@ -12,18 +12,20 @@ export class SocketService {
   ) { }
 
   playerJoin = (gameID: string, username: string) => {
-    console.log('player joining')
     this.socket.emit("player_join", {
       "name": gameID,
       "player_id": username
     })
   }
 
-  loadOrCreateGame = (gameID: string) => {
-    this.socket.emit("load_game", {
+  connectToSocket = (gameID: string) => {
+    this.socket.emit("join", {
       "name": gameID
     })
-    this.socket.emit("join", {
+  }
+
+  loadOrCreateGame = (gameID: string) => {
+    this.socket.emit("load_game", {
       "name": gameID
     })
   }

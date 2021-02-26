@@ -1,10 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Socket } from 'ngx-socket-io';
+import { ActionReducerMap, createFeatureSelector, createSelector, Store, select } from '@ngrx/store';
+import { Actions, ofType } from '@ngrx/effects';
 
+import { take } from 'rxjs/operators';
 import { Observable, of, fromEvent, throwError } from 'rxjs';
 import { catchError, map, tap, first } from 'rxjs/operators';
+
+import { Socket } from 'ngx-socket-io';
+
 
 import { SocketService } from '../../services/socket.service';
 import { ErrorService } from '../../services/error.service';
@@ -12,15 +17,12 @@ import { AppComponent } from '../../app.component';
 
 import * as Selectors from '../../store/selectors';
 
-import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
-
-
 
 import * as Models from './../../models';
 
-import { Store, select } from '@ngrx/store';
 import * as fromStore from './../../store';
-import { take } from 'rxjs/operators';
+import { GameActionTypes } from './../../store';
+import * as GameActions from './../../store/actions/game.actions'
 
 @Component({
   selector: 'app-lobby',
@@ -42,36 +44,54 @@ export class LobbyComponent implements OnInit {
     private router: Router,
     private socket: Socket,
     private socketService: SocketService,
-    private _store: Store<Models.GameState>
+    private _store: Store<Models.GameState>,
+    private action$: Actions<GameActionTypes>
   ) { }
 
   ngOnInit(): void {
-    this.socketSubscribe();
+    this.checkCache();
     this.listenToStore();  // probably need to destroy this??
+    this.loadLobby();
+  }
+
+  getGameID = () => {
+    this._store.pipe(select(fromStore.selectGameID)).subscribe(gameID => {
+      this.gameID = gameID;
+      console.log('game id is', gameID)
+    });
+  }
+
+
+  loadLobby = () => {
+    this._store.dispatch(new fromStore.OpenSocket(this.gameID))
+    this.action$.pipe(
+      ofType(GameActions.LOAD_GAME_SUCCESS)
+    ).subscribe(() =>
+      this._store.dispatch(new fromStore.LoadOrCreateGame(this.gameID))
+    )
   }
 
   listenToStore = () => {
-    this._store.pipe(select(fromStore.getPlayerIDSelector)).subscribe(id => {
-      this.playerID = id;
-      // this.autoJoin();
-    })
-    this._store.pipe(select(fromStore.selectGameID)).subscribe(gameID => {
-      console.log(gameID)
-      this.gameID = gameID;
-      this._store.dispatch(new fromStore.LoadOrCreateGame(gameID));
-    });
+    // this._store.pipe(select(fromStore.getPlayerIDSelector)).subscribe(id => {
+    //   console.log('player id', id)
+    //   this.playerID = id;
+    //   this.autoJoin(this.playerID);
+    // })
     this._store.pipe(select(fromStore.getGameDataSelector)).subscribe(gameData => this.playersInLobby = gameData.players)
   }
 
-  autoJoin = () => {
-    if (this.playerID) this.playerJoin(this.playerID);
+  checkCache = () => {
+    const playerName = localStorage.getItem("player_id");
+    console.log("CACHED NAME", playerName)
+    if (playerName) this.playerJoin(playerName);
   }
 
   playerJoin = (playerID: string): void => {
     if (!playerID) return;
     // TODO: disable join the game button if input is empty
 
-    this._store.dispatch(new fromStore.SetPlayerId(playerID));
+    this._store.dispatch(new fromStore.SetPlayerId(this.gameID, playerID));
+    console.log("submitted player name", playerID)
     localStorage.setItem("player_id", playerID);
 
     // this.socketService.playerJoin(this.gameID, playerID);
@@ -81,21 +101,5 @@ export class LobbyComponent implements OnInit {
     this.socket.emit("start_game", {
       "name": this.gameID
     })
-  }
-
-  // TODO: refactor
-  socketSubscribe = () => {
-    this.messages$
-      .subscribe(value => {
-        if (value.data.players) {
-          this.playersInLobby = [];
-          for (let player in value.data.players) {
-            this.playersInLobby.push(player)
-          }
-        }
-      },
-        // err => this.error = this.errorService.parseError(err)
-        err => console.log("ERROR", err)
-      )
   }
 }

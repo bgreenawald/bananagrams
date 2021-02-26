@@ -24,7 +24,7 @@ export const OPEN_SOCKET = '[Any] Connect to Socket Server';
 export const UPDATE_SOCKET_DATA = '[Any] Received Data from Socket Server';
 export const SET_PLAYER_ID = '[Lobby] Set Player ID';
 export const SET_GAME_ID = '[App] Set Game ID';
-export const LOAD_GAME = '[Lobby] Load Game from socket server';
+export const JOIN_ROOM = '[Lobby] Join room by Game ID';
 export const LOAD_RESERVED_GAME_IDS = '[Landing] Get all game IDs in use by server';
 export const SET_RESERVED_GAME_IDS = '[Effects via Landing] Response received: data of reserved game IDs'
 export const LOAD_OR_CREATE_GAME = '[Lobby] Load or Create New Game from socket server';
@@ -33,7 +33,7 @@ export class Loading implements Action {
     readonly type = LOADING;
     constructor(public payload: any) { }
 }
-export class LoadUser implements Action {
+export class LoadUser implements Action { // remove?
     readonly type = LOAD_USER;
 }
 export class LoadGameFail implements Action {
@@ -46,6 +46,7 @@ export class LoadGameSuccess implements Action {
 
 export class OpenSocket implements Action {
     readonly type = OPEN_SOCKET;
+    constructor(public gameID: string) { };
 }
 
 export class UpdateSocketData implements Action {
@@ -55,17 +56,17 @@ export class UpdateSocketData implements Action {
 
 export class SetPlayerId implements Action {
     readonly type = SET_PLAYER_ID;
-    constructor(public playerName: string) { }
+    constructor(public gameID: string, public playerName: string) { }
 }
 
-export class SetGameID implements Action {
+export class SetGameID implements Action { // remove?
     readonly type = SET_GAME_ID;
     constructor(public gameID: string) { }
 }
 
-export class LoadGame implements Action {
-    readonly type = LOAD_GAME;
-    constructor(public GameID: string) { }
+export class JoinRoom implements Action { // remove?
+    readonly type = JOIN_ROOM;
+    constructor(public gameID: string) { }
 }
 
 export class LoadReservedGameIDs implements Action {
@@ -82,4 +83,4 @@ export class LoadOrCreateGame implements Action {
     constructor(public gameID: string) { };
 }
 
-export type GameActionTypes = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID | LoadReservedGameIDs | SetReservedGameIDs | LoadOrCreateGame;
+export type GameActionTypes = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID | LoadReservedGameIDs | SetReservedGameIDs | LoadOrCreateGame | JoinRoom;

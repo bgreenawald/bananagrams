@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import * as fromStore from './../../store';
 import * as Models from './../../models';
 import { ApiService } from '../../services/api.service';
-import { ofType } from '@ngrx/effects';
+import { Actions } from '@ngrx/effects';
 import { filter } from 'rxjs/operators';
 
 @Component({

@@ -4,7 +4,7 @@ import * as endpointServices from '../../services/api.service';
 import * as SocketServices from '../../services/socket.service';
 
 import { Effect, Actions, ofType, createEffect } from '@ngrx/effects';
-import { switchMap, map, catchError, mergeMap, mapTo } from 'rxjs/operators';
+import { switchMap, map, catchError, mergeMap, mapTo, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs';
 
@@ -19,19 +19,12 @@ export class GameEffects {
         private socketService: SocketServices.SocketService
     ) { }
 
-    // CHANGE TO PLAYER JOIN
-    // @Effect()
-    // loadUser$ = this.actions$.pipe(
-    //     ofType(GameActions.LOAD_USER)
-    // )
-    //     .pipe(
-    //         switchMap(() => {
-    //             return this.endpointService.getIDs().pipe(
-    //                 map(userData => new GameActions.LoadGameSuccess(userData)),
-    //                 catchError(err => of(new GameActions.LoadGameFail(err)))
-    //             )
-    //         })
-    //     )
+    playerJoin$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(GameActions.SET_PLAYER_ID),
+        )).subscribe(action =>
+            this.socketService.playerJoin(action.gameID, action.playerName)
+        )
 
     loadUnavailableGameIDs$ = createEffect(() =>
         this.actions$.pipe(
@@ -45,6 +38,16 @@ export class GameEffects {
         )
     )
 
+    enterRoom$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(GameActions.OPEN_SOCKET),
+            map(action => {
+                this.socketService.connectToSocket(action.gameID)
+                return new GameActions.LoadGameSuccess()
+            }
+            )
+        )
+    )
 
     loadOrCreateGame$ = createEffect(() =>
         this.actions$.pipe(
@@ -77,15 +80,4 @@ export class GameEffects {
                 })
             )
     )
-
-
-    // @Effect()
-    // loadOrCreateGame$ = this.actions$.pipe(
-    //     ofType(GameActions.LOAD_OR_CREATE_GAME),
-    // )
-    // .pipe(
-    //     switchMap(action => {
-    //         return this.socketService.loadOrCreateGame(action.gameID)
-    //     })
-    // )
 }

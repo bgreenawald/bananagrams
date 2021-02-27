@@ -28,6 +28,8 @@ export const JOIN_ROOM = '[Lobby] Join room by Game ID';
 export const LOAD_RESERVED_GAME_IDS = '[Landing] Get all game IDs in use by server';
 export const SET_RESERVED_GAME_IDS = '[Effects via Landing] Response received: data of reserved game IDs'
 export const LOAD_OR_CREATE_GAME = '[Lobby] Load or Create New Game from socket server';
+export const SUCCESS_JOIN_ROOM = '[Lobby] Room successfully joined';
+export const FAIL_OPEN_SOCKET = '[App] Could not connect to socket';
 
 export class Loading implements Action {
     readonly type = LOADING;
@@ -83,4 +85,13 @@ export class LoadOrCreateGame implements Action {
     constructor(public gameID: string) { };
 }
 
-export type GameActionTypes = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID | LoadReservedGameIDs | SetReservedGameIDs | LoadOrCreateGame | JoinRoom;
+export class SuccessJoinRoom implements Action {
+    readonly type = SUCCESS_JOIN_ROOM;
+}
+
+export class FailOpenSocket implements Action {
+    readonly type = FAIL_OPEN_SOCKET;
+    constructor(public error: string, public response: any) { };
+}
+
+export type GameActionTypes = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID | LoadReservedGameIDs | SetReservedGameIDs | LoadOrCreateGame | JoinRoom | SuccessJoinRoom | FailOpenSocket;

@@ -31,9 +31,12 @@ export class AppComponent implements OnInit {
   public playersInLobby: string[];
   public tiles: string[];
   private playersTiles: string[];
-  private messages$ = this.socketService.receive();
+  private _socketStream$;
+  private _socketSubscription$;
   private openModal$ = this.messageBusService.openModal$;
-  private _state$: Observable<Models.GameState>
+  private _state$: Observable<Models.GameState>;
+  private messages$ = this.socketService.receive();
+
 
 
   constructor(
@@ -50,14 +53,15 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.setCachedData();
     this._state$ = this._store.select(fromStore.getGameStateSelector);
-    this._store.dispatch(new fromStore.LoadReservedGameIDs())
-    this.route.params.subscribe(() => {
-      console.log('testing')
-    })
-    // this.openSocket();
-    this.getMessages();
+    // this.route.params.subscribe(() => {
+    //   console.log('testing')
+    // })
+    this.openSocket();
   }
 
+  ngOnDestroy() {
+    this._socketSubscription$.unsubscribe();
+  }
 
   setCachedData = () => {
     const cachedPlayerID = localStorage.getItem("player_id");
@@ -92,7 +96,9 @@ export class AppComponent implements OnInit {
   }
 
   openSocket = (): void => {
-    this.messages$.subscribe(response => {
+    this._socketStream$ = this.socketService.receive();
+    this._socketSubscription$ = this._socketStream$.subscribe(response => {
+      console.log("SOCKET RESPONSE", response)
       if (response.status_code !== 200) this._store.dispatch(new fromStore.LoadGameFail(response.message));
 
       switch (response.message) {
@@ -102,6 +108,7 @@ export class AppComponent implements OnInit {
     }
     )
   }
+
 
   handleClick = (e) => {
     // is the clicked element NOT the swap button

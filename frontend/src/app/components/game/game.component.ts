@@ -41,7 +41,7 @@ export class GameComponent implements OnInit {
   public confirmMessage: string;
 
   private openModal$ = this.messageBusService.openModal$;
-  private _messages$ = this.app.getMessages();
+  // private _messages$ = this.app.getMessages();
   private _modifyCell$ = this.eventHandleService.removeCell$;
 
 
@@ -59,7 +59,7 @@ export class GameComponent implements OnInit {
   ngOnInit(): void {
     this._getPlayerID();
     this.setGameID();
-    this.socketSubscribe();
+    // this.socketSubscribe();
     this.socketService.loadOrCreateGame(this.gameID);
     this.tileEventListen();
   }
@@ -74,19 +74,19 @@ export class GameComponent implements OnInit {
   }
 
   // TODO: refactor
-  socketSubscribe = () => {
-    this._messages$
-      .subscribe(value => {
-        const tileArray = value.data.players[this.playerID];
-        if (value.message === "Game loaded." && !this.tiles) {
-          this.initializeTiles(tileArray);
-        }
-        else this.updateTiles(tileArray);
-        this.tiles = tileArray;
-      },
-        err => this.error = this.errorService.parseError(err)
-      )
-  }
+  // socketSubscribe = () => {
+  //   this._messages$
+  //     .subscribe(value => {
+  //       const tileArray = value.data.players[this.playerID];
+  //       if (value.message === "Game loaded." && !this.tiles) {
+  //         this.initializeTiles(tileArray);
+  //       }
+  //       else this.updateTiles(tileArray);
+  //       this.tiles = tileArray;
+  //     },
+  //       err => this.error = this.errorService.parseError(err)
+  //     )
+  // }
 
   setTiles = (tiles: string[]) => {
     if (tiles.length <= 0) return;

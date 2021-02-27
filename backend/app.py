@@ -76,7 +76,7 @@ def on_join(data: Dict[str, Any]):
         if "name" in data:
             emit_error(data["name"], str(e))
         else:
-            logger.error("No game specified in input.")
+            logger.error("No game specified in input. from join event")
     else:
         room_name = data["name"]
         join_room(room_name)
@@ -116,6 +116,7 @@ def emit_game(game_name: str, game: Game, msg: str):
         },
         room=game_name,
     )
+    logger.info(f"{request.sid} has successfully rendered their game")
 
 
 @socketio.on("load_game")
@@ -137,7 +138,7 @@ def load_game(data: Dict[Any, Any]):
         if "name" in data:
             emit_error(data["name"], str(e))
         else:
-            logger.error("No game specified in input.")
+            logger.error("No game specified in input. from load_game")
     else:
         game_name = data["name"]
 
@@ -173,14 +174,14 @@ def player_join(data: Dict[Any, Any]):
         if "name" in data:
             emit_error(data["name"], str(e))
         else:
-            logger.error("No game specified in input.")
+            logger.error("No game specified in input. from player_join")
     else:
         game_name = data["name"]
         try:
             game = all_games[game_name]
         except KeyError:
-            logger.warning(f"Could not find the game named {game_name}.")
-            emit_error(game_name, f"Could not find the game named {game_name}.")
+            logger.warning(f"Could not find the game named {game_name}. from player_join")
+            emit_error(game_name, f"Could not find the game named {game_name}. from player_join")
             return
 
         # See if the player has already joined
@@ -219,7 +220,7 @@ def start_game(data: Dict[Any, Any]):
         if "name" in data:
             emit_error(data["name"], str(e))
         else:
-            logger.error("No game specified in input.")
+            logger.error("No game specified in input. from start_game")
     else:
         game_name = data["name"]
         try:
@@ -257,7 +258,7 @@ def peel(data: Dict[Any, Any]):
         if "name" in data:
             emit_error(data["name"], str(e))
         else:
-            logger.error("No game specified in input.")
+            logger.error("No game specified in input. from peel")
     else:
         game_name = data["name"]
         try:
@@ -302,7 +303,7 @@ def swap(data: Dict[Any, Any]):
         if "name" in data:
             emit_error(data["name"], str(e))
         else:
-            logger.error("No game specified in input.")
+            logger.error("No game specified in input. from swap")
     else:
         game_name = data["name"]
         try:
@@ -349,7 +350,7 @@ def bananagrams(data: Dict[Any, Any]):
         if "name" in data:
             emit_error(data["name"], str(e))
         else:
-            logger.error("No game specified in input.")
+            logger.error("No game specified in input. from bananagrams")
     else:
         game_name = data["name"]
         try:
@@ -388,7 +389,7 @@ def continue_game(data: Dict[Any, Any]):
         if "name" in data:
             emit_error(data["name"], str(e))
         else:
-            logger.error("No game specified in input.")
+            logger.error("No game specified in input. from continue_game")
     else:
         game_name = data["name"]
         try:
@@ -426,14 +427,14 @@ def reset(data: Dict[Any, Any]):
         if "name" in data:
             emit_error(data["name"], str(e))
         else:
-            logger.error("No game specified in input.")
+            logger.error("No game specified in input. from reset")
     else:
         game_name = data["name"]
         try:
             game = all_games[game_name]
         except KeyError:
-            logger.warning(f"Could not find the game named {game_name}.")
-            emit_error(game_name, f"Could not find the game named {game_name}.")
+            logger.warning(f"Could not find the game named {game_name}. from reset")
+            emit_error(game_name, f"Could not find the game named {game_name}. from reset")
             return
 
         game.reset()

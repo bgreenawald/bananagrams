@@ -23,7 +23,7 @@ export class MenuGameplayComponent implements OnInit {
   public tilesRemaining: number;
   public playerID: string;
 
-  private message$ = this.app.getMessages();
+  // private message$ = this.app.getMessages();
 
   constructor(
     private app: AppComponent,
@@ -35,7 +35,6 @@ export class MenuGameplayComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.socketSubscribe();
 
     this.listenToStore();
   }
@@ -203,14 +202,14 @@ export class MenuGameplayComponent implements OnInit {
     return [minRow, maxRow, minColumn, maxColumn];
   }
 
-  socketSubscribe = () => {
-    this.message$.
-      subscribe(value => {
-        if (value.data.tiles_remaining) {
-          this.tilesRemaining = value.data.tiles_remaining
-        }
-      },
-        err => this.errorService.parseError(err)
-      )
-  }
+  // socketSubscribe = () => {
+  //   this.message$.
+  //     subscribe(value => {
+  //       if (value.data.tiles_remaining) {
+  //         this.tilesRemaining = value.data.tiles_remaining
+  //       }
+  //     },
+  //       err => this.errorService.parseError(err)
+  //     )
+  // }
 }

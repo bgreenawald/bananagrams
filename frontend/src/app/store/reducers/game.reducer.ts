@@ -12,7 +12,7 @@ const initialState: any = {
     gameData: {}
 }
 
-export function gameReducer(state: Models.GameState = initialState, action: Actions.GameActions): any {
+export function gameReducer(state: Models.GameState = initialState, action: Actions.GameActionTypes): any {
     switch (action.type) {
         case Actions.UPDATE_STORE:
             return { ...state, ...action.payload };
@@ -27,8 +27,7 @@ export function gameReducer(state: Models.GameState = initialState, action: Acti
             return {
                 ...state,
                 loading: false,
-                loaded: true,
-                reservedGameIDs: action.payload
+                loaded: true
             }
         case Actions.LOAD_GAME_FAIL:
             return {

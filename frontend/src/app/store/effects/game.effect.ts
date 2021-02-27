@@ -4,7 +4,7 @@ import * as endpointServices from '../../services/api.service';
 import * as SocketServices from '../../services/socket.service';
 
 import { Effect, Actions, ofType, createEffect } from '@ngrx/effects';
-import { switchMap, map, catchError, mergeMap, mapTo, exhaustMap } from 'rxjs/operators';
+import { switchMap, map, catchError, mergeMap, mapTo, exhaustMap, pluck } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs';
 
@@ -38,23 +38,27 @@ export class GameEffects {
         )
     )
 
-    enterRoom$ = createEffect(() =>
+    joinRoom$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(GameActions.OPEN_SOCKET),
-            map(action => {
-                this.socketService.connectToSocket(action.gameID)
-                return new GameActions.LoadGameSuccess()
-            }
-            )
+            ofType(GameActions.JOIN_ROOM),
+            pluck('gameID'),
+            map(gameID => {
+                console.log('this is the gameid from effects', gameID)
+                this.socketService.joinRoom(gameID)
+                return new GameActions.SuccessJoinRoom()
+            })
         )
     )
 
     loadOrCreateGame$ = createEffect(() =>
         this.actions$.pipe(
             ofType(GameActions.LOAD_OR_CREATE_GAME),
-        )).subscribe(action =>
-            this.socketService.loadOrCreateGame(action.gameID)
-        )
+            pluck('gameID'),
+            map(gameID => {
+                this.socketService.loadOrCreateGame(gameID)
+                return new GameActions.LoadGameSuccess()
+            })
+        ))
 
     openSocket$ = createEffect(() =>
         this.actions$.pipe(
@@ -66,12 +70,13 @@ export class GameEffects {
                         map(response => {
                             if (response.status_code !== 200) {
                                 console.log('error from socket server', response)
-                                throw `error: ${response.message}`
+                                // throw `error: ${response.message}` throw the error in the action
+                                return new GameActions.FailOpenSocket(response.message, JSON.parse(response.payload));
                             }
 
                             switch (response.message) {
                                 case (SocketSuccessResponses.GameLoaded):
-                                    new GameActions.UpdateSocketData(response.message, JSON.parse(response.payload));
+                                    return new GameActions.UpdateSocketData(response.message, JSON.parse(response.payload));
                             }
                         }
                         ),

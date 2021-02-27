@@ -35,7 +35,7 @@ export class LobbyComponent implements OnInit {
   public playerID: string;
   public playersInLobby: string[] = [];
   public error: string;
-  private messages$ = this.app.getMessages();
+  // private messages$ = this.app.getMessages();
 
   constructor(
     public app: AppComponent,
@@ -45,37 +45,39 @@ export class LobbyComponent implements OnInit {
     private socket: Socket,
     private socketService: SocketService,
     private _store: Store<Models.GameState>,
-    private action$: Actions<GameActionTypes>
+    private action$: Actions<GameActions.GameActionTypes>
   ) { }
 
   ngOnInit(): void {
     this.checkCache();
     this.listenToStore();  // probably need to destroy this??
-    this.loadLobby();
+    this.getGameID();
   }
 
   getGameID = () => {
     this._store.pipe(select(fromStore.selectGameID)).subscribe(gameID => {
       this.gameID = gameID;
-      console.log('game id is', gameID)
+      console.log('game id is', this.gameID)
+      this.loadLobby();
     });
   }
 
 
   loadLobby = () => {
-    this._store.dispatch(new fromStore.OpenSocket(this.gameID))
     this.action$.pipe(
-      ofType(GameActions.LOAD_GAME_SUCCESS)
-    ).subscribe(() =>
+      ofType(GameActions.SUCCESS_JOIN_ROOM)
+    ).subscribe(() => {
+      console.log('found room load success')
       this._store.dispatch(new fromStore.LoadOrCreateGame(this.gameID))
-    )
+    })
+    this._store.dispatch(new fromStore.JoinRoom(this.gameID))
   }
 
   listenToStore = () => {
     // this._store.pipe(select(fromStore.getPlayerIDSelector)).subscribe(id => {
     //   console.log('player id', id)
     //   this.playerID = id;
-    //   this.autoJoin(this.playerID);
+    //   // this.autoJoin(this.playerID);
     // })
     this._store.pipe(select(fromStore.getGameDataSelector)).subscribe(gameData => this.playersInLobby = gameData.players)
   }
@@ -91,10 +93,7 @@ export class LobbyComponent implements OnInit {
     // TODO: disable join the game button if input is empty
 
     this._store.dispatch(new fromStore.SetPlayerId(this.gameID, playerID));
-    console.log("submitted player name", playerID)
     localStorage.setItem("player_id", playerID);
-
-    // this.socketService.playerJoin(this.gameID, playerID);
   }
 
   startGame = (): void => {

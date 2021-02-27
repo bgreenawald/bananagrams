@@ -31,7 +31,6 @@ export class LandingComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this._store.dispatch(new fromStore.LoadReservedGameIDs())
     this._generateNewID();
     localStorage.clear();
     this._getReservedIDsFromStore();

@@ -30,6 +30,7 @@ export const SET_RESERVED_GAME_IDS = '[Effects via Landing] Response received: d
 export const LOAD_OR_CREATE_GAME = '[Lobby] Load or Create New Game from socket server';
 export const SUCCESS_JOIN_ROOM = '[Lobby] Room successfully joined';
 export const FAIL_OPEN_SOCKET = '[App] Could not connect to socket';
+export const SOCKET_READY = '[App] Now receiving socket messages';
 
 export class Loading implements Action {
     readonly type = LOADING;
@@ -94,4 +95,8 @@ export class FailOpenSocket implements Action {
     constructor(public error: string, public response: any) { };
 }
 
-export type GameActionTypes = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID | LoadReservedGameIDs | SetReservedGameIDs | LoadOrCreateGame | JoinRoom | SuccessJoinRoom | FailOpenSocket;
+export class SocketReady implements Action {
+    readonly type = SOCKET_READY;
+}
+
+export type GameActionTypes = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID | LoadReservedGameIDs | SetReservedGameIDs | LoadOrCreateGame | JoinRoom | SuccessJoinRoom | FailOpenSocket | SocketReady;

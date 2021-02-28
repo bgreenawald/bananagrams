@@ -116,7 +116,7 @@ def emit_game(game_name: str, game: Game, msg: str):
         },
         room=game_name,
     )
-    logger.info(f"{request.sid} has successfully rendered their game")
+    logger.info(f"{request.sid} has successfully rendered their game with messagee {msg}")
 
 
 @socketio.on("load_game")

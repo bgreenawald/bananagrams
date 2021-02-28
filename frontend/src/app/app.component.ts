@@ -80,7 +80,10 @@ export class AppComponent implements OnInit {
   openSocket = (): void => {
     console.log("OPENING A NEW SOCKET LISTENER")
     this._socketStream$ = this.socketService.receive();
+    this._store.dispatch(new fromStore.SocketReady());
+
     this._socketSubscription$ = this._socketStream$.subscribe(response => {
+      console.log("received new response", response)
 
       if (response.status_code !== 200) {
         this._store.dispatch(new fromStore.LoadGameFail(response.message));
@@ -88,11 +91,13 @@ export class AppComponent implements OnInit {
       }
 
       const resp = this.formatRawResponse(response)
+      this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
 
-      switch (resp.message) {
-        case (SocketSuccessResponses.GameLoaded):
-          this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
-      }
+
+      // switch (resp.message) {
+      //   case (SocketSuccessResponses.GameLoaded):
+      //     this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
+      // }
     }
     )
   }

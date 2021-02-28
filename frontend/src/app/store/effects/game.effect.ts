@@ -43,7 +43,6 @@ export class GameEffects {
             ofType(GameActions.JOIN_ROOM),
             pluck('gameID'),
             map(gameID => {
-                console.log('this is the gameid from effects', gameID)
                 this.socketService.joinRoom(gameID)
                 return new GameActions.SuccessJoinRoom()
             })
@@ -69,7 +68,6 @@ export class GameEffects {
                     return this.socketService.receive().pipe(
                         map(response => {
                             if (response.status_code !== 200) {
-                                console.log('error from socket server', response)
                                 // throw `error: ${response.message}` throw the error in the action
                                 return new GameActions.FailOpenSocket(response.message, JSON.parse(response.payload));
                             }

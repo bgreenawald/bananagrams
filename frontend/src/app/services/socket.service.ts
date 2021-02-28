@@ -39,6 +39,10 @@ export class SocketService {
     private socket: Socket
   ) { }
 
+  public disconnect = () => {
+    this.socket.disconnect();
+  }
+
   public playerJoin = (gameID: string, username: string): void => {
     this.socket.emit("player_join", {
       "name": gameID,
@@ -47,7 +51,6 @@ export class SocketService {
   }
 
   public joinRoom = (gameID: string): void => {
-    console.log('socket is joining with game id of:', gameID)
     this.socket.emit("join", {
       "name": gameID
     })

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 
@@ -8,7 +8,7 @@ import * as fromStore from './../../store';
 import * as Models from './../../models';
 import { ApiService } from '../../services/api.service';
 import { Actions } from '@ngrx/effects';
-import { filter } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-landing',
@@ -19,7 +19,9 @@ export class LandingComponent implements OnInit {
   public reservedGameIDs: any;
   public suggestedID: number;
   public error: string;
+  public ngDestroyed$ = new Subject();
   private baseURL = "http://localhost:5000/api/";
+
 
   constructor(
     private apiService: ApiService,
@@ -32,13 +34,17 @@ export class LandingComponent implements OnInit {
 
   ngOnInit(): void {
     this._generateNewID();
-    localStorage.clear();
+    // localStorage.clear();
     this._store.dispatch(new fromStore.LoadReservedGameIDs())
     this._getReservedIDsFromStore();
   }
 
+  public ngOnDestroy() {
+    this.ngDestroyed$.next();
+  }
+
   private _getReservedIDsFromStore = () => {
-    this._store.select(fromStore.getReservedGameIDs).subscribe(gameIDs => this.reservedGameIDs = gameIDs)
+    this._store.select(fromStore.getReservedGameIDs).pipe(takeUntil(this.ngDestroyed$)).subscribe(gameIDs => this.reservedGameIDs = gameIDs)
   }
 
   private _generateNewID = (): void => {

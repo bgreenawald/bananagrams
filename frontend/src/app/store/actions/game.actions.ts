@@ -18,7 +18,7 @@ export class UpdateUserData implements Action {
 // load pizzas
 export const LOADING = '[Landing] Load Game Data';
 export const LOAD_USER = '[Landing] Load User Data';
-export const LOAD_GAME_SUCCESS = '[Landing] Load Game Data Success';
+export const LOAD_GAME_SUCCESS = '[Lobby] Load Game Data Success';
 export const LOAD_GAME_FAIL = '[Landing] Error received from socket server';
 export const OPEN_SOCKET = '[Any] Connect to Socket Server';
 export const UPDATE_SOCKET_DATA = '[Any] Received Data from Socket Server';

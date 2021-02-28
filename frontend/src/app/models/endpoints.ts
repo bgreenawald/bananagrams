@@ -21,4 +21,5 @@ export interface GameState {
     loaded: boolean;
     loading: boolean;
     playerID: string;
+    unavailableIDs: string[];
 }

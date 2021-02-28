@@ -31,11 +31,11 @@ export class AppComponent implements OnInit {
   public playersInLobby: string[];
   public tiles: string[];
   private playersTiles: string[];
-  private _socketStream$;
   private _socketSubscription$;
   private openModal$ = this.messageBusService.openModal$;
   private _state$: Observable<Models.GameState>;
-  private messages$ = this.socketService.receive();
+  // private _socketStream$ = this.socketService.receive();
+  private _socketStream$: Observable<any>;
 
 
 
@@ -61,6 +61,7 @@ export class AppComponent implements OnInit {
 
   ngOnDestroy() {
     this._socketSubscription$.unsubscribe();
+    this.socketService.disconnect();
   }
 
   setCachedData = () => {
@@ -76,39 +77,33 @@ export class AppComponent implements OnInit {
   // better name for this is, listen to socket events server observable and parse response data
   // better named getSocketResponseData or socketResponseData$
 
-
-  getMessages = (): Observable<any> => {
-    // send off different actions in response to different socket messages? 
-    return this.messages$.pipe(
-      map(resp => {
-        console.log(resp.message)
-        if (resp.status_code !== 200) throw `error: ${resp.message}`
-        const value = {
-          "message": resp.message,
-          "status_code": resp.status_code,
-          "data": JSON.parse(resp.payload)
-        };
-        return value;
-      }
-      ),
-      catchError(errorMessage => throwError(errorMessage))
-    )
-  }
-
   openSocket = (): void => {
+    console.log("OPENING A NEW SOCKET LISTENER")
     this._socketStream$ = this.socketService.receive();
     this._socketSubscription$ = this._socketStream$.subscribe(response => {
-      console.log("SOCKET RESPONSE", response)
-      if (response.status_code !== 200) this._store.dispatch(new fromStore.LoadGameFail(response.message));
 
-      switch (response.message) {
+      if (response.status_code !== 200) {
+        this._store.dispatch(new fromStore.LoadGameFail(response.message));
+        return;
+      }
+
+      const resp = this.formatRawResponse(response)
+
+      switch (resp.message) {
         case (SocketSuccessResponses.GameLoaded):
-          this._store.dispatch(new fromStore.UpdateSocketData(response.message, JSON.parse(response.payload)));
+          this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
       }
     }
     )
   }
 
+  formatRawResponse = rawData => {
+    return {
+      "message": rawData.message,
+      "status_code": rawData.status_code,
+      "payload": JSON.parse(rawData.payload)
+    };
+  }
 
   handleClick = (e) => {
     // is the clicked element NOT the swap button

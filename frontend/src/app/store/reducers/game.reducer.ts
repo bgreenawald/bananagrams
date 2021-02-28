@@ -37,7 +37,6 @@ export function gameReducer(state: Models.GameState = initialState, action: Acti
                 error: action.errorMessage
             }
         case Actions.UPDATE_SOCKET_DATA:
-            console.log('Socket message received:', action.message)
             return {
                 ...state,
                 gameData: action.payload
@@ -58,10 +57,7 @@ export function gameReducer(state: Models.GameState = initialState, action: Acti
         case Actions.SET_RESERVED_GAME_IDS:
             return {
                 ...state,
-                gameData: {
-                    ...state.gameData,
-                    unavailableIDs: action.gameIDs
-                }
+                unavailableIDs: action.gameIDs
             }
         default:
             return state;

@@ -4,8 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ActionReducerMap, createFeatureSelector, createSelector, Store, select } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
 
-import { take } from 'rxjs/operators';
-import { Observable, of, fromEvent, throwError } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
+import { Observable, of, fromEvent, throwError, Subject } from 'rxjs';
 import { catchError, map, tap, first } from 'rxjs/operators';
 
 import { Socket } from 'ngx-socket-io';
@@ -36,6 +36,7 @@ export class LobbyComponent implements OnInit {
   public playersInLobby: string[] = [];
   public error: string;
   // private messages$ = this.app.getMessages();
+  public ngDestroyed$ = new Subject();
 
   constructor(
     public app: AppComponent,
@@ -48,50 +49,55 @@ export class LobbyComponent implements OnInit {
     private action$: Actions<GameActions.GameActionTypes>
   ) { }
 
-  ngOnInit(): void {
-    this.checkCache();
-    this.listenToStore();  // probably need to destroy this??
+  public ngOnInit(): void {
+    this.getPlayersInLobby();  // probably need to destroy this??
     this.getGameID();
   }
 
-  getGameID = () => {
-    this._store.pipe(select(fromStore.selectGameID)).subscribe(gameID => {
-      this.gameID = gameID;
-      console.log('game id is', this.gameID)
-      this.loadLobby();
-    });
+  public ngOnDestroy(): void {
+    this.ngDestroyed$.next();
   }
 
+  getGameID = () => {
+    this._store.pipe(
+      takeUntil(this.ngDestroyed$))
+      .pipe(select(fromStore.selectGameID)).subscribe(gameID => {
+        this.gameID = gameID;
+        this.joinRoom();
+      });
+  }
 
-  loadLobby = () => {
+  joinRoom = () => {
     this.action$.pipe(
-      ofType(GameActions.SUCCESS_JOIN_ROOM)
+      ofType(GameActions.SUCCESS_JOIN_ROOM),
+      take(1)
     ).subscribe(() => {
-      console.log('found room load success')
       this._store.dispatch(new fromStore.LoadOrCreateGame(this.gameID))
+      // this.checkCachedPlayerID();
     })
     this._store.dispatch(new fromStore.JoinRoom(this.gameID))
   }
 
-  listenToStore = () => {
-    // this._store.pipe(select(fromStore.getPlayerIDSelector)).subscribe(id => {
-    //   console.log('player id', id)
-    //   this.playerID = id;
-    //   // this.autoJoin(this.playerID);
-    // })
-    this._store.pipe(select(fromStore.getGameDataSelector)).subscribe(gameData => this.playersInLobby = gameData.players)
+  getPlayersInLobby = () => {
+    this._store
+      .pipe(
+        takeUntil(this.ngDestroyed$))
+      .pipe(select(fromStore.getGameDataSelector))
+      .subscribe(gameData => {
+        console.log("NEW GAME DATA", gameData)
+        const isGameDataLoaded = Object.keys(gameData).length > 0 ? true : false;
+        if (isGameDataLoaded) this.playersInLobby = Object.keys(gameData.players)
+      })
   }
 
-  checkCache = () => {
-    const playerName = localStorage.getItem("player_id");
-    console.log("CACHED NAME", playerName)
-    if (playerName) this.playerJoin(playerName);
+  checkCachedPlayerID = () => {
+    this.playerID = localStorage.getItem("player_id");
+    if (this.playerID) this.playerJoin(this.playerID);
   }
 
   playerJoin = (playerID: string): void => {
-    if (!playerID) return;
-    // TODO: disable join the game button if input is empty
 
+    // TODO: disable join the game button if input is empty
     this._store.dispatch(new fromStore.SetPlayerId(this.gameID, playerID));
     localStorage.setItem("player_id", playerID);
   }

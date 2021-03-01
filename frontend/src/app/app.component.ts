@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute, RouterState, ActivationEnd } from '@angular/router';
 
 import { Observable, of, fromEvent, throwError } from 'rxjs';
-import { catchError, map, tap, first, filter, takeUntil, finalize, switchMap } from 'rxjs/operators';
+import { catchError, map, tap, first, filter, takeUntil, finalize, switchMap, take } from 'rxjs/operators';
 
 import { Store, select } from '@ngrx/store';
 import * as fromStore from './store';
@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
   title = 'frontend';
   public gameID: string; // TO REMOVE
   public playerID: string;
-  public playersInLobby: string[];
+  public playersInRoom: string[];
   public tiles: string[];
   private playersTiles: string[];
   private _socketSubscription$;
@@ -57,6 +57,7 @@ export class AppComponent implements OnInit {
     //   console.log('testing')
     // })
     this.openSocket();
+    this.setDataFromStore();
   }
 
   ngOnDestroy() {
@@ -64,6 +65,23 @@ export class AppComponent implements OnInit {
     this.socketService.disconnect();
   }
 
+  setDataFromStore = () => {
+    this._store
+      .select(fromStore.getAllPlayers)
+      .subscribe(
+        playersArray => {
+          this.playersInRoom = playersArray;
+        }
+      )
+
+    this._store
+      .select(fromStore.getPlayerIDSelector)
+      .subscribe(
+        username => {
+          this.playerID = username;
+        }
+      )
+  }
   setCachedData = () => {
     const cachedPlayerID = localStorage.getItem("player_id");
     // this._store.dispatch(new GameActions.SetPlayerId(this.gameID, cachedPlayerID));
@@ -93,13 +111,37 @@ export class AppComponent implements OnInit {
       const resp = this.formatRawResponse(response)
       this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
 
+      const gameID = resp.payload.id;
 
-      // switch (resp.message) {
-      //   case (SocketSuccessResponses.GameLoaded):
-      //     this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
-      // }
+
+      switch (resp.payload.state) {
+        case "IDLE":
+          this.router.navigate([`/lobby/${gameID}`]);
+          break;
+        case "ACTIVE":
+          if (this.allowedToJoinGame(this.playerID)) {
+            this.router.navigate([`/game/${gameID}`]);
+          }
+          else {
+            // show cannot join game until over
+            this.router.navigate([`**`]);
+          }
+          break;
+        case "ENDGAME":
+          break;
+        case "OVER":
+          this.messageBusService.openModal('review')
+          break;
+        default:
+          this.router.navigate([`**`]);
+          break;
+      }
     }
     )
+  }
+
+  allowedToJoinGame = (playerID: string): boolean => {
+    return this.playersInRoom.includes(this.playerID)
   }
 
   formatRawResponse = rawData => {

@@ -117,6 +117,7 @@ export class LobbyComponent implements OnInit {
   updatePlayerID = (newUsername: string) => {
     this.isEditingName = false;
     // make backend call to update userid. 
+    // IMPORTANT: will not actually update name until endpoint is available
 
   }
 }

@@ -67,7 +67,6 @@ export class SocketService {
   public receive = (): Observable<any> => {
     return Observable.create(observer => {
       this.socket.on("render_game", resp => {
-        console.log("NEW SOCKET RESPONSE", { ...resp, payload: JSON.parse(resp.payload) })
         observer.next(resp)
       })
     })

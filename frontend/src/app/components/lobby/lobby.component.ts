@@ -37,6 +37,7 @@ export class LobbyComponent implements OnInit {
   public error: string;
   // private messages$ = this.app.getMessages();
   public ngDestroyed$ = new Subject();
+  public isEditingName: boolean = false;
 
   constructor(
     public app: AppComponent,
@@ -73,7 +74,7 @@ export class LobbyComponent implements OnInit {
       take(1)
     ).subscribe(() => {
       this._store.dispatch(new fromStore.LoadOrCreateGame(this.gameID))
-      // this.checkCachedPlayerID();
+      this.checkCachedPlayerID();
     })
     this._store.dispatch(new fromStore.JoinRoom(this.gameID))
   }
@@ -82,11 +83,12 @@ export class LobbyComponent implements OnInit {
     this._store
       .pipe(
         takeUntil(this.ngDestroyed$))
-      .pipe(select(fromStore.getGameDataSelector))
-      .subscribe(gameData => {
-        console.log("NEW GAME DATA", gameData)
-        const isGameDataLoaded = Object.keys(gameData).length > 0 ? true : false;
-        if (isGameDataLoaded) this.playersInLobby = Object.keys(gameData.players)
+      .pipe(select(fromStore.getAllPlayers))
+      .subscribe(playersInRoom => {
+        this.playersInLobby = playersInRoom;
+        console.log(playersInRoom)
+        // const isGameDataLoaded = Object.keys(gameData).length > 0 ? true : false;
+        // if (isGameDataLoaded) this.playersInLobby = Object.keys(gameData.players)
       })
   }
 
@@ -106,5 +108,15 @@ export class LobbyComponent implements OnInit {
     this.socket.emit("start_game", {
       "name": this.gameID
     })
+  }
+
+  editPlayerName = () => {
+    this.isEditingName = true;
+  }
+
+  updatePlayerID = (newUsername: string) => {
+    this.isEditingName = false;
+    // make backend call to update userid. 
+
   }
 }

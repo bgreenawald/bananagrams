@@ -49,10 +49,7 @@ export function gameReducer(state: Models.GameState = initialState, action: Acti
         case Actions.SET_GAME_ID:
             return {
                 ...state,
-                gameData: {
-                    ...state.gameData,
-                    id: action.gameID
-                }
+                id: action.gameID
             }
         case Actions.SET_RESERVED_GAME_IDS:
             return {

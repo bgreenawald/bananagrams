@@ -32,3 +32,8 @@ export const getReservedGameIDs = createSelector(
     getGameStateSelector,
     (state: Models.GameState) => state.unavailableIDs
 )
+
+export const getAllPlayers = createSelector(
+    getGameDataSelector,
+    (data: Models.GameData) => data.players ? Object.keys(data.players) : []
+)

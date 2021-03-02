@@ -50,22 +50,21 @@ export class AppComponent implements OnInit {
     private _store: Store<Models.GameState>,
     private _routerStore: Store<any>) { }
 
-  ngOnInit() {
-    this.setCachedData();
+  public ngOnInit() {
     this._state$ = this._store.select(fromStore.getGameStateSelector);
     // this.route.params.subscribe(() => {
     //   console.log('testing')
     // })
-    this.openSocket();
-    this.setDataFromStore();
+    this._openSocket();
+    this._setDataFromStore();
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this._socketSubscription$.unsubscribe();
     this.socketService.disconnect();
   }
 
-  setDataFromStore = () => {
+  private _setDataFromStore = (): void => {
     this._store
       .select(fromStore.getAllPlayers)
       .subscribe(
@@ -82,10 +81,7 @@ export class AppComponent implements OnInit {
         }
       )
   }
-  setCachedData = () => {
-    const cachedPlayerID = localStorage.getItem("player_id");
-    // this._store.dispatch(new GameActions.SetPlayerId(this.gameID, cachedPlayerID));
-  }
+
 
   getPlayers = (): string[] => this.playersTiles;
 
@@ -95,7 +91,7 @@ export class AppComponent implements OnInit {
   // better name for this is, listen to socket events server observable and parse response data
   // better named getSocketResponseData or socketResponseData$
 
-  openSocket = (): void => {
+  private _openSocket = (): void => {
     console.log("OPENING A NEW SOCKET LISTENER")
     this._socketStream$ = this.socketService.receive();
     this._store.dispatch(new fromStore.SocketReady());
@@ -108,7 +104,7 @@ export class AppComponent implements OnInit {
         return;
       }
 
-      const resp = this.formatRawResponse(response)
+      const resp = this._formatRawResponse(response)
       this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
 
       const gameID = resp.payload.id;
@@ -119,7 +115,7 @@ export class AppComponent implements OnInit {
           this.router.navigate([`/lobby/${gameID}`]);
           break;
         case "ACTIVE":
-          if (this.allowedToJoinGame(this.playerID)) {
+          if (this._allowedToJoinGame(this.playerID)) {
             this.router.navigate([`/game/${gameID}`]);
           }
           else {
@@ -140,11 +136,11 @@ export class AppComponent implements OnInit {
     )
   }
 
-  allowedToJoinGame = (playerID: string): boolean => {
+  private _allowedToJoinGame = (playerID: string): boolean => {
     return this.playersInRoom.includes(this.playerID)
   }
 
-  formatRawResponse = rawData => {
+  private _formatRawResponse = (rawData): Models.RawSocketResponse => {
     return {
       "message": rawData.message,
       "status_code": rawData.status_code,
@@ -152,7 +148,7 @@ export class AppComponent implements OnInit {
     };
   }
 
-  handleClick = (e) => {
+  public handleClick = (e): void => {
     // is the clicked element NOT the swap button
     const didClickOutsideSwap: boolean = !e.target.classList.contains('swap');
     const swapButton = document.querySelector('button.swap');

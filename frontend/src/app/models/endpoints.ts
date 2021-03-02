@@ -2,6 +2,8 @@
 // data that comes back from the socket endpoint for player join. 
 
 // JSON object from the socket server
+// example data:
+// payload: "{"id": "827663", "state": "IDLE", "num_players": null, "tiles_remaining": 144, "players": {}, "winning_words": null, "winning_player": null}"
 export interface GameData {
     id: string; // gameID
     num_players: number;
@@ -11,8 +13,6 @@ export interface GameData {
     winning_player: string;
     winning_words: string; // ?
     unavailableIDs: string[];
-    // example data:
-    // payload: "{"id": "827663", "state": "IDLE", "num_players": null, "tiles_remaining": 144, "players": {}, "winning_words": null, "winning_player": null}"
 }
 
 // for front end use only
@@ -22,4 +22,10 @@ export interface GameState {
     loading: boolean;
     playerID: string;
     unavailableIDs: string[];
+}
+
+export interface RawSocketResponse {
+    message: string;
+    status_code: number;
+    payload: any;
 }

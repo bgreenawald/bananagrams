@@ -59,7 +59,7 @@ export class LobbyComponent implements OnInit {
     this.ngDestroyed$.next();
   }
 
-  getGameID = () => {
+  public getGameID = (): void => {
     this._store.pipe(
       takeUntil(this.ngDestroyed$))
       .pipe(select(fromStore.selectGameID)).subscribe(gameID => {
@@ -68,7 +68,7 @@ export class LobbyComponent implements OnInit {
       });
   }
 
-  joinRoom = () => {
+  public joinRoom = (): void => {
     this.action$.pipe(
       ofType(GameActions.SUCCESS_JOIN_ROOM),
       take(1)
@@ -79,7 +79,7 @@ export class LobbyComponent implements OnInit {
     this._store.dispatch(new fromStore.JoinRoom(this.gameID))
   }
 
-  getPlayersInLobby = () => {
+  public getPlayersInLobby = (): void => {
     this._store
       .pipe(
         takeUntil(this.ngDestroyed$))
@@ -92,29 +92,29 @@ export class LobbyComponent implements OnInit {
       })
   }
 
-  checkCachedPlayerID = () => {
+  public checkCachedPlayerID = (): void => {
     this.playerID = localStorage.getItem("player_id");
     if (this.playerID) this.playerJoin(this.playerID);
   }
 
-  playerJoin = (playerID: string): void => {
+  public playerJoin = (playerID: string): void => {
 
     // TODO: disable join the game button if input is empty
     this._store.dispatch(new fromStore.SetPlayerId(this.gameID, playerID));
     localStorage.setItem("player_id", playerID);
   }
 
-  startGame = (): void => {
+  public startGame = (): void => {
     this.socket.emit("start_game", {
       "name": this.gameID
     })
   }
 
-  editPlayerName = () => {
+  public editPlayerName = (): void => {
     this.isEditingName = true;
   }
 
-  updatePlayerID = (newUsername: string) => {
+  public updatePlayerID = (newUsername: string): void => {
     this.isEditingName = false;
     // make backend call to update userid. 
     // IMPORTANT: will not actually update name until endpoint is available

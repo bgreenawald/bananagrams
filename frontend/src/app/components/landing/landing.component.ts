@@ -34,7 +34,6 @@ export class LandingComponent implements OnInit {
 
   ngOnInit(): void {
     this._generateNewID();
-    // localStorage.clear();
     this._store.dispatch(new fromStore.LoadReservedGameIDs())
     this._getReservedIDsFromStore();
   }
@@ -57,13 +56,13 @@ export class LandingComponent implements OnInit {
   public createGame = (id: string) => {
     let submittedID: number = Number(id.trim());
     if (!id) { return; }
-    if (this.isIDUnique(submittedID)) {
+    if (this._isIDUnique(submittedID)) {
       this.router.navigate([`/lobby/${submittedID}`]);
     }
     this.error = "ID not available.  Please choose a different room."
   }
 
-  private isIDUnique = (id: number): boolean => {
+  private _isIDUnique = (id: number): boolean => {
     console.log(this.reservedGameIDs)
     return !this.reservedGameIDs.includes(id);
   }

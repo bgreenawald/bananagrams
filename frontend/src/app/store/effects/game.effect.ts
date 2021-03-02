@@ -21,7 +21,7 @@ export class GameEffects {
 
     playerJoin$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(GameActions.SET_PLAYER_ID),
+            ofType(GameActions.SET_PLAYER_ID)
         )).subscribe(action =>
             this.socketService.playerJoin(action.gameID, action.playerName)
         )
@@ -83,4 +83,11 @@ export class GameEffects {
                 })
             )
     )
+
+    startGame$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(GameActions.START_GAME)
+        )).subscribe(action =>
+            this.socketService.startGame(action.gameID)
+        )
 }

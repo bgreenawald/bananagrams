@@ -31,6 +31,7 @@ export const LOAD_OR_CREATE_GAME = '[Lobby] Load or Create New Game from socket 
 export const SUCCESS_JOIN_ROOM = '[Lobby] Room successfully joined';
 export const FAIL_OPEN_SOCKET = '[App] Could not connect to socket';
 export const SOCKET_READY = '[App] Now receiving socket messages';
+export const START_GAME = '[Lobby] Started the game';
 
 export class Loading implements Action {
     readonly type = LOADING;
@@ -99,4 +100,9 @@ export class SocketReady implements Action {
     readonly type = SOCKET_READY;
 }
 
-export type GameActionTypes = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID | LoadReservedGameIDs | SetReservedGameIDs | LoadOrCreateGame | JoinRoom | SuccessJoinRoom | FailOpenSocket | SocketReady;
+export class StartGame implements Action {
+    readonly type = START_GAME;
+    constructor(public gameID: string) { };
+}
+
+export type GameActionTypes = UpdateStore | UpdateUserData | Loading | LoadUser | LoadGameFail | LoadGameSuccess | OpenSocket | UpdateSocketData | SetPlayerId | SetGameID | LoadReservedGameIDs | SetReservedGameIDs | LoadOrCreateGame | JoinRoom | SuccessJoinRoom | FailOpenSocket | SocketReady | StartGame;

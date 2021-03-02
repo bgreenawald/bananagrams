@@ -109,7 +109,7 @@ export class AppComponent implements OnInit {
 
       const gameID = resp.payload.id;
 
-
+      // ui routing
       switch (resp.payload.state) {
         case "IDLE":
           this.router.navigate([`/lobby/${gameID}`]);

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 
 import { ActionReducerMap, createFeatureSelector, createSelector, Store, select } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
@@ -31,19 +30,15 @@ import * as GameActions from './../../store/actions/game.actions'
 })
 export class LobbyComponent implements OnInit {
   public gameID: string; // numerical game id formatted as a string
-  public playerJoined: boolean = false;
   public playerID: string;
   public playersInLobby: string[] = [];
   public error: string;
-  // private messages$ = this.app.getMessages();
   public ngDestroyed$ = new Subject();
   public isEditingName: boolean = false;
 
   constructor(
     public app: AppComponent,
     private errorService: ErrorService,
-    private route: ActivatedRoute,
-    private router: Router,
     private socket: Socket,
     private socketService: SocketService,
     private _store: Store<Models.GameState>,
@@ -105,9 +100,7 @@ export class LobbyComponent implements OnInit {
   }
 
   public startGame = (): void => {
-    this.socket.emit("start_game", {
-      "name": this.gameID
-    })
+    this._store.dispatch(new fromStore.StartGame(this.gameID));
   }
 
   public editPlayerName = (): void => {

@@ -32,19 +32,20 @@
         <ul id="players">
           <div class="player" *ngFor="let player of playersInLobby">
             <img src="https://www.svgrepo.com/show/58475/bird-hand-drawn-animal-toy.svg" alt="" class="player-icon">
-            <container class="player-info">
+            <div class="player-info">
               <h3>{{player}}</h3>
               <button class="icon-button edit_player_icon" (keydown.enter)="editPlayerName()"
                 (click)="editPlayerName()">
                 <fa-icon [icon]="faEdit"></fa-icon>
               </button>
-            </container>
+            </div>
 
           </div>
 
         </ul>
       </div>
-      <button class="btn btn-primary" id="start_game_button" type="submit" (click)="startGame()">Start</button>
+      <button class="btn btn-primary" id="start_game_button" type="submit" (click)="startGame()"
+        [disabled]="!startButtonEnabled">{{startButtonEnabled ? "Start Game" : "Need at least 2 players"}}</button>
     </div>
 
     <!-- <div id="game_info"></div> -->

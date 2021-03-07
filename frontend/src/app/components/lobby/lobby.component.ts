@@ -36,6 +36,7 @@ export class LobbyComponent implements OnInit {
   public ngDestroyed$ = new Subject();
   public isEditingName: boolean = false;
   public faEdit = faEdit;
+  public startButtonEnabled = false;
 
   constructor(
     public app: AppComponent,
@@ -83,6 +84,7 @@ export class LobbyComponent implements OnInit {
       .pipe(select(fromStore.getAllPlayers))
       .subscribe(playersInRoom => {
         this.playersInLobby = playersInRoom;
+        if (this.playersInLobby.length > 1) this.startButtonEnabled = true;
         console.log(playersInRoom)
         // const isGameDataLoaded = Object.keys(gameData).length > 0 ? true : false;
         // if (isGameDataLoaded) this.playersInLobby = Object.keys(gameData.players)

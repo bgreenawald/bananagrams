@@ -25,7 +25,9 @@ export const selectLoadingStatus = createSelector(
 
 export const getPlayerIDSelector = createSelector(
     getGameStateSelector,
-    (state: Models.GameState) => state.playerID
+    (state: Models.GameState) => {
+        return state.playerID ? state.playerID : localStorage.getItem('player_id')
+    }
 )
 
 export const getReservedGameIDs = createSelector(
@@ -36,4 +38,19 @@ export const getReservedGameIDs = createSelector(
 export const getAllPlayers = createSelector(
     getGameDataSelector,
     (data: Models.GameData) => data.players ? Object.keys(data.players) : []
+)
+
+export const getPlayerTiles = createSelector(
+    getGameDataSelector,
+    getPlayerIDSelector,
+    (data: Models.GameData, playerID: string) => {
+        const playersToTiles: any = data.players;
+        console.log('players to tiles', playersToTiles)
+        const allPlayerIDs = Object.keys(playersToTiles);
+        console.log('data for tiles from effects', allPlayerIDs)
+        for (let i = 0; i < allPlayerIDs.length; i++) {
+            const player = allPlayerIDs[i];
+            if (player === playerID) return playersToTiles[playerID]
+        }
+    }
 )

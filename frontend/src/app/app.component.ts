@@ -51,12 +51,16 @@ export class AppComponent implements OnInit {
     private _routerStore: Store<any>) { }
 
   public ngOnInit() {
+    this._loadCachedData();
     this._state$ = this._store.select(fromStore.getGameStateSelector);
+    this._store.select(fromStore.getPlayerIDSelector).subscribe(playerID => {
+      this.playerID = playerID
+    })
     // this.route.params.subscribe(() => {
     //   console.log('testing')
     // })
-    this._openSocket();
     this._setDataFromStore();
+    // this._openSocket();
   }
 
   public ngOnDestroy() {
@@ -78,8 +82,13 @@ export class AppComponent implements OnInit {
       .subscribe(
         username => {
           this.playerID = username;
+          this._openSocket();
         }
       )
+  }
+
+  private _loadCachedData = () => {
+    this.playerID = localStorage.getItem('player_id');
   }
 
 

@@ -48,6 +48,7 @@ export class LobbyComponent implements OnInit {
   public ngOnInit(): void {
     this.getPlayersInLobby();  // probably need to destroy this??
     this.getGameID();
+    this._listenErrors();
   }
 
   public ngOnDestroy(): void {
@@ -111,6 +112,15 @@ export class LobbyComponent implements OnInit {
     this.isEditingName = false;
     // make backend call to update userid. 
     // IMPORTANT: will not actually update name until endpoint is available
+  }
 
+  private _listenErrors = () => {
+    this.action$.pipe(
+      ofType(GameActions.LOAD_GAME_FAIL)
+    )
+      .subscribe(resp => {
+        console.log(resp)
+        this.error = resp.errorMessage;
+      })
   }
 }

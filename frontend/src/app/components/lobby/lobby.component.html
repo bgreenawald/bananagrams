@@ -27,23 +27,27 @@
     <div id="options" *ngIf="playerID && !isEditingName">
       <div id="players-in-lobby">
         <h2>Players in Lobby:</h2>
+        <p class=" lobby-wait-message">Waiting for other players. Hit "Start" when everyone has joined.</p>
+
         <ul id="players">
           <div class="player" *ngFor="let player of playersInLobby">
             <img src="https://www.svgrepo.com/show/58475/bird-hand-drawn-animal-toy.svg" alt="" class="player-icon">
-            <h3>{{player}}</h3>
-            <button id="edit_player_id" (keydown.enter)="editPlayerName()" (click)="editPlayerName()">
-              edit user name
-            </button>
+            <container class="player-info">
+              <h3>{{player}}</h3>
+              <button class="icon-button edit_player_icon" (keydown.enter)="editPlayerName()"
+                (click)="editPlayerName()">
+                <fa-icon [icon]="faEdit"></fa-icon>
+              </button>
+            </container>
 
           </div>
 
         </ul>
       </div>
-      <p class=" lobby-wait-message">Waiting for other players. Hit "Start" when everyone has joined.</p>
       <button class="btn btn-primary" id="start_game_button" type="submit" (click)="startGame()">Start</button>
     </div>
 
-    <div id="game_info"></div>
+    <!-- <div id="game_info"></div> -->
 
   </div>
 </header>

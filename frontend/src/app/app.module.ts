@@ -32,6 +32,7 @@ import * as fromComponents from './components';
 import { environment } from "../environments/environment";
 import { Routes, RouterModule } from '@angular/router';
 import { CustomSerializer } from './store/selectors/router.selectors';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
 
@@ -71,7 +72,8 @@ export const ROUTES: Routes = [
     StoreDevtoolsModule.instrument(),
     EffectsModule.forRoot(effects),
     StoreRouterConnectingModule.forRoot({ serializer: CustomSerializer }),
-    RouterModule.forChild(ROUTES)
+    RouterModule.forChild(ROUTES),
+    FontAwesomeModule
   ],
   providers: [{ provide: RouterStateSerializer, useClass: CustomSerializer }],
   bootstrap: [AppComponent]

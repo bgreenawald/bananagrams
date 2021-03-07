@@ -8,7 +8,7 @@ import { Observable, of, fromEvent, throwError, Subject } from 'rxjs';
 import { catchError, map, tap, first } from 'rxjs/operators';
 
 import { Socket } from 'ngx-socket-io';
-
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
 import { SocketService } from '../../services/socket.service';
 import { ErrorService } from '../../services/error.service';
@@ -35,6 +35,7 @@ export class LobbyComponent implements OnInit {
   public error: string;
   public ngDestroyed$ = new Subject();
   public isEditingName: boolean = false;
+  public faEdit = faEdit;
 
   constructor(
     public app: AppComponent,

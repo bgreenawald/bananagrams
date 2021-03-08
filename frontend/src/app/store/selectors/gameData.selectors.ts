@@ -44,10 +44,12 @@ export const getPlayerTiles = createSelector(
     getGameDataSelector,
     getPlayerIDSelector,
     (data: Models.GameData, playerID: string) => {
+        console.log('data', data, 'playerID', playerID)
+        if (Object.keys(data).length === 0) return;
+
         const playersToTiles: any = data.players;
-        console.log('players to tiles', playersToTiles)
         const allPlayerIDs = Object.keys(playersToTiles);
-        console.log('data for tiles from effects', allPlayerIDs)
+
         for (let i = 0; i < allPlayerIDs.length; i++) {
             const player = allPlayerIDs[i];
             if (player === playerID) return playersToTiles[playerID]

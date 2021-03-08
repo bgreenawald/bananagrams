@@ -3,8 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { Socket } from 'ngx-socket-io';
 
-import { Observable, of, fromEvent, throwError, Subject } from 'rxjs';
-import { catchError, map, tap, first, takeUntil, take } from 'rxjs/operators';
+import { Observable, of, fromEvent, throwError, Subject, timer } from 'rxjs';
+import { catchError, map, tap, first, takeUntil, take, takeWhile, distinct, debounce, filter } from 'rxjs/operators';
 
 import { Store, select } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
@@ -68,13 +68,11 @@ export class GameComponent implements OnInit {
 
   ngOnInit(): void {
     this._getPlayerID();
-    // this.setGameID();
-    // this.socketSubscribe();
-    this.socketService.loadOrCreateGame(this.gameID);
+    // this._loadGameData();
     this.tileEventListen();
     this._rejoinRoom();
-    // this._loadGameData();  why doesn't this work if on line 76, only on line 95?
     // this._loadBoard();
+    this._initializeTiles();
   }
 
   public ngOnDestroy(): void {
@@ -84,79 +82,59 @@ export class GameComponent implements OnInit {
   private _rejoinRoom = () => {
     // if not yet loaded. 
     this._store.pipe(
-      takeUntil(this._ngDestroyed$),
+      take(1),
       select(Selectors.selectLoadedStatus))
       .subscribe(isLoaded => {
-        if (isLoaded) return;
+        console.log('loading status', isLoaded)
 
+        if (!isLoaded) {
+
+          this._store
+            .select(Selectors.selectGameID)
+            .subscribe(gameID => {
+              this.gameID = gameID;
+            });
+
+          this._store.dispatch(new GameActions.JoinRoom(this.gameID));
+          this._store.dispatch(new GameActions.LoadOrCreateGame(this.gameID));
+
+        }
+      })
+  }
+
+  private _loadGameData = (gameID) => {
+    this._store.pipe(
+      take(1),
+      select(Selectors.selectLoadedStatus)
+    ).subscribe(isLoaded => {
+      if (!isLoaded) {
         this._store
           .select(Selectors.selectGameID)
           .subscribe(gameID => {
             this.gameID = gameID
-            this._loadGameData();
-            this._store.dispatch(new GameActions.JoinRoom(gameID));
+            this._store.dispatch(new GameActions.LoadOrCreateGame(gameID));
           });
+      }
 
-      })
-  }
+      else {
 
-  private _loadGameData = () => {
-    this._action$.pipe(
-      ofType(GameActions.SUCCESS_JOIN_ROOM),
-      take(1)
-    ).subscribe(() => {
-      this._store.dispatch(new GameActions.LoadOrCreateGame(this.gameID));
-      this._loadBoard();
+      }
     })
   }
 
   private _loadBoard = () => {
-    this._action$.pipe(
-      ofType(GameActions.LOAD_GAME_SUCCESS),
-      take(1)
-    ).subscribe(action => {
-      this._action$.pipe(
-        ofType(GameActions.UPDATE_SOCKET_DATA),
-        take(1)
-      ).subscribe(() => {
-        this._store
-          .select(Selectors.getPlayerTiles)
-          .subscribe(tiles => {
-            this.tiles = tiles;
-            this.initializeTiles(this.tiles);
-          });
-      })
-    })
+    this._initializeTiles();
   }
-
-  // setGameID = () => {
-  //   const id = +this.route.snapshot.paramMap.get('id');
-  //   this.gameID = id.toString();
-  // }
 
   _getPlayerID = () => {
     this.playerID = localStorage.getItem("player_id")
   }
 
-  // TODO: refactor
-  // socketSubscribe = () => {
-  //   this._messages$
-  //     .subscribe(value => {
-  //       const tileArray = value.data.players[this.playerID];
-  //       if (value.message === "Game loaded." && !this.tiles) {
-  //         this.initializeTiles(tileArray);
-  //       }
-  //       else this.updateTiles(tileArray);
-  //       this.tiles = tileArray;
-  //     },
-  //       err => this.error = this.errorService.parseError(err)
-  //     )
-  // }
 
   setTiles = (tiles: string[]) => {
     if (tiles.length <= 0) return;
     if (this.benchTiles.length <= 0) {
-      this.initializeTiles(tiles);
+      this._initializeTiles();
     }
     else {
       this.updateTiles(tiles);
@@ -198,7 +176,19 @@ export class GameComponent implements OnInit {
     })
   }
 
-  initializeTiles = (tiles: string[]) => {
+  _initializeTiles = () => {
+    this._store
+      .select(Selectors.getPlayerTiles)
+      .pipe(
+        filter(tiles => !!tiles)
+      )
+      .subscribe(tiles => {
+        this.tiles = tiles;
+        this._renderTiles(this.tiles);
+      });
+  }
+
+  _renderTiles = (tiles: string[]) => {
     let i = 0;
     tiles.forEach(tile => {
       this.benchTiles.push({

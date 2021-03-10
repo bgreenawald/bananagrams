@@ -180,7 +180,8 @@ export class GameComponent implements OnInit {
     this._store
       .select(Selectors.getPlayerTiles)
       .pipe(
-        filter(tiles => !!tiles)
+        filter(tiles => !!tiles),
+        first()
       )
       .subscribe(tiles => {
         this.tiles = tiles;

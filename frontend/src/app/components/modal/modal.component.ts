@@ -53,8 +53,11 @@ export class ModalComponent implements OnInit {
   }
 
   private _listenStore = () => {
-    // this._store.pipe(select(fromStore.getGameStateSelector))
-    // I don't think I need this actually TODO
+    this._store
+      .pipe(select(fromStore.selectGameID))
+      .subscribe(gameID => {
+        this.gameID = gameID;
+      })
   }
 
   handleReset = () => {

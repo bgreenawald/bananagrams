@@ -25,4 +25,4 @@ export class ResetGame implements Action {
     constructor(public gameID: string) { }
 }
 
-export type UserActions = CallBananagrams | UpdatePlayerID | ResetGame;
+export type UserActions = CallBananagrams | UpdatePlayerID | ResetGame; // QUESTION: what is the diff between the action (string) and the export class and this?

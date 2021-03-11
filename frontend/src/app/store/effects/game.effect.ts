@@ -67,8 +67,9 @@ export class GameEffects {
                 switchMap(action => {
                     return this.socketService.receive().pipe(
                         map(response => {
+                            console.log("SOCKET RESPONSE FROM EFFECTS", response)
+                            // QUESTION: why is effects not receiving socket responses?
                             if (response.status_code !== 200) {
-                                // throw `error: ${response.message}` throw the error in the action
                                 return new GameActions.FailOpenSocket(response.message, JSON.parse(response.payload));
                             }
 
@@ -90,4 +91,5 @@ export class GameEffects {
         )).subscribe(action =>
             this.socketService.startGame(action.gameID)
         )
+
 }

@@ -53,12 +53,12 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   peel = () => {
-    if (this.isValidBoard()) {
-      this.socket.emit("peel", {
-        "name": this.gameID
-      })
-    }
-    else this.errorService.displayError('To peel, your bench must be empty and your board must be valid.')
+    // if (this.isValidBoard()) {
+    this.socket.emit("peel", {
+      "name": this.gameID
+    })
+    // }
+    // else this.errorService.displayError('To peel, your bench must be empty and your board must be valid.')
   }
 
 
@@ -101,7 +101,7 @@ export class MenuGameplayComponent implements OnInit {
     }
 
     // Using a queue, process each tile and make sure we can get to every tile
-    let processTiles = [document.querySelector('app-tile')];
+    let processTiles = Array.from(document.querySelectorAll('app-tile'));
     let seenTiles = [];
 
     while (processTiles.length > 0) {

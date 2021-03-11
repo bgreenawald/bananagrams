@@ -17,6 +17,7 @@ import * as GameActions from './store/actions';
 import { SocketSuccessResponses } from './constants';
 
 import * as Models from "./models";
+import * as Constants from "./constants";
 
 @Component({
   selector: 'app-root',
@@ -113,8 +114,18 @@ export class AppComponent implements OnInit {
         return;
       }
 
+
       const resp = this._formatRawResponse(response)
+
       this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
+
+      switch (resp.message) {
+        case Constants.SocketSuccessResponses.Peel:
+          this._store.dispatch(new fromStore.AddPeeledTile());
+        default:
+          console.log(resp)
+      }
+
 
       const gameID = resp.payload.id;
 

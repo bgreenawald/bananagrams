@@ -29,11 +29,11 @@ import * as GameActions from '../../store/actions';
   encapsulation: ViewEncapsulation.None
 })
 export class GameComponent implements OnInit {
-  @HostListener('window:beforeunload', ['$event'])
-  confirmExit($event: any) {
-    $event.preventDefault();
-    $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
-  }
+  // @HostListener('window:beforeunload', ['$event'])
+  // confirmExit($event: any) {
+  //   $event.preventDefault();
+  //   $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
+  // }
   public benchTiles: Tile[] = [];
   public error: string;
   public gameID: string; // numerical game id formatted as a string
@@ -62,17 +62,16 @@ export class GameComponent implements OnInit {
     private errorService: ErrorService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
-    private _store: Store<any>,
+    private _store: Store<Models.GameState>,
     private _action$: Actions<GameActions.GameActionTypes>,
   ) { }
 
   ngOnInit(): void {
     this._getPlayerID();
-    // this._loadGameData();
     this.tileEventListen();
     this._rejoinRoom();
-    // this._loadBoard();
     this._initializeTiles();
+    this._listenUpdateTiles();
   }
 
   public ngOnDestroy(): void {
@@ -163,6 +162,20 @@ export class GameComponent implements OnInit {
         id: lastTileIndex++
       })
     });
+    this.tiles = tiles;
+  }
+
+  _listenUpdateTiles = () => {
+    this._action$.pipe(
+      ofType(GameActions.ADD_PEELED_TILE)
+    ).subscribe(() => {
+      this._store.select(Selectors.getPlayerTiles)
+        .subscribe(allNewTiles => {
+          this.updateTiles(allNewTiles);
+        })
+      console.log("adding new tile")
+
+    })
   }
 
   tileEventListen = () => {

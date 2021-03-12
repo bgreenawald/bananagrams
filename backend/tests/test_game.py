@@ -82,6 +82,40 @@ class testGameMethods(unittest.TestCase):
             else:
                 self.fail()
 
+    def test_change_player_id(self):
+        g = Game("")
+
+        g.join_game("id_1")
+        g.join_game("id_2")
+
+        with self.subTest("Test fail on changing a non-existent ID."):
+            try:
+                g.change_player_id("id_3", "id_4")
+            except GameException:
+                pass
+            else:
+                self.fail()
+
+        with self.subTest("Test fail on changing to an existing ID."):
+            try:
+                g.change_player_id("id_1", "id_2")
+            except GameException:
+                pass
+            else:
+                self.fail()
+
+        g.change_player_id("id_2", "id_3")
+        with self.subTest("Test old ID does not exist in players."):
+            self.assertFalse("id_2" in g.players)
+        with self.subTest("Test new ID exists in players."):
+            self.assertTrue("id_3" in g.players)
+
+        g.start_game()
+        old_tiles = g.players["id_3"]
+        g.change_player_id("id_3", "id_4")
+        with self.subTest("Test tiles remain the same after ID swap."):
+            self.assertEqual(old_tiles, g.players["id_4"])
+
     def test_start_game(self):
         g = Game("")
         g.join_game("id_0")

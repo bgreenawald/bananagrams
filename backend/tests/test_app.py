@@ -121,6 +121,47 @@ def test_player_join(socket_client):
     }
 
 
+def test_change_player_id(socket_client):
+    socket_client.emit("player_join", {"name": "TEST_GAME", "player_id": "p1"})
+    _ = socket_client.get_received()
+    socket_client.emit(
+        "change_player_id",
+        {"name": "TEST_GAME", "old_player_id": "p1", "new_player_id": "p2"},
+    )
+    resp = socket_client.get_received()
+    assert resp[0]["name"] == "render_game"
+    assert len(resp[0]["args"][0]) == 3
+    assert resp[0]["args"][0]["status_code"] == 200
+    assert resp[0]["args"][0]["message"].split("\n")[0] == "Updated player ID p1 to p2."
+    assert json.loads(resp[0]["args"][0]["payload"]) == {
+        "id": "test_game",
+        "state": "IDLE",
+        "num_players": None,
+        "tiles_remaining": 144,
+        "players": {"p2": []},
+        "winning_words": None,
+        "winning_player": None,
+    }
+
+
+def test_change_player_id_fail(socket_client):
+    socket_client.emit("player_join", {"name": "TEST_GAME", "player_id": "p1"})
+    _ = socket_client.get_received()
+    socket_client.emit(
+        "change_player_id",
+        {"name": "TEST_GAME", "old_player_id": "p3", "new_player_id": "p2"},
+    )
+    resp = socket_client.get_received()
+    assert resp[0]["name"] == "render_game"
+    assert len(resp[0]["args"][0]) == 3
+    assert resp[0]["args"][0]["status_code"] == 400
+    assert (
+        resp[0]["args"][0]["message"].split("\n")[0]
+        == "Update player ID failed, old ID does not exist."
+    )
+    assert resp[0]["args"][0]["payload"] == {}
+
+
 def test_start_game(socket_client):
     socket_client.emit("player_join", {"name": "TEST_GAME", "player_id": "p1"})
     _ = socket_client.get_received()

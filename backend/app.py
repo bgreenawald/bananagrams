@@ -200,7 +200,7 @@ def player_join(data: Dict[Any, Any]):
 
 
 @socketio.on("change_player_id")
-def player_join(data: Dict[Any, Any]):
+def change_player_id(data: Dict[Any, Any]):
     """Adds a player to the game.
 
     Args:

@@ -11,7 +11,7 @@ export interface GameData {
     state: string; // enum??
     tiles_remaining: number;
     winning_player: string;
-    winning_words: string; // ?
+    winning_words: any[]; // ?
     unavailableIDs: string[];
 }
 

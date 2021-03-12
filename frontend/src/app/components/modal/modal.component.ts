@@ -27,6 +27,8 @@ export class ModalComponent implements OnInit {
   private _globalClick$ = this._helperService.globalClick$;
   public store$: Observable<any>; // REMOVE
   // private _message$ = this._app.getMessages();
+  public winningPlayer$ = this._store.pipe(select(fromStore.getWinningPlayer));
+  public
 
   constructor(
     private _app: AppComponent,
@@ -57,6 +59,16 @@ export class ModalComponent implements OnInit {
       .pipe(select(fromStore.selectGameID))
       .subscribe(gameID => {
         this.gameID = gameID;
+      })
+
+    this._store.pipe(select(fromStore.getWinningPlayer))
+      .subscribe(winningPlayer => {
+        this.winningPlayer = winningPlayer
+      })
+
+    this._store.pipe(select(fromStore.getWinningWords))
+      .subscribe(words => {
+        this.winningWords = words
       })
   }
 

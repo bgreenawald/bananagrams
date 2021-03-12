@@ -71,16 +71,16 @@ export class MenuGameplayComponent implements OnInit {
 
   // create call bananagrams action
   bananagrams = () => {
-    if (this.isValidBoard()) {
-      const words: string[] = this.getAllWords();
-      // this.socket.emit("bananagrams", {
-      //   "name": this.gameID,
-      //   "player_id": this.playerID,
-      //   "words": words
-      // })
-      this._store.dispatch(new fromStore.CallBananagrams(this.gameID, this.playerID, words))
-    }
-    else this.errorService.displayError('Cannot call bananagrams.  Board is invalid.')
+    // if (this.isValidBoard()) {
+    const words: string[] = this.getAllWords();
+    // this.socket.emit("bananagrams", {
+    //   "name": this.gameID,
+    //   "player_id": this.playerID,
+    //   "words": words
+    // })
+    this._store.dispatch(new fromStore.CallBananagrams(this.gameID, this.playerID, words))
+    // }
+    // else this.errorService.displayError('Cannot call bananagrams.  Board is invalid.')
   }
 
   continueGame = () => {
@@ -190,8 +190,8 @@ export class MenuGameplayComponent implements OnInit {
 
   findFilledArea = (): number[] => {
     let allTiles: any[] = Array.from(document.querySelectorAll('#board app-tile'));
-    let occupiedColumns = allTiles.map((tile: any) => tile.dataset.column);
-    let occupiedRows = allTiles.map((tile: any) => tile.dataset.row);
+    let occupiedColumns = allTiles.map((tile: any) => tile.parentElement.dataset.column);
+    let occupiedRows = allTiles.map((tile: any) => tile.parentElement.dataset.row);
 
 
     const minRow = Math.min(...occupiedRows);

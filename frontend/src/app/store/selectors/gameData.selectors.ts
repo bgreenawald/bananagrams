@@ -40,6 +40,16 @@ export const getAllPlayers = createSelector(
     (data: Models.GameData) => data.players ? Object.keys(data.players) : []
 )
 
+export const getWinningPlayer = createSelector(
+    getGameDataSelector,
+    (socketData: Models.GameData) => socketData.winning_player
+)
+
+export const getWinningWords = createSelector(
+    getGameDataSelector,
+    (socketData: Models.GameData) => socketData.winning_words
+)
+
 export const getPlayerTiles = createSelector(
     getGameDataSelector,
     getPlayerIDSelector,

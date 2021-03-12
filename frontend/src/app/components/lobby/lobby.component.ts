@@ -100,6 +100,7 @@ export class LobbyComponent implements OnInit {
 
     // TODO: disable join the game button if input is empty
     this._store.dispatch(new fromStore.SetPlayerId(this.gameID, playerID));
+    this.playerID = playerID;
     localStorage.setItem("player_id", playerID);
   }
 

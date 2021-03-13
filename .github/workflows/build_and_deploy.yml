@@ -60,8 +60,11 @@ jobs:
         IMAGE_NAME: chalkful_frontend
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $IMAGE_NAME .
-        docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker build \
+          -t $IMAGE_NAME \
+          --cache-from $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+          --build-arg BUILDKIT_INLINE_CACHE=1 .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -75,7 +78,11 @@ jobs:
         IMAGE_NAME: chalkful_backend
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $IMAGE_NAME .
+        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker build \
+          -t $IMAGE_NAME \
+          --cache-from $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+          --build-arg BUILDKIT_INLINE_CACHE=1 .
         docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -87,7 +94,7 @@ jobs:
       run: zip -g deploy.zip Dockerrun.aws.json
 
     - name: Beanstalk Deploy my app
-      uses: einaregilsson/beanstalk-deploy@v4
+      uses: einaregilsson/beanstalk-deploy@v16
       with:
         aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
         aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}

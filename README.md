@@ -4,7 +4,7 @@ An online version of the game Bananagrams. The frontend and the backend are sepe
 
 ## Setup - Backend
 
-This app runs on Python 3 and uses *poetry* to maintain dependencies. Assuming you already have poetry installed, you can simply run
+This app runs on Python 3 and uses *poetry* to maintain dependencies. Assuming you already have poetry installed and that you are in the *backend* directory, you can simply run
 
 ```bash
 # 'poetry' must be installed first.
@@ -34,7 +34,7 @@ python app.py
 ```
 
 ## Test - Backend
-To test the backend, make sure you have the correct virtual environment setup and run
+To test the backend, make sure you have the correct virtual environment setup and are in the *backend* directory, and run
 ```bash
 pytest tests/
 ```

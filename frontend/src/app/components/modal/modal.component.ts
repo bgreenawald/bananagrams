@@ -21,7 +21,7 @@ export class ModalComponent implements OnInit {
   public open: boolean;
   public modalType: string;
   public gameID: string;
-  public winningWords: any[];
+  public winningWords: any[] = [];
   public winningPlayer: string;
   private _openModal$ = this.messageBusService.openModal$;
   private _globalClick$ = this._helperService.globalClick$;
@@ -68,7 +68,12 @@ export class ModalComponent implements OnInit {
 
     this._store.pipe(select(fromStore.getWinningWords))
       .subscribe(words => {
-        this.winningWords = words
+        if (!words) return;
+        console.log("WORDS", words)
+        words.forEach((wordPair, index) => {
+          this.winningWords.push([wordPair[0], wordPair[1]])
+        })
+        console.log("winning words", this.winningWords)
       })
   }
 

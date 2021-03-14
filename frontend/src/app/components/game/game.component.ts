@@ -29,28 +29,6 @@ import * as GameActions from '../../store/actions';
   encapsulation: ViewEncapsulation.None
 })
 export class GameComponent implements OnInit {
-  // @HostListener('window:beforeunload', ['$event'])
-  // confirmExit($event: any) {
-  //   $event.preventDefault();
-  //   $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
-  // }
-  public benchTiles: Tile[] = [];
-  public error: string;
-  public gameID: string; // numerical game id formatted as a string
-  public modal: {
-    message: string
-  }
-  public playerJoined: boolean = false;
-  public playerID: string = this.app.playerID;
-  public playersTiles: string[];
-  public tiles: string[];
-  public modalOpen: boolean = false;
-  public confirmMessage: string;
-
-  private openModal$ = this.messageBusService.openModal$;
-  // private _messages$ = this.app.getMessages();
-  private _modifyCell$ = this.eventHandleService.removeCell$;
-  private _ngDestroyed$ = new Subject();
 
 
   constructor(
@@ -65,6 +43,28 @@ export class GameComponent implements OnInit {
     private _store: Store<Models.GameState>,
     private _action$: Actions<GameActions.GameActionTypes>,
   ) { }
+  public benchTiles: Tile[] = [];
+  public error: string;
+  public gameID: string; // numerical game id formatted as a string
+  public modal: {
+    message: string
+  };
+  public playerJoined = false;
+  public playerID: string = this.app.playerID;
+  public playersTiles: string[];
+  public tiles: string[];
+  public modalOpen = false;
+  public confirmMessage: string;
+
+  private openModal$ = this.messageBusService.openModal$;
+  // private _messages$ = this.app.getMessages();
+  private _modifyCell$ = this.eventHandleService.removeCell$;
+  private _ngDestroyed$ = new Subject();
+  @HostListener('window:beforeunload', ['$event'])
+  confirmExit($event: any) {
+    $event.preventDefault();
+    $event.returnValue = 'Are you sure you want to leave? This will clear your board.';
+  }
 
   ngOnInit(): void {
     this._getPlayerID();
@@ -79,7 +79,7 @@ export class GameComponent implements OnInit {
   }
 
   private _rejoinRoom = () => {
-    // if not yet loaded. 
+    // if not yet loaded.
     this._store.pipe(
       take(1),
       select(Selectors.selectLoadedStatus))
@@ -97,7 +97,7 @@ export class GameComponent implements OnInit {
           this._store.dispatch(new GameActions.LoadOrCreateGame(this.gameID));
 
         }
-      })
+      });
   }
 
   private _loadGameData = (gameID) => {
@@ -109,7 +109,7 @@ export class GameComponent implements OnInit {
         this._store
           .select(Selectors.selectGameID)
           .subscribe(gameID => {
-            this.gameID = gameID
+            this.gameID = gameID;
             this._store.dispatch(new GameActions.LoadOrCreateGame(gameID));
           });
       }
@@ -117,7 +117,7 @@ export class GameComponent implements OnInit {
       else {
 
       }
-    })
+    });
   }
 
   private _loadBoard = () => {
@@ -125,12 +125,12 @@ export class GameComponent implements OnInit {
   }
 
   _getPlayerID = () => {
-    this.playerID = localStorage.getItem("player_id")
+    this.playerID = localStorage.getItem('player_id');
   }
 
 
   setTiles = (tiles: string[]) => {
-    if (tiles.length <= 0) return;
+    if (tiles.length <= 0) { return; }
     if (this.benchTiles.length <= 0) {
       this._initializeTiles();
     }
@@ -143,8 +143,8 @@ export class GameComponent implements OnInit {
   findDifference = (tiles: string[]) => {
     const oldTiles = this.tiles.slice();
     const newTiles = tiles.slice();
-    for (let letter of oldTiles) {
-      let index = newTiles.indexOf(letter);
+    for (const letter of oldTiles) {
+      const index = newTiles.indexOf(letter);
       if (index > -1) {
         newTiles.splice(index, 1);
       }
@@ -159,7 +159,7 @@ export class GameComponent implements OnInit {
       this.benchTiles.push({
         letter: tile,
         id: lastTileIndex++
-      })
+      });
     });
     this.tiles = tiles;
   }
@@ -171,21 +171,21 @@ export class GameComponent implements OnInit {
       this._store.select(Selectors.getPlayerTiles)
         .subscribe(allNewTiles => {
           this.updateTiles(allNewTiles);
-        })
-      console.log("adding new tile")
+        });
+      console.log('adding new tile');
 
-    })
+    });
   }
 
   tileEventListen = () => {
     // Listen into observable for events, which give index of tile to remove from bench
     this._modifyCell$.subscribe((cellIndexArray: number[]) => {
-      if (cellIndexArray.length > 1) cellIndexArray.sort(((a, b) => b - a));
+      if (cellIndexArray.length > 1) { cellIndexArray.sort(((a, b) => b - a)); }
       cellIndexArray.forEach(index => {
-        this.benchTiles.splice(index, 1)
+        this.benchTiles.splice(index, 1);
       });
-      console.log(this.benchTiles)
-    })
+      console.log(this.benchTiles);
+    });
   }
 
   _initializeTiles = () => {
@@ -205,9 +205,9 @@ export class GameComponent implements OnInit {
     let i = 0;
     tiles.forEach(tile => {
       this.benchTiles.push({
-        'letter': tile,
-        'id': i++
-      })
-    })
+        letter: tile,
+        id: i++
+      });
+    });
   }
 }

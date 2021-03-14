@@ -4,8 +4,8 @@ export interface Tile {
 }
 
 export enum Modals {
-    startNewGameConfirm = "startNewGameConfirm",
-    resetConfirm = "resetConfirm"
+    startNewGameConfirm = 'startNewGameConfirm',
+    resetConfirm = 'resetConfirm'
 }
 
 export interface Cell {

@@ -24,7 +24,7 @@ export class GameEffects {
             ofType(GameActions.SET_PLAYER_ID)
         )).subscribe(action =>
             this.socketService.playerJoin(action.gameID, action.playerName)
-        )
+        );
 
     loadUnavailableGameIDs$ = createEffect(() =>
         this.actions$.pipe(
@@ -36,28 +36,28 @@ export class GameEffects {
                 )
             )
         )
-    )
+    );
 
     joinRoom$ = createEffect(() =>
         this.actions$.pipe(
             ofType(GameActions.JOIN_ROOM),
             pluck('gameID'),
             map(gameID => {
-                this.socketService.joinRoom(gameID)
-                return new GameActions.SuccessJoinRoom()
+                this.socketService.joinRoom(gameID);
+                return new GameActions.SuccessJoinRoom();
             })
         )
-    )
+    );
 
     loadOrCreateGame$ = createEffect(() =>
         this.actions$.pipe(
             ofType(GameActions.LOAD_OR_CREATE_GAME),
             pluck('gameID'),
             map(gameID => {
-                this.socketService.loadOrCreateGame(gameID)
-                return new GameActions.LoadGameSuccess()
+                this.socketService.loadOrCreateGame(gameID);
+                return new GameActions.LoadGameSuccess();
             })
-        ))
+        ));
 
     openSocket$ = createEffect(() =>
         this.actions$.pipe(
@@ -67,7 +67,7 @@ export class GameEffects {
                 switchMap(action => {
                     return this.socketService.receive().pipe(
                         map(response => {
-                            console.log("SOCKET RESPONSE FROM EFFECTS", response)
+                            console.log('SOCKET RESPONSE FROM EFFECTS', response);
                             // QUESTION: why is effects not receiving socket responses?
                             if (response.status_code !== 200) {
                                 return new GameActions.FailOpenSocket(response.message, JSON.parse(response.payload));
@@ -80,16 +80,16 @@ export class GameEffects {
                         }
                         ),
                         catchError(errorMessage => throwError(errorMessage))
-                    )
+                    );
                 })
             )
-    )
+    );
 
     startGame$ = createEffect(() =>
         this.actions$.pipe(
             ofType(GameActions.START_GAME)
         )).subscribe(action =>
             this.socketService.startGame(action.gameID)
-        )
+        );
 
 }

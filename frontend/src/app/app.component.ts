@@ -9,15 +9,15 @@ import * as fromStore from './store';
 
 import { Socket } from 'ngx-socket-io';
 import { SocketService } from './services/socket.service';
-import { HelperService } from './services/helper.service'
+import { HelperService } from './services/helper.service';
 import { ErrorService } from './services/error.service';
 import { MessageBusService } from './services/message-bus.service';
 
 import * as GameActions from './store/actions';
 import { SocketSuccessResponses } from './constants';
 
-import * as Models from "./models";
-import * as Constants from "./constants";
+import * as Models from './models';
+import * as Constants from './constants';
 
 @Component({
   selector: 'app-root',
@@ -35,7 +35,6 @@ export class AppComponent implements OnInit {
   private _socketSubscription$;
   private openModal$ = this.messageBusService.openModal$;
   private _state$: Observable<Models.GameState>;
-  // private _socketStream$ = this.socketService.receive();
   private _socketStream$: Observable<any>;
 
 
@@ -55,13 +54,9 @@ export class AppComponent implements OnInit {
     this._loadCachedData();
     this._state$ = this._store.select(fromStore.getGameStateSelector);
     this._store.select(fromStore.getPlayerIDSelector).subscribe(playerID => {
-      this.playerID = playerID
-    })
-    // this.route.params.subscribe(() => {
-    //   console.log('testing')
-    // })
+      this.playerID = playerID;
+    });
     this._setDataFromStore();
-    // this._openSocket();
   }
 
   public ngOnDestroy() {
@@ -76,7 +71,7 @@ export class AppComponent implements OnInit {
         playersArray => {
           this.playersInRoom = playersArray;
         }
-      )
+      );
 
     this._store
       .select(fromStore.getPlayerIDSelector)
@@ -85,7 +80,7 @@ export class AppComponent implements OnInit {
           this.playerID = username;
           this._openSocket();
         }
-      )
+      );
   }
 
   private _loadCachedData = () => {
@@ -106,7 +101,7 @@ export class AppComponent implements OnInit {
     this._store.dispatch(new fromStore.SocketReady());
 
     this._socketSubscription$ = this._socketStream$.subscribe(response => {
-      console.log("received new response", response)
+      console.log('received new response', response);
 
       if (response.status_code !== 200) {
         this._store.dispatch(new fromStore.LoadGameFail(response.message));
@@ -114,7 +109,7 @@ export class AppComponent implements OnInit {
       }
 
 
-      const resp = this._formatRawResponse(response)
+      const resp = this._formatRawResponse(response);
 
       this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
 
@@ -122,7 +117,7 @@ export class AppComponent implements OnInit {
         case Constants.SocketSuccessResponses.Peel:
           this._store.dispatch(new fromStore.AddPeeledTile());
         default:
-          console.log(resp)
+          console.log(resp);
       }
 
 
@@ -130,10 +125,10 @@ export class AppComponent implements OnInit {
 
       // ui routing
       switch (resp.payload.state) {
-        case "IDLE":
+        case 'IDLE':
           this.router.navigate([`/lobby/${gameID}`]);
           break;
-        case "ACTIVE":
+        case 'ACTIVE':
           if (this._allowedToJoinGame(this.playerID)) {
             this.router.navigate([`/game/${gameID}`]);
           }
@@ -142,28 +137,28 @@ export class AppComponent implements OnInit {
             this.router.navigate([`**`]);
           }
           break;
-        case "ENDGAME":
+        case 'ENDGAME':
           break;
-        case "OVER":
-          this.messageBusService.openModal('review')
+        case 'OVER':
+          this.messageBusService.openModal('review');
           break;
         default:
           this.router.navigate([`**`]);
           break;
       }
     }
-    )
+    );
   }
 
   private _allowedToJoinGame = (playerID: string): boolean => {
-    return this.playersInRoom.includes(this.playerID)
+    return this.playersInRoom.includes(this.playerID);
   }
 
   private _formatRawResponse = (rawData): Models.RawSocketResponse => {
     return {
-      "message": rawData.message,
-      "status_code": rawData.status_code,
-      "payload": JSON.parse(rawData.payload)
+      message: rawData.message,
+      status_code: rawData.status_code,
+      payload: JSON.parse(rawData.payload)
     };
   }
 
@@ -172,10 +167,10 @@ export class AppComponent implements OnInit {
     const didClickOutsideSwap: boolean = !e.target.classList.contains('swap');
     const swapButton = document.querySelector('button.swap');
     if (swapButton && didClickOutsideSwap) {
-      this.helperService.globalClick('click')
+      this.helperService.globalClick('click');
     }
     const isModalOpen: boolean = !!document.querySelector('.modal');
     const didClickOutsideModal: boolean = e.target.classList.contains('overlay');
-    if (isModalOpen && didClickOutsideModal) this.helperService.globalClick('click');
+    if (isModalOpen && didClickOutsideModal) { this.helperService.globalClick('click'); }
   }
 }

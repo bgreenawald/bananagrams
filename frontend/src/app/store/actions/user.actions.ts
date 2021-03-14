@@ -8,7 +8,7 @@ import { Tile, UserData } from './../../models';
 // load pizzas
 export const CALL_BANANAGRAMS = '[Menu Gameplay] User called Bananagrams';
 export const UPDATE_PLAYER_ID = '[Lobby] User submitted player id';
-export const RESET_GAME = '[Game] User reset game'
+export const RESET_GAME = '[Game] User reset game';
 
 export class CallBananagrams implements Action {
     readonly type = CALL_BANANAGRAMS;

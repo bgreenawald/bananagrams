@@ -40,23 +40,23 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   listenToStore = () => {
-    this._store.select(fromStore.getPlayerIDSelector).pipe(take(1)).subscribe(id => this.playerID = id)
-    this._store.select(fromStore.selectGameID).pipe(take(1)).subscribe(id => this.gameID = id)
+    this._store.select(fromStore.getPlayerIDSelector).pipe(take(1)).subscribe(id => this.playerID = id);
+    this._store.select(fromStore.selectGameID).pipe(take(1)).subscribe(id => this.gameID = id);
   }
 
   handleStartNewGame = () => {
-    this.messageBusService.openModal("startNewGameConfirm");
+    this.messageBusService.openModal('startNewGameConfirm');
   }
 
   handleReset = () => {
-    this.messageBusService.openModal("resetConfirm");
+    this.messageBusService.openModal('resetConfirm');
   }
 
   peel = () => {
     // if (this.isValidBoard()) {
-    this.socket.emit("peel", {
-      "name": this.gameID
-    })
+    this.socket.emit('peel', {
+      name: this.gameID
+    });
     // }
     // else this.errorService.displayError('To peel, your bench must be empty and your board must be valid.')
   }
@@ -66,7 +66,7 @@ export class MenuGameplayComponent implements OnInit {
     const tiles: Element[] = Array.from(document.querySelectorAll('#board app-tile'));
     tiles.forEach(tile => {
       tile.classList.add('selected');
-    })
+    });
   }
 
   // create call bananagrams action
@@ -78,20 +78,20 @@ export class MenuGameplayComponent implements OnInit {
     //   "player_id": this.playerID,
     //   "words": words
     // })
-    this._store.dispatch(new fromStore.CallBananagrams(this.gameID, this.playerID, words))
+    this._store.dispatch(new fromStore.CallBananagrams(this.gameID, this.playerID, words));
     // }
     // else this.errorService.displayError('Cannot call bananagrams.  Board is invalid.')
   }
 
   continueGame = () => {
-    this.socket.emit("continue_game", {
-      "name": this.gameID
-    })
+    this.socket.emit('continue_game', {
+      name: this.gameID
+    });
   }
 
   isValidBoard = () => {
-    let board = document.querySelector('#board');
-    let bench = document.getElementById('bench')
+    const board = document.querySelector('#board');
+    const bench = document.getElementById('bench');
 
     const benchTiles = Array.from(document.querySelectorAll('#bench app-tile'));
 
@@ -101,63 +101,63 @@ export class MenuGameplayComponent implements OnInit {
     }
 
     // Using a queue, process each tile and make sure we can get to every tile
-    let processTiles = Array.from(document.querySelectorAll('app-tile'));
-    let seenTiles = [];
+    const processTiles = Array.from(document.querySelectorAll('app-tile'));
+    const seenTiles = [];
 
     while (processTiles.length > 0) {
-      let currentTile = processTiles.pop();
+      const currentTile = processTiles.pop();
 
       if (!seenTiles.includes(currentTile)) {
         seenTiles.push(currentTile);
       }
 
-      let neighborTiles = Array.from(this.getTileNeighbors(currentTile))
+      const neighborTiles = Array.from(this.getTileNeighbors(currentTile));
       neighborTiles.forEach(neighborTile => {
         if (!seenTiles.includes(neighborTile)) {
           processTiles.push(neighborTile);
         }
-      })
+      });
     }
     // If we hit every tile, then we have a valid board
 
-    let allTiles = board.querySelectorAll("app-tile");
-    console.log(seenTiles)
-    console.log(allTiles)
+    const allTiles = board.querySelectorAll('app-tile');
+    console.log(seenTiles);
+    console.log(allTiles);
     return seenTiles.length === allTiles.length;
   }
 
   getTileNeighbors = (tile): any[] => {
-    let neighbors = [];
+    const neighbors = [];
     const parentCell = tile.parentElement;
-    let tileRow = parseInt(parentCell.getAttribute("data-row"));
-    let tileColumn = parseInt(parentCell.getAttribute("data-column"));
-    var board = document.querySelector("#board");
+    const tileRow = parseInt(parentCell.getAttribute('data-row'));
+    const tileColumn = parseInt(parentCell.getAttribute('data-column'));
+    const board = document.querySelector('#board');
 
     const neighborIndices = [
       { row: tileRow - 1, column: tileColumn },
       { row: tileRow + 1, column: tileColumn },
       { row: tileRow, column: tileColumn + 1 },
       { row: tileRow, column: tileColumn - 1 }
-    ]
+    ];
 
     neighborIndices.forEach(neighbor => {
       const neighborTile = board.querySelector(`app-cell[data-row="${neighbor.row}"][data-column="${neighbor.column}"] app-tile`);
-      if (neighborTile) neighbors.push(neighborTile);
+      if (neighborTile) { neighbors.push(neighborTile); }
     });
 
     return neighbors;
   }
 
   getAllWords = (): string[] => {
-    let allWords = [];
+    const allWords = [];
 
     const [minRow, maxRow, minColumn, maxColumn] = this.findFilledArea();
 
     // Get all words row wise
     for (let r = minRow; r <= maxRow; r++) {
-      let curWord = "";
+      let curWord = '';
       for (let c = minColumn; c <= maxColumn + 1; c++) {
-        var curTile = document.querySelectorAll(`#board app-cell[data-row="${r}"][data-column="${c}"] .tile`);
+        const curTile = document.querySelectorAll(`#board app-cell[data-row="${r}"][data-column="${c}"] .tile`);
 
         if (curTile.length > 0) {
           curWord += curTile[0].textContent;
@@ -165,23 +165,23 @@ export class MenuGameplayComponent implements OnInit {
           if (curWord.length > 1) {
             allWords.push(curWord);
           }
-          curWord = "";
+          curWord = '';
         }
       }
     }
 
     // Get all column wise
     for (let c = minColumn; c <= maxColumn; c++) {
-      let curWord = "";
+      let curWord = '';
       for (let r = minRow; r <= maxRow + 1; r++) {
-        var curCell = document.querySelectorAll(`#board app-cell[data-row="${r}"][data-column="${c}"]`)[0];
+        const curCell = document.querySelectorAll(`#board app-cell[data-row="${r}"][data-column="${c}"]`)[0];
         if (curCell.children.length > 0) {
           curWord += curCell.querySelector('.tile').textContent;
         } else {
           if (curWord.length > 1) {
             allWords.push(curWord);
           }
-          curWord = "";
+          curWord = '';
         }
       }
     }
@@ -189,9 +189,9 @@ export class MenuGameplayComponent implements OnInit {
   }
 
   findFilledArea = (): number[] => {
-    let allTiles: any[] = Array.from(document.querySelectorAll('#board app-tile'));
-    let occupiedColumns = allTiles.map((tile: any) => tile.parentElement.dataset.column);
-    let occupiedRows = allTiles.map((tile: any) => tile.parentElement.dataset.row);
+    const allTiles: any[] = Array.from(document.querySelectorAll('#board app-tile'));
+    const occupiedColumns = allTiles.map((tile: any) => tile.parentElement.dataset.column);
+    const occupiedRows = allTiles.map((tile: any) => tile.parentElement.dataset.row);
 
 
     const minRow = Math.min(...occupiedRows);

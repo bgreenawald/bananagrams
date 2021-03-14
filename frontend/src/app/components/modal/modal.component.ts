@@ -28,7 +28,7 @@ export class ModalComponent implements OnInit {
   public store$: Observable<any>; // REMOVE
   // private _message$ = this._app.getMessages();
   public winningPlayer$ = this._store.pipe(select(fromStore.getWinningPlayer));
-  public
+  public;
 
   constructor(
     private _app: AppComponent,
@@ -51,7 +51,7 @@ export class ModalComponent implements OnInit {
     this._openModal$.subscribe((modalType: string) => {
       this.open = true;
       this.modalType = modalType;
-    })
+    });
   }
 
   private _listenStore = () => {
@@ -59,22 +59,22 @@ export class ModalComponent implements OnInit {
       .pipe(select(fromStore.selectGameID))
       .subscribe(gameID => {
         this.gameID = gameID;
-      })
+      });
 
     this._store.pipe(select(fromStore.getWinningPlayer))
       .subscribe(winningPlayer => {
-        this.winningPlayer = winningPlayer
-      })
+        this.winningPlayer = winningPlayer;
+      });
 
     this._store.pipe(select(fromStore.getWinningWords))
       .subscribe(words => {
-        if (!words) return;
-        console.log("WORDS", words)
+        if (!words) { return; }
+        console.log('WORDS', words);
         words.forEach((wordPair, index) => {
-          this.winningWords.push([wordPair[0], wordPair[1]])
-        })
-        console.log("winning words", this.winningWords)
-      })
+          this.winningWords.push([wordPair[0], wordPair[1]]);
+        });
+        console.log('winning words', this.winningWords);
+      });
   }
 
   handleReset = () => {
@@ -84,7 +84,7 @@ export class ModalComponent implements OnInit {
   handleStartNewGame = () => {
     this.socketService.reset(this.gameID);
     // ADD here
-    this._store.dispatch(new fromStore.ResetGame(this.gameID)); // update with a ref to the gameID from the store. 
+    this._store.dispatch(new fromStore.ResetGame(this.gameID)); // update with a ref to the gameID from the store.
   }
 
   handleClose = () => {
@@ -106,7 +106,7 @@ export class ModalComponent implements OnInit {
 
   _listenCloseModals = () => {
     this._globalClick$.subscribe(click => {
-      if (this.open && (this.modalType !== "over")) this.open = false;
-    })
+      if (this.open && (this.modalType !== 'over')) { this.open = false; }
+    });
   }
 }

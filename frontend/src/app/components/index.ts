@@ -24,7 +24,7 @@ export const components: any[] = [
     ModalComponent,
     PageNotFoundComponent,
     TileComponent
-]
+];
 
 export * from './bench/bench.component';
 export * from './board/board.component';

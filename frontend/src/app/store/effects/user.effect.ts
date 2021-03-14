@@ -33,14 +33,14 @@ export class UserEffects {
             ofType(ChalkfulActions.CALL_BANANAGRAMS),
             withLatestFrom(this._store.select(Selectors.getPlayerIDSelector)),
             tap(([action, playerID]) => {
-                this.socketService.userCallBananagrams(action.gameID, playerID, action.words)
+                this.socketService.userCallBananagrams(action.gameID, playerID, action.words);
             })
         ), { dispatch: false }
-    )
+    );
 
     resetGame$ = createEffect(() =>
         this.actions$.pipe(
             ofType(ChalkfulActions.RESET_GAME),
             tap(action => this.socketService.startGame(action.gameID))
-        ), { dispatch: false })
+        ), { dispatch: false });
 }

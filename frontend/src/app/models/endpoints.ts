@@ -1,5 +1,5 @@
 // for message: 'Game loaded.'
-// data that comes back from the socket endpoint for player join. 
+// data that comes back from the socket endpoint for player join.
 
 // JSON object from the socket server
 // example data:

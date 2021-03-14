@@ -14,12 +14,6 @@ import { MessageBusService } from '../../services/message-bus.service';
   styleUrls: ['./cell.component.scss']
 })
 export class CellComponent implements OnInit {
-  @HostBinding('attr.data-row') @Input() row!: number;
-  @HostBinding('attr.data-column') @Input() column!: number;
-  // public childTile: Tile;
-  @Input('tile') childTile: Tile;
-  private _moveCell$ = this.messageBusService.moveChildTile$;
-  private _removeTile$ = this.messageBusService.removeChildTile$;
 
   constructor(
     private cdRef: ChangeDetectorRef,
@@ -27,6 +21,15 @@ export class CellComponent implements OnInit {
     private eventHandler: EventHandleService,
     private messageBusService: MessageBusService
   ) { }
+  @HostBinding('class.filled') get filledClass() { return !!this.childTile; }
+  @HostBinding('attr.data-row') @Input() row!: number;
+  @HostBinding('attr.data-column') @Input() column!: number;
+  // public childTile: Tile;
+  @Input('tile') childTile: Tile;
+  private _moveCell$ = this.messageBusService.moveChildTile$;
+  private _removeTile$ = this.messageBusService.removeChildTile$;
+
+  @HostBinding('class') class = 'cell';
 
   ngOnInit(): void {
     this.listenMoveCell();
@@ -50,7 +53,7 @@ export class CellComponent implements OnInit {
 
   @HostListener('dragend', ['$event'])
   handleDragEnd = ($event) => {
-    $event.target.classList.remove('over')
+    $event.target.classList.remove('over');
   }
 
   @HostListener('drop', ['$event'])
@@ -58,12 +61,9 @@ export class CellComponent implements OnInit {
     this.eventHandler.handleDrop($event);
   }
 
-  @HostBinding('class') class = 'cell';
-  @HostBinding('class.filled') get filledClass() { return !!this.childTile; }
-
   @HostListener('click', ['$event'])
   handleClick = ($event) => {
-    console.log('cell clicked!')
+    console.log('cell clicked!');
   }
 
   listenMoveCell = () => {
@@ -72,9 +72,9 @@ export class CellComponent implements OnInit {
         this.childTile = {
           id: data.id,
           letter: data.letter
-        }
+        };
       }
-    })
+    });
   }
 
   removeChildTile = () => {
@@ -82,6 +82,6 @@ export class CellComponent implements OnInit {
       if ((originCell.row === this.row) && (originCell.column === this.column)) {
         this.childTile = null;
       }
-    })
+    });
   }
 }

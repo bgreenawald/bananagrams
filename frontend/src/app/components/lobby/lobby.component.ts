@@ -21,7 +21,7 @@ import * as Models from './../../models';
 
 import * as fromStore from './../../store';
 import { GameActionTypes } from './../../store';
-import * as GameActions from './../../store/actions/game.actions'
+import * as GameActions from './../../store/actions/game.actions';
 
 @Component({
   selector: 'app-lobby',
@@ -34,7 +34,7 @@ export class LobbyComponent implements OnInit {
   public playersInLobby: string[] = [];
   public error: string;
   public ngDestroyed$ = new Subject();
-  public isEditingName: boolean = false;
+  public isEditingName = false;
   public faEdit = faEdit;
   public startButtonEnabled = false;
 
@@ -71,10 +71,10 @@ export class LobbyComponent implements OnInit {
       ofType(GameActions.SUCCESS_JOIN_ROOM),
       take(1)
     ).subscribe(() => {
-      this._store.dispatch(new fromStore.LoadOrCreateGame(this.gameID))
+      this._store.dispatch(new fromStore.LoadOrCreateGame(this.gameID));
       this.checkCachedPlayerID();
-    })
-    this._store.dispatch(new fromStore.JoinRoom(this.gameID))
+    });
+    this._store.dispatch(new fromStore.JoinRoom(this.gameID));
   }
 
   public getPlayersInLobby = (): void => {
@@ -84,16 +84,16 @@ export class LobbyComponent implements OnInit {
       .pipe(select(fromStore.getAllPlayers))
       .subscribe(playersInRoom => {
         this.playersInLobby = playersInRoom;
-        if (this.playersInLobby.length > 1) this.startButtonEnabled = true;
-        console.log(playersInRoom)
+        if (this.playersInLobby.length > 1) { this.startButtonEnabled = true; }
+        console.log(playersInRoom);
         // const isGameDataLoaded = Object.keys(gameData).length > 0 ? true : false;
         // if (isGameDataLoaded) this.playersInLobby = Object.keys(gameData.players)
-      })
+      });
   }
 
   public checkCachedPlayerID = (): void => {
-    this.playerID = localStorage.getItem("player_id");
-    if (this.playerID) this.playerJoin(this.playerID);
+    this.playerID = localStorage.getItem('player_id');
+    if (this.playerID) { this.playerJoin(this.playerID); }
   }
 
   public playerJoin = (playerID: string): void => {
@@ -101,7 +101,7 @@ export class LobbyComponent implements OnInit {
     // TODO: disable join the game button if input is empty
     this._store.dispatch(new fromStore.SetPlayerId(this.gameID, playerID));
     this.playerID = playerID;
-    localStorage.setItem("player_id", playerID);
+    localStorage.setItem('player_id', playerID);
   }
 
   public startGame = (): void => {
@@ -114,7 +114,7 @@ export class LobbyComponent implements OnInit {
 
   public updatePlayerID = (newUsername: string): void => {
     this.isEditingName = false;
-    // make backend call to update userid. 
+    // make backend call to update userid.
     // IMPORTANT: will not actually update name until endpoint is available
   }
 
@@ -123,8 +123,8 @@ export class LobbyComponent implements OnInit {
       ofType(GameActions.LOAD_GAME_FAIL)
     )
       .subscribe(resp => {
-        console.log(resp)
+        console.log(resp);
         this.error = resp.errorMessage;
-      })
+      });
   }
 }

@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Socket } from 'ngx-socket-io';
 
-import { environment } from "../../environments/environment";
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class ApiService {
   ) { }
 
   getIDs(): Observable<string[]> {
-    return this.http.get<any>(this.baseURL + "get_names")
+    return this.http.get<any>(this.baseURL + 'get_names')
       .pipe(
         map(resp => resp.ids),
         catchError(this.handleError<any>('getIDs', []))
@@ -33,10 +33,10 @@ export class ApiService {
    */
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-      console.error(error)
+      console.error(error);
       console.log(`${operation} failed: ${error.message}`);
       return of(result as T);
-    }
+    };
   }
 
 }

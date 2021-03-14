@@ -20,7 +20,7 @@ export class LandingComponent implements OnInit {
   public suggestedID: number;
   public error: string;
   public ngDestroyed$ = new Subject();
-  private baseURL = "http://localhost:5000/api/";
+  private baseURL = 'http://localhost:5000/api/';
 
 
   constructor(
@@ -34,7 +34,7 @@ export class LandingComponent implements OnInit {
 
   ngOnInit(): void {
     this._generateNewID();
-    this._store.dispatch(new fromStore.LoadReservedGameIDs())
+    this._store.dispatch(new fromStore.LoadReservedGameIDs());
     this._getReservedIDsFromStore();
   }
 
@@ -43,27 +43,27 @@ export class LandingComponent implements OnInit {
   }
 
   private _getReservedIDsFromStore = () => {
-    this._store.select(fromStore.getReservedGameIDs).pipe(takeUntil(this.ngDestroyed$)).subscribe(gameIDs => this.reservedGameIDs = gameIDs)
+    this._store.select(fromStore.getReservedGameIDs).pipe(takeUntil(this.ngDestroyed$)).subscribe(gameIDs => this.reservedGameIDs = gameIDs);
   }
 
   private _generateNewID = (): void => {
     const min = 0;
     const max = 999999;
-    let random = Math.floor(Math.random() * (+max - +min)) + +min;
+    const random = Math.floor(Math.random() * (+max - +min)) + +min;
     this.suggestedID = random;
   }
 
   public createGame = (id: string) => {
-    let submittedID: number = Number(id.trim());
+    const submittedID: number = Number(id.trim());
     if (!id) { return; }
     if (this._isIDUnique(submittedID)) {
       this.router.navigate([`/lobby/${submittedID}`]);
     }
-    this.error = "ID not available.  Please choose a different room."
+    this.error = 'ID not available.  Please choose a different room.';
   }
 
   private _isIDUnique = (id: number): boolean => {
-    console.log(this.reservedGameIDs)
+    console.log(this.reservedGameIDs);
     return !this.reservedGameIDs.includes(id);
   }
 }

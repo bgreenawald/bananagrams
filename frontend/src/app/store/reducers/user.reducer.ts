@@ -4,13 +4,13 @@ import * as Actions from './../actions';
 import * as Models from '../../models';
 // import * as Constants from '../../constants';
 
-// The user state only contains data applicable to the frontend. 
+// The user state only contains data applicable to the frontend.
 // For refresh persistence, select bits of the state are stored in local storage (ex: previously used playerID)
 const initialState: Models.UserState = {
     playerID: null,
     tiles: [],
-    currentView: "Loading State"
-}
+    currentView: 'Loading State'
+};
 
 export function userReducer(
     state: any = initialState,
@@ -21,7 +21,7 @@ export function userReducer(
             return {
                 ...state,
                 playerID: action.playerID
-            }
+            };
 
         case Actions.CALL_BANANAGRAMS:
             return state;

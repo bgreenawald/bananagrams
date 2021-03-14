@@ -45,57 +45,57 @@ export class SocketService {
   }
 
   public playerJoin = (gameID: string, username: string): void => {
-    this.socket.emit("player_join", {
-      "name": gameID,
-      "player_id": username
-    })
+    this.socket.emit('player_join', {
+      name: gameID,
+      player_id: username
+    });
   }
 
   public joinRoom = (gameID: string): void => {
-    this.socket.emit("join", {
-      "name": gameID
-    })
+    this.socket.emit('join', {
+      name: gameID
+    });
   }
 
   public loadOrCreateGame = (gameID: string): void => {
-    this.socket.emit("load_game", {
-      "name": gameID
-    })
+    this.socket.emit('load_game', {
+      name: gameID
+    });
   }
 
   public startGame = (gameID: string): void => {
-    this.socket.emit("start_game", {
-      "name": gameID
-    })
+    this.socket.emit('start_game', {
+      name: gameID
+    });
   }
 
   // listens and receives all incoming socket messages from the server
   // TODO: why does game loaded fire four times? from here.  But only fires once from the app component?
   public receive = (): Observable<any> => {
     return Observable.create(observer => {
-      this.socket.on("render_game", resp => {
-        observer.next(resp)
-      })
-    })
+      this.socket.on('render_game', resp => {
+        observer.next(resp);
+      });
+    });
   }
 
   public reset = (gameID: string): void => {
-    this.socket.emit("reset", {
-      "name": gameID
+    this.socket.emit('reset', {
+      name: gameID
     });
   }
 
   public continueGame = (gameID: string): void => {
-    this.socket.emit("continue_game", {
-      "name": gameID,
-    })
+    this.socket.emit('continue_game', {
+      name: gameID,
+    });
   }
 
   public userCallBananagrams = (gameID: string, playerID: string, words: string[]): void => {
-    this.socket.emit("bananagrams", {
-      "name": gameID,
-      "player_id": playerID,
-      "words": words
-    })
+    this.socket.emit('bananagrams', {
+      name: gameID,
+      player_id: playerID,
+      words
+    });
   }
 }

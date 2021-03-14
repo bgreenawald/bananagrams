@@ -9,11 +9,11 @@ export class ErrorService {
 
   parseError(err: string) {
     switch (err) {
-      case "error: Cannot start game, game state is State.ACTIVE. Should be 'IDLE'":
-        return "This game is already underway!  Wait until it's over to join!"
+      case 'error: Cannot start game, game state is State.ACTIVE. Should be \'IDLE\'':
+        return 'This game is already underway!  Wait until it\'s over to join!';
       // TODO: if error is not empty, send back error
       default:
-        return "Error found!";
+        return 'Error found!';
     }
   }
 
@@ -22,6 +22,6 @@ export class ErrorService {
   }
 
   clearError = () => {
-    document.querySelector('.error-content').textContent = "";
+    document.querySelector('.error-content').textContent = '';
   }
 }

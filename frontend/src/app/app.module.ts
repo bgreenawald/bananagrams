@@ -29,7 +29,7 @@ import { MenuGameplayComponent } from './components/menu-gameplay/menu-gameplay.
 import { ModalComponent } from './components/modal/modal.component';
 import * as fromComponents from './components';
 
-import { environment } from "../environments/environment";
+import { environment } from '../environments/environment';
 import { Routes, RouterModule } from '@angular/router';
 import { CustomSerializer } from './store/selectors/router.selectors';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -50,7 +50,7 @@ export const ROUTES: Routes = [
     path: 'game/:gameID',
     component: BoardComponent
   }
-]
+];
 
 @NgModule({
   declarations: [

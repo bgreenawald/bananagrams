@@ -2,18 +2,18 @@ import { Injectable } from '@angular/core';
 import { Action, createAction, props } from '@ngrx/store';
 import { Tile, UserData } from './../../models';
 
-export const UPDATE_STORE = 'Add'
-export const UPDATE_USER_DATA = 'Update User Data'
+export const UPDATE_STORE = 'Add';
+export const UPDATE_USER_DATA = 'Update User Data';
 
 export class UpdateStore implements Action {
-    readonly type = UPDATE_STORE
+    readonly type = UPDATE_STORE;
     constructor(public payload: any) { }
-};
+}
 
 export class UpdateUserData implements Action {
-    readonly type = UPDATE_USER_DATA
+    readonly type = UPDATE_USER_DATA;
     constructor(public payload: UserData) { }
-};
+}
 
 // load pizzas
 export const LOADING = '[Landing] Load Game Data';
@@ -26,13 +26,13 @@ export const SET_PLAYER_ID = '[Lobby] Set Player ID';
 export const SET_GAME_ID = '[App] Set Game ID';
 export const JOIN_ROOM = '[Lobby] Join room by Game ID';
 export const LOAD_RESERVED_GAME_IDS = '[Landing] Get all game IDs in use by server';
-export const SET_RESERVED_GAME_IDS = '[Effects via Landing] Response received: data of reserved game IDs'
+export const SET_RESERVED_GAME_IDS = '[Effects via Landing] Response received: data of reserved game IDs';
 export const LOAD_OR_CREATE_GAME = '[Lobby] Load or Create New Game from socket server';
 export const SUCCESS_JOIN_ROOM = '[Lobby] Room successfully joined';
 export const FAIL_OPEN_SOCKET = '[App] Could not connect to socket';
 export const SOCKET_READY = '[App] Now receiving socket messages';
 export const START_GAME = '[Lobby] Started the game';
-export const ADD_PEELED_TILE = '[Game] Add peeled tile to bench'
+export const ADD_PEELED_TILE = '[Game] Add peeled tile to bench';
 
 export class Loading implements Action {
     readonly type = LOADING;
@@ -51,7 +51,7 @@ export class LoadGameSuccess implements Action {
 
 export class OpenSocket implements Action {
     readonly type = OPEN_SOCKET;
-    constructor(public gameID: string) { };
+    constructor(public gameID: string) { }
 }
 
 export class UpdateSocketData implements Action {
@@ -85,7 +85,7 @@ export class SetReservedGameIDs implements Action {
 
 export class LoadOrCreateGame implements Action {
     readonly type = LOAD_OR_CREATE_GAME;
-    constructor(public gameID: string) { };
+    constructor(public gameID: string) { }
 }
 
 export class SuccessJoinRoom implements Action {
@@ -94,7 +94,7 @@ export class SuccessJoinRoom implements Action {
 
 export class FailOpenSocket implements Action {
     readonly type = FAIL_OPEN_SOCKET;
-    constructor(public error: string, public response: any) { };
+    constructor(public error: string, public response: any) { }
 }
 
 export class SocketReady implements Action {
@@ -103,7 +103,7 @@ export class SocketReady implements Action {
 
 export class StartGame implements Action {
     readonly type = START_GAME;
-    constructor(public gameID: string) { };
+    constructor(public gameID: string) { }
 }
 
 

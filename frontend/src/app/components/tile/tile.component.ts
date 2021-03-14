@@ -13,12 +13,6 @@ import { AppComponent } from '../../app.component';
   styleUrls: ['./tile.component.scss']
 })
 export class TileComponent implements OnInit {
-  @HostBinding('attr.data-tile-id') @Input() index: number;
-  @Input() letter: string;
-
-  public gameID = this.app.gameID;
-  public playerID = this.app.playerID;
-  public displaySwap: boolean = false;
 
   constructor(
     private app: AppComponent,
@@ -29,14 +23,20 @@ export class TileComponent implements OnInit {
   ) {
     helperService.globalClick$.subscribe(click => {
       this.clearSwapButton();
-    })
+    });
   }
+  @HostBinding('attr.data-tile-id') @Input() index: number;
+  @Input() letter: string;
+
+  public gameID = this.app.gameID;
+  public playerID = this.app.playerID;
+  public displaySwap = false;
+
+  @HostBinding('draggable') true;
 
   ngOnInit(): void {
 
   }
-
-  @HostBinding('draggable') true;
 
   @HostListener('click', ['$event'])
   handleClick = $event => {
@@ -61,11 +61,11 @@ export class TileComponent implements OnInit {
   handleSwap = $event => {
     const tiles = this.app.getUserTiles();
     const letter = this.eventHandler.handleSwap(this.index, tiles);
-    this.socket.emit("swap", {
+    this.socket.emit('swap', {
       name: this.gameID,
-      "letter": this.letter,
-      "player_id": this.playerID
-    })
+      letter: this.letter,
+      player_id: this.playerID
+    });
     this.clearSwapButton();
   }
 

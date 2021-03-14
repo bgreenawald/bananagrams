@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { LobbyComponent } from './components/lobby/lobby.component';
 import { LandingComponent } from './components/landing/landing.component';
 import { GameComponent } from './components/game/game.component';
-import { PageNotFoundComponent } from './components/pagenotfound/pagenotfound.component'
+import { PageNotFoundComponent } from './components/pagenotfound/pagenotfound.component';
 
 
 

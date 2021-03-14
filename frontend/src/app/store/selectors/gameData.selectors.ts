@@ -54,7 +54,6 @@ export const getPlayerTiles = createSelector(
     getGameDataSelector,
     getPlayerIDSelector,
     (data: Models.GameData, playerID: string) => {
-        console.log('data', data, 'playerID', playerID)
         if (Object.keys(data).length === 0) return;
 
         const playersToTiles: any = data.players;

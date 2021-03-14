@@ -102,7 +102,6 @@ export class AppComponent implements OnInit {
   // better named getSocketResponseData or socketResponseData$
 
   private _openSocket = (): void => {
-    console.log("OPENING A NEW SOCKET LISTENER")
     this._socketStream$ = this.socketService.receive();
     this._store.dispatch(new fromStore.SocketReady());
 

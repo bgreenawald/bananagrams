@@ -84,7 +84,6 @@ export class GameComponent implements OnInit {
       take(1),
       select(Selectors.selectLoadedStatus))
       .subscribe(isLoaded => {
-        console.log('loading status', isLoaded)
 
         if (!isLoaded) {
 

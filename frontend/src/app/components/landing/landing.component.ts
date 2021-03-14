@@ -63,7 +63,6 @@ export class LandingComponent implements OnInit {
   }
 
   private _isIDUnique = (id: number): boolean => {
-    console.log(this.reservedGameIDs);
     return !this.reservedGameIDs.includes(id);
   }
 }

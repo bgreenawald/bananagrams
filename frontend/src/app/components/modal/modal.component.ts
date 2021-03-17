@@ -4,7 +4,6 @@ import { SocketService } from './../../services/socket.service';
 import { HelperService } from './../../services/helper.service';
 import { Observable } from 'rxjs';
 import { skip, take } from 'rxjs/operators';
-import { AppComponent } from '../../app.component';
 import { Store, select } from '@ngrx/store';
 import { AppState } from './../../app.state';
 
@@ -26,12 +25,10 @@ export class ModalComponent implements OnInit {
   private _openModal$ = this.messageBusService.openModal$;
   private _globalClick$ = this._helperService.globalClick$;
   public store$: Observable<any>; // REMOVE
-  // private _message$ = this._app.getMessages();
   public winningPlayer$ = this._store.pipe(select(fromStore.getWinningPlayer));
   public;
 
   constructor(
-    private _app: AppComponent,
     private _helperService: HelperService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
@@ -43,7 +40,6 @@ export class ModalComponent implements OnInit {
   ngOnInit(): void {
     this._listenOpenModals();
     this._listenCloseModals();
-    // this.gameID = this._app.getGameID();
     this._listenStore();
   }
 

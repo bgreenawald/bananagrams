@@ -15,7 +15,6 @@ export class UpdateUserData implements Action {
     constructor(public payload: UserData) { }
 }
 
-// load pizzas
 export const LOADING = '[Landing] Load Game Data';
 export const LOAD_USER = '[Landing] Load User Data';
 export const LOAD_GAME_SUCCESS = '[Lobby] Load Game Data Success';

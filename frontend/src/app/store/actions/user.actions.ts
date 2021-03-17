@@ -5,7 +5,6 @@ import { Tile, UserData } from './../../models';
 // QUESTION - should you access your state in the reducers or pass them in through the parameters?
 
 
-// load pizzas
 export const CALL_BANANAGRAMS = '[Menu Gameplay] User called Bananagrams';
 export const UPDATE_PLAYER_ID = '[Lobby] User submitted player id';
 export const RESET_GAME = '[Game] User reset game';

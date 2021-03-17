@@ -19,7 +19,7 @@ export interface UserData { // TODO: Can remove??
     tiles: Tile[];
 }
 
-// how to model this?
+// QUESTION: how to model this?
 export interface players {
     // player 1: tile[]
     // player 2 : tile[]

@@ -20,7 +20,6 @@ import { fromStringWithSourceMap } from 'source-list-map';
 
 @Injectable()
 export class UserEffects {
-    // selectors = this._store
     constructor(
         private actions$: Actions<ChalkfulActions.UserActions>,
         private endpointService: endpointServices.ApiService,

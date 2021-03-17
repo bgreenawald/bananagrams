@@ -9,9 +9,9 @@ export enum SocketSuccessResponses {
     Reset = 'reset'
 }
 
-// export enum SocketFailResponses {
-//     "'words' is a required property"
-// }
+export enum SocketFailResponses {
+    WordsRequired = "'words' is a required property"
+}
 
 export enum GameViews {
     ModalResetConfirm = 'Ask User to Confirm Reset Game',

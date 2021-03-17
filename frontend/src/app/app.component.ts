@@ -112,7 +112,6 @@ export class AppComponent implements OnInit {
 
 
       if (resp.message.includes("Performed swap")) {
-        // update tiles
         this._store.select(fromStore.getPlayerTiles).subscribe(tiles => {
           this._store.dispatch(new GameActions.UpdatePeeledTiles(tiles))
         })

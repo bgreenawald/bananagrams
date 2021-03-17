@@ -65,7 +65,6 @@ export class MenuGameplayComponent implements OnInit {
     });
   }
 
-  // create call bananagrams action
   bananagrams = () => {
     if (this.isValidBoard()) {
       const words: string[] = this.getAllWords();
@@ -197,15 +196,4 @@ export class MenuGameplayComponent implements OnInit {
 
     return [minRow, maxRow, minColumn, maxColumn];
   }
-
-  // socketSubscribe = () => {
-  //   this.message$.
-  //     subscribe(value => {
-  //       if (value.data.tiles_remaining) {
-  //         this.tilesRemaining = value.data.tiles_remaining
-  //       }
-  //     },
-  //       err => this.errorService.parseError(err)
-  //     )
-  // }
 }

@@ -24,16 +24,14 @@ export class ModalComponent implements OnInit {
   public winningPlayer: string;
   private _openModal$ = this.messageBusService.openModal$;
   private _globalClick$ = this._helperService.globalClick$;
-  public store$: Observable<any>; // REMOVE
   public winningPlayer$ = this._store.pipe(select(fromStore.getWinningPlayer));
-  public;
 
   constructor(
     private _helperService: HelperService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
     private _ref: ElementRef,
-    private _store: Store<Models.GameState>  // better name is _store$?
+    private _store: Store<Models.GameState>
   ) {
   }
 
@@ -65,11 +63,9 @@ export class ModalComponent implements OnInit {
     this._store.pipe(select(fromStore.getWinningWords))
       .subscribe(words => {
         if (!words) { return; }
-        console.log('WORDS', words);
         words.forEach((wordPair, index) => {
           this.winningWords.push([wordPair[0], wordPair[1]]);
         });
-        console.log('winning words', this.winningWords);
       });
   }
 
@@ -79,8 +75,7 @@ export class ModalComponent implements OnInit {
 
   handleStartNewGame = () => {
     this.socketService.reset(this.gameID);
-    // ADD here
-    this._store.dispatch(new fromStore.ResetGame(this.gameID)); // update with a ref to the gameID from the store.
+    this._store.dispatch(new fromStore.ResetGame(this.gameID));
   }
 
   handleClose = () => {

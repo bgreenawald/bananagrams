@@ -1,5 +1,3 @@
-
-// game state
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromCoreRouter from '@ngrx/router-store';
 import * as Models from './../../models';

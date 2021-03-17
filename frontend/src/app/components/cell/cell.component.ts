@@ -5,9 +5,6 @@ import { EventHandleService } from '../../services/event-handle.service';
 import { Tile } from './../../models';
 import { MessageBusService } from '../../services/message-bus.service';
 
-// @Directive({
-//   selector: '[row]'
-// })
 @Component({
   selector: 'app-cell',
   templateUrl: './cell.component.html',

@@ -55,7 +55,6 @@ export class GameComponent implements OnInit {
   public confirmMessage: string;
 
   private openModal$ = this.messageBusService.openModal$;
-  // private _messages$ = this.app.getMessages();
   private _modifyCell$ = this.eventHandleService.removeCell$;
   private _ngDestroyed$ = new Subject();
   @HostListener('window:beforeunload', ['$event'])

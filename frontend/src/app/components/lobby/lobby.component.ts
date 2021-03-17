@@ -45,7 +45,7 @@ export class LobbyComponent implements OnInit {
   ) { }
 
   public ngOnInit(): void {
-    this.getPlayersInLobby();  // probably need to destroy this??
+    this.getPlayersInLobby();
     this.getGameID();
     this._listenErrors();
   }
@@ -83,8 +83,6 @@ export class LobbyComponent implements OnInit {
         this.playersInLobby = playersInRoom;
         if (this.playersInLobby.length > 1) { this.startButtonEnabled = true; }
         console.log(playersInRoom);
-        // const isGameDataLoaded = Object.keys(gameData).length > 0 ? true : false;
-        // if (isGameDataLoaded) this.playersInLobby = Object.keys(gameData.players)
       });
   }
 
@@ -94,7 +92,6 @@ export class LobbyComponent implements OnInit {
   }
 
   public playerJoin = (playerID: string): void => {
-
     // TODO: disable join the game button if input is empty
     this._store.dispatch(new fromStore.SetPlayerId(this.gameID, playerID));
     this.playerID = playerID;

@@ -86,9 +86,6 @@ export class AppComponent implements OnInit {
     this.playerID = localStorage.getItem('player_id');
   }
 
-
-  getPlayers = (): string[] => this.playersTiles;
-
   // TODO: refactor
   // better name for this is, listen to socket events server observable and parse response data
   // better named getSocketResponseData or socketResponseData$

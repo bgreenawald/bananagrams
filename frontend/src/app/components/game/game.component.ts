@@ -13,7 +13,6 @@ import { ErrorService } from '../../services/error.service';
 import { SocketService } from '../../services/socket.service';
 import { MessageBusService } from '../../services/message-bus.service';
 
-import { AppComponent } from '../../app.component';
 import { EventHandleService } from '../../services/event-handle.service';
 
 import { Tile } from '../../models';
@@ -32,7 +31,6 @@ export class GameComponent implements OnInit {
 
 
   constructor(
-    public app: AppComponent,
     private route: ActivatedRoute,
     private router: Router,
     private socket: Socket,
@@ -50,7 +48,7 @@ export class GameComponent implements OnInit {
     message: string
   };
   public playerJoined = false;
-  public playerID: string = this.app.playerID;
+  public playerID: string;
   public playersTiles: string[];
   public tiles: string[];
   public modalOpen = false;
@@ -166,7 +164,7 @@ export class GameComponent implements OnInit {
 
   _listenUpdateTiles = () => {
     this._action$.pipe(
-      ofType(GameActions.ADD_PEELED_TILE)
+      ofType(GameActions.ADD_PEELED_TILE, GameActions.UPDATE_PEELED_TILES)
     ).subscribe(() => {
       this._store.select(Selectors.getPlayerTiles)
         .subscribe(allNewTiles => {

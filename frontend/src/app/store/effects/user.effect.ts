@@ -43,4 +43,18 @@ export class UserEffects {
             ofType(ChalkfulActions.RESET_GAME),
             tap(action => this.socketService.startGame(action.gameID))
         ), { dispatch: false });
+
+    swapTile$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(ChalkfulActions.SWAP_TILES),
+            withLatestFrom(
+                this._store.select(Selectors.getPlayerIDSelector),
+                this._store.select(Selectors.getPlayerTiles),
+                this._store.select(Selectors.selectGameID)
+            ),
+            tap(([action, playerID, tiles, gameID]) => {
+                this.socketService.swapTiles(gameID, action.letter, playerID)
+            })
+        ), { dispatch: false }
+    );
 }

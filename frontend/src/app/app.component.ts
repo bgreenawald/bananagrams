@@ -30,7 +30,6 @@ export class AppComponent implements OnInit {
   public gameID: string; // TO REMOVE
   public playerID: string;
   public playersInRoom: string[];
-  public tiles: string[];
   private playersTiles: string[];
   private _socketSubscription$;
   private openModal$ = this.messageBusService.openModal$;
@@ -90,8 +89,6 @@ export class AppComponent implements OnInit {
 
   getPlayers = (): string[] => this.playersTiles;
 
-  getUserTiles = () => this.tiles;
-
   // TODO: refactor
   // better name for this is, listen to socket events server observable and parse response data
   // better named getSocketResponseData or socketResponseData$
@@ -113,12 +110,20 @@ export class AppComponent implements OnInit {
 
       this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
 
-      switch (resp.message) {
-        case Constants.SocketSuccessResponses.Peel:
-          this._store.dispatch(new fromStore.AddPeeledTile());
-        default:
-          console.log(resp);
+
+      if (resp.message.includes("Performed swap")) {
+        // update tiles
+        this._store.select(fromStore.getPlayerTiles).subscribe(tiles => {
+          this._store.dispatch(new GameActions.UpdatePeeledTiles(tiles))
+        })
       }
+      else if (resp.message === Constants.SocketSuccessResponses.Peel) {
+        this._store.dispatch(new fromStore.AddPeeledTile());
+      }
+      else {
+        console.log(resp.message, resp.status_code, resp.payload);
+      }
+
 
 
       const gameID = resp.payload.id;

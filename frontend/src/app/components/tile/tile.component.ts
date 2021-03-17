@@ -4,8 +4,11 @@ import { Socket } from 'ngx-socket-io';
 
 import { EventHandleService } from '../../services/event-handle.service';
 import { HelperService } from '../../services/helper.service';
-
-import { AppComponent } from '../../app.component';
+import { Store } from '@ngrx/store';
+import * as Models from './../../models';
+import * as GameActions from './../../store/actions';
+import * as Selectors from './../../store/selectors';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-tile',
@@ -15,11 +18,11 @@ import { AppComponent } from '../../app.component';
 export class TileComponent implements OnInit {
 
   constructor(
-    private app: AppComponent,
     private eventHandler: EventHandleService,
     private helperService: HelperService,
     private ref: ElementRef,
-    private socket: Socket
+    private socket: Socket,
+    private _store: Store<Models.GameState>
   ) {
     helperService.globalClick$.subscribe(click => {
       this.clearSwapButton();
@@ -28,8 +31,6 @@ export class TileComponent implements OnInit {
   @HostBinding('attr.data-tile-id') @Input() index: number;
   @Input() letter: string;
 
-  public gameID = this.app.gameID;
-  public playerID = this.app.playerID;
   public displaySwap = false;
 
   @HostBinding('draggable') true;
@@ -59,13 +60,10 @@ export class TileComponent implements OnInit {
   }
 
   handleSwap = $event => {
-    const tiles = this.app.getUserTiles();
-    const letter = this.eventHandler.handleSwap(this.index, tiles);
-    this.socket.emit('swap', {
-      name: this.gameID,
-      letter: this.letter,
-      player_id: this.playerID
-    });
+    this._store.select(Selectors.getPlayerTiles).pipe(first()).subscribe(tiles => {
+      const letter = this.eventHandler.handleSwap(this.index, tiles);
+    })
+    this._store.dispatch(new GameActions.SwapTiles(this.letter));
     this.clearSwapButton();
   }
 

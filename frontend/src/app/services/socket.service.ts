@@ -98,4 +98,12 @@ export class SocketService {
       words
     });
   }
+
+  public swapTiles = (gameID: string, tileLetter: string, playerID: string) => {
+    this.socket.emit('swap', {
+      name: gameID,
+      letter: tileLetter,
+      player_id: playerID
+    });
+  }
 }

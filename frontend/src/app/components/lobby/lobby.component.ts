@@ -12,7 +12,6 @@ import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
 import { SocketService } from '../../services/socket.service';
 import { ErrorService } from '../../services/error.service';
-import { AppComponent } from '../../app.component';
 
 import * as Selectors from '../../store/selectors';
 
@@ -39,9 +38,7 @@ export class LobbyComponent implements OnInit {
   public startButtonEnabled = false;
 
   constructor(
-    public app: AppComponent,
     private errorService: ErrorService,
-    private socket: Socket,
     private socketService: SocketService,
     private _store: Store<Models.GameState>,
     private action$: Actions<GameActions.GameActionTypes>

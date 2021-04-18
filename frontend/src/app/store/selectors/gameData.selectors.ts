@@ -48,6 +48,11 @@ export const getWinningWords = createSelector(
     (socketData: Models.GameData) => socketData.winning_words
 );
 
+export const getRemainingTiles = createSelector(
+    getGameDataSelector,
+    (socketData: Models.GameData) => socketData.tiles_remaining
+)
+
 export const getPlayerTiles = createSelector(
     getGameDataSelector,
     getPlayerIDSelector,

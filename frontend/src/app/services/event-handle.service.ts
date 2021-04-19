@@ -1,7 +1,7 @@
 import { Injectable, TemplateRef } from '@angular/core';
 import { HelperService } from './helper.service';
 import { ErrorService } from './error.service';
-import { Subject } from "rxjs";
+import { Subject } from 'rxjs';
 import { AppRoutingModule } from '../app-routing.module';
 import { TileComponent } from '../components/tile/tile.component';
 import { MessageBusService } from '../services/message-bus.service';
@@ -25,7 +25,7 @@ export class EventHandleService {
 
   handleClick = (e, appTile?) => {
     e.preventDefault();
-    let tile = this.getTile(e.target, appTile);
+    const tile = this.getTile(e.target, appTile);
 
     this.errorService.clearError();
     this.toggleSelectedClass(tile);
@@ -33,20 +33,20 @@ export class EventHandleService {
 
   getTile = (targetElement, appTile) => {
     let tile;
-    if (targetElement.tagName === "APP-TILE") {
-      tile = targetElement
+    if (targetElement.tagName === 'APP-TILE') {
+      tile = targetElement;
     }
     else if (appTile) {
-      tile = appTile
+      tile = appTile;
     }
     return tile;
   }
 
   toggleSelectedClass = (tile: HTMLElement) => {
     if (!!tile) {
-      let classes = tile.classList;
+      const classes = tile.classList;
       if (classes.contains('selected')) {
-        classes.remove('selected')
+        classes.remove('selected');
       }
       else {
         classes.add('selected');
@@ -59,21 +59,21 @@ export class EventHandleService {
     if (!this.selectedTiles.includes(currentTile)) {
       // dataset.tileId is casing is determined by the DOM.
       const tileID = e.target.dataset.tileId;
-      const tile = document.querySelector(`app-tile[data-tile-id='${tileID}']`)
-      tile.classList.add("selected")
+      const tile = document.querySelector(`app-tile[data-tile-id='${tileID}']`);
+      tile.classList.add('selected');
     }
 
-    e.target.style.cursor = "grabbing";
-    e.dataTransfer.dropEffect = "copy";
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text", e.target.dataset.tileId);
-  };
+    e.target.style.cursor = 'grabbing';
+    e.dataTransfer.dropEffect = 'copy';
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text', e.target.dataset.tileId);
+  }
 
   handleDragEnd = e => {
     e.preventDefault();
     this.selectedTiles.forEach(tile => {
-      tile.classList.remove('selected')
-    })
+      tile.classList.remove('selected');
+    });
     this.selectedTiles = [];
   }
 
@@ -85,26 +85,26 @@ export class EventHandleService {
   handleDragEnter = e => {
     e.preventDefault();
     if (e.target.children.length === 0) {
-      e.target.classList.add("over");
+      e.target.classList.add('over');
     }
 
-  };
+  }
 
   handleDragLeave = e => {
     e.preventDefault();
-    if (e.target.classList.contains("over")) {
-      e.target.classList.remove("over");
+    if (e.target.classList.contains('over')) {
+      e.target.classList.remove('over');
     }
-  };
+  }
 
   handleDragOver = e => {
-    if (e.preventDefault) e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
+    if (e.preventDefault) { e.preventDefault(); }
+    e.dataTransfer.dropEffect = 'move';
     return false;
-  };
+  }
 
   handleOnMouseDown = e => {
-    if (e.preventDefault) e.preventDefault();
+    if (e.preventDefault) { e.preventDefault(); }
     return false;
   }
 
@@ -114,7 +114,7 @@ export class EventHandleService {
     const letter = tileToRemove.children[0].textContent;
 
     this.clearParentCell(parentCell);
-    this._removeCells.next(this._emptyCellColumns)
+    this._removeCells.next(this._emptyCellColumns);
     this._emptyCellColumns = [];
 
     return letter;
@@ -123,52 +123,52 @@ export class EventHandleService {
   clearSelectedTiles = () => {
     const selectedTiles = Array.from(document.querySelectorAll('app-tile.selected'));
     selectedTiles.forEach(tile => {
-      tile.classList.remove('selected')
-    })
+      tile.classList.remove('selected');
+    });
   }
 
   handleDrop = e => {
     e.preventDefault();
 
     let cellsToClear: number[]; // array with the identifying column numbers of the cells to delete
-    let primaryDestinationCell = e.target;
+    const primaryDestinationCell = e.target;
 
     // Get the tile ID and handle the null case
-    let id = e.dataTransfer.getData('text');
+    const id = e.dataTransfer.getData('text');
 
-    if (id === null || id.trim() === "") {
-      if (primaryDestinationCell.classList.contains("over")) {
-        primaryDestinationCell.classList.remove("over");
+    if (id === null || id.trim() === '') {
+      if (primaryDestinationCell.classList.contains('over')) {
+        primaryDestinationCell.classList.remove('over');
       }
       return;
     }
 
-    let primaryTile = document.querySelector(`app-tile[data-tile-id="${id}"]`);
+    const primaryTile = document.querySelector(`app-tile[data-tile-id="${id}"]`);
     const [rowChange, columnChange] = this.calculateDistanceChange(primaryTile, primaryDestinationCell);
 
-    //move additional cells 
+    // move additional cells
     const selectedTiles = Array.from(document.querySelectorAll('app-tile.selected'));
     if (selectedTiles.length > 0) {
       selectedTiles.forEach((tile, i) => {
         this.moveTile(tile, rowChange, columnChange);
-      })
+      });
     }
 
     this.tilesToDrag = [];
     this.clearSelectedTiles();
-    this._removeCells.next(this._emptyCellColumns)
+    this._removeCells.next(this._emptyCellColumns);
     this._emptyCellColumns = [];
-    primaryDestinationCell.classList.remove("over");
+    primaryDestinationCell.classList.remove('over');
   }
 
 
   calculateDistanceChange = (primaryTile, primaryDestinationCell) => {
-    let sourceRow = Number(primaryTile.parentElement.dataset.row);
-    let sourceColumn = Number(primaryTile.parentElement.dataset.column);
+    const sourceRow = Number(primaryTile.parentElement.dataset.row);
+    const sourceColumn = Number(primaryTile.parentElement.dataset.column);
 
 
-    let destinationRow = Number(primaryDestinationCell.dataset.row);
-    let destinationColumn = Number(primaryDestinationCell.dataset.column);
+    const destinationRow = Number(primaryDestinationCell.dataset.row);
+    const destinationColumn = Number(primaryDestinationCell.dataset.column);
 
     const rowChange = destinationRow - sourceRow;
     const columnChange = destinationColumn - sourceColumn;
@@ -183,18 +183,18 @@ export class EventHandleService {
 
     const newChildTile = {
       id: tileID,
-      letter: letter
-    }
+      letter
+    };
 
     // tile is of type app-tile
     const parentCell = tile.parentElement;
-    let sourceRow = Number(parentCell.dataset.row);
-    let sourceColumn = Number(parentCell.dataset.column);
+    const sourceRow = Number(parentCell.dataset.row);
+    const sourceColumn = Number(parentCell.dataset.column);
 
-    let destinationRow = rowChange + sourceRow;
-    let destinationColumn = columnChange + sourceColumn;
+    const destinationRow = rowChange + sourceRow;
+    const destinationColumn = columnChange + sourceColumn;
 
-    let secondaryDestination = document.querySelector(
+    const secondaryDestination = document.querySelector(
       `#board app-cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
     );
     const destinationCell = {
@@ -202,7 +202,7 @@ export class EventHandleService {
       column: destinationColumn
     };
 
-    // if desired target cell has no tile in it already 
+    // if desired target cell has no tile in it already
     if (secondaryDestination.children.length === 0) {
       this._messageBusService.addChildTile(
         newChildTile, destinationCell);
@@ -214,15 +214,15 @@ export class EventHandleService {
   }
 
   clearParentCell = (parentCell: HTMLElement) => {
-    if (parentCell.parentElement.id === "bench") {
-      this._emptyCellColumns.push(Number(parentCell.dataset.column))
+    if (parentCell.parentElement.id === 'bench') {
+      this._emptyCellColumns.push(Number(parentCell.dataset.column));
     }
     // else, clear child tile
     else {
       this._messageBusService.removeChildTile({
         row: parseInt(parentCell.dataset.row),
         column: parseInt(parentCell.dataset.column)
-      })
+      });
     }
   }
 }

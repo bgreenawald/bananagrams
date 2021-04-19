@@ -20,6 +20,8 @@
     top: 0;
     right: 0;
     font-size: 30px;
+    cursor: pointer;
+    margin: 5px 5px 0px 0px;
   }
 
   .content {
@@ -36,14 +38,6 @@
     }
   }
 }
-
-// ul#winning-words-list {
-//   li {
-//     @include flexbox();
-//     flex-flow: row nowrap;
-//     justify-content: flex-start;
-//   }
-// }
 
 td,
 th {

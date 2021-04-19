@@ -1,34 +1,42 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd, ActivatedRoute, RouterState } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute, RouterState, ActivationEnd } from '@angular/router';
 
 import { Observable, of, fromEvent, throwError } from 'rxjs';
-import { catchError, map, tap, first } from 'rxjs/operators';
+import { catchError, map, tap, first, filter, takeUntil, finalize, switchMap, take } from 'rxjs/operators';
 
 import { Store, select } from '@ngrx/store';
-import { updateStore } from './app.actions';
-
+import * as fromStore from './store';
 
 import { Socket } from 'ngx-socket-io';
 import { SocketService } from './services/socket.service';
-import { HelperService } from './services/helper.service'
+import { HelperService } from './services/helper.service';
 import { ErrorService } from './services/error.service';
 import { MessageBusService } from './services/message-bus.service';
+
+import * as GameActions from './store/actions';
+import { SocketSuccessResponses } from './constants';
+
+import * as Models from './models';
+import * as Constants from './constants';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
+
 export class AppComponent implements OnInit {
   title = 'frontend';
-  public gameID: string; // numerical game id formatted as a string
+  public gameID: string; // TO REMOVE
   public playerID: string;
-  public playersInLobby: string[];
-  public tiles: string[];
-  public store$: Observable<any>;
+  public playersInRoom: string[];
   private playersTiles: string[];
-  private messages$ = this.socketService.receive();
+  private _socketSubscription$;
   private openModal$ = this.messageBusService.openModal$;
+  private _state$: Observable<Models.GameState>;
+  private _socketStream$: Observable<any>;
+
+
 
   constructor(
     private route: ActivatedRoute,
@@ -38,103 +46,132 @@ export class AppComponent implements OnInit {
     private helperService: HelperService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
-    private _store: Store<{ bananagrams: any }>
-  ) { this.store$ = _store.pipe(select('bananagrams')) }
+    private _store: Store<Models.GameState>,
+    private _routerStore: Store<any>) { }
 
-  ngOnInit() {
-    this.detectIDChange();
-    this.setPlayerID();
-    this.setGameID();
-    this.socketSubscribe();
+  public ngOnInit() {
+    this._loadCachedData();
+    this._state$ = this._store.select(fromStore.getGameStateSelector);
+    this._store.select(fromStore.getPlayerIDSelector).subscribe(playerID => {
+      this.playerID = playerID;
+    });
+    this._setDataFromStore();
   }
 
-  detectIDChange = () => {
-    this.router.events.subscribe(e => {
-      if (e instanceof NavigationEnd) {
-        const gameID = this.helperService.getGameID();
-        if (this.gameID !== gameID && !!gameID) {
-          this.gameID = gameID;
-          this.socketService.loadOrCreateGame(this.gameID);
-          this.socketService.receive();
+  public ngOnDestroy() {
+    this._socketSubscription$.unsubscribe();
+    this.socketService.disconnect();
+  }
+
+  private _setDataFromStore = (): void => {
+    this._store
+      .select(fromStore.getAllPlayers)
+      .subscribe(
+        playersArray => {
+          this.playersInRoom = playersArray;
         }
-      }
-    })
+      );
+
+    this._store
+      .select(fromStore.getPlayerIDSelector)
+      .subscribe(
+        username => {
+          this.playerID = username;
+          this._openSocket();
+        }
+      );
   }
 
-  setGameID = () => {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.gameID = id;
+  private _loadCachedData = () => {
+    this.playerID = localStorage.getItem('player_id');
   }
-
-  setPlayerID = () => {
-    this.playerID = localStorage.getItem("player_id");
-  }
-
-  getPlayerID = (): string => this.playerID;
-
-  getGameID = (): string => this.gameID;
-
-  getPlayers = (): string[] => this.playersTiles;
-
-  getUserTiles = () => this.tiles;
 
   // TODO: refactor
-  getMessages = (): Observable<any> => {
-    return this.messages$.pipe(
-      map(resp => {
-        if (resp.status_code !== 200) throw `error: ${resp.message}`
-        const value = {
-          ...resp,
-          "data": JSON.parse(resp.payload)
-        };
-        return value;
+  // better name for this is, listen to socket events server observable and parse response data
+  // better named getSocketResponseData or socketResponseData$
+
+  private _openSocket = (): void => {
+    this._socketStream$ = this.socketService.receive();
+    this._store.dispatch(new fromStore.SocketReady());
+
+    this._socketSubscription$ = this._socketStream$.subscribe(response => {
+      console.log('received new response', response);
+
+      if (response.status_code !== 200) {
+        this._store.dispatch(new fromStore.LoadGameFail(response.message));
+        return;
       }
-      ),
-      catchError(errorMessage => throwError(errorMessage))
-    )
-  }
 
-  socketSubscribe = () => {
-    this.getMessages()
-      .subscribe(value => {
-        console.log("SOCKET RESPONSE", value)
-        switch (value.data.state) {
-          case "IDLE":
-            this.router.navigate([`/lobby/${this.gameID}`]);
-            break;
-          case "ACTIVE":
-            const allPlayers: string[] = Object.keys(value.data.players);
-            if (allPlayers.includes(this.playerID)) {
-              this.router.navigate([`/game/${this.gameID}`]);
-            }
-            else {
-              // show cannot join game until over
-              this.router.navigate([`**`]);
-            }
-            break;
-          case "ENDGAME":
-            break;
-          case "OVER":
-            this.messageBusService.openModal('review')
-            break;
-          default:
+
+      const resp = this._formatRawResponse(response);
+
+      this._store.dispatch(new fromStore.UpdateSocketData(resp.message, resp.payload));
+
+
+      if (resp.message.includes("Performed swap")) {
+        this._store.select(fromStore.getPlayerTiles).subscribe(tiles => {
+          this._store.dispatch(new GameActions.UpdatePeeledTiles(tiles))
+        })
+      }
+      else if (resp.message === Constants.SocketSuccessResponses.Peel) {
+        this._store.dispatch(new fromStore.AddPeeledTile());
+      }
+      else {
+        console.log(resp.message, resp.status_code, resp.payload);
+      }
+
+
+
+      const gameID = resp.payload.id;
+
+      // ui routing
+      switch (resp.payload.state) {
+        case 'IDLE':
+          this.router.navigate([`/lobby/${gameID}`]);
+          break;
+        case 'ACTIVE':
+          if (this._allowedToJoinGame(this.playerID)) {
+            this.router.navigate([`/game/${gameID}`]);
+          }
+          else {
+            // show cannot join game until over
             this.router.navigate([`**`]);
-            break;
-        }
-      },
-        err => this.errorService.displayError(err)
-      )
+          }
+          break;
+        case 'ENDGAME':
+          break;
+        case 'OVER':
+          this.messageBusService.openModal('review');
+          break;
+        default:
+          this.router.navigate([`**`]);
+          break;
+      }
+    }
+    );
   }
 
-  handleClick = (e) => {
+  private _allowedToJoinGame = (playerID: string): boolean => {
+    return this.playersInRoom.includes(this.playerID);
+  }
+
+  private _formatRawResponse = (rawData): Models.RawSocketResponse => {
+    return {
+      message: rawData.message,
+      status_code: rawData.status_code,
+      payload: JSON.parse(rawData.payload)
+    };
+  }
+
+  public handleClick = (e): void => {
     // is the clicked element NOT the swap button
     const didClickOutsideSwap: boolean = !e.target.classList.contains('swap');
     const swapButton = document.querySelector('button.swap');
     if (swapButton && didClickOutsideSwap) {
-      this.helperService.globalClick('click')
+      this.helperService.globalClick('click');
     }
     const isModalOpen: boolean = !!document.querySelector('.modal');
     const didClickOutsideModal: boolean = e.target.classList.contains('overlay');
-    if (isModalOpen && didClickOutsideModal) this.helperService.globalClick('click');
+    if (isModalOpen && didClickOutsideModal) { this.helperService.globalClick('click'); }
   }
 }

@@ -180,6 +180,12 @@ button {
       color: $off-black;
     }
   }
+
+  &.icon-button {
+    background-color: transparent;
+    color: white;
+    border: none;
+  }
 }
 
 .overlay {

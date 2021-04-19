@@ -7,8 +7,8 @@ import { Component, OnInit, Input, ViewEncapsulation, ElementRef, AfterViewInit 
   encapsulation: ViewEncapsulation.None
 })
 export class BoardComponent implements OnInit, AfterViewInit {
-  @Input("rows") rowNumber!: number;
-  @Input("columns") columnNumber!: number;
+  @Input('rows') rowNumber!: number;
+  @Input('columns') columnNumber!: number;
 
   constructor(
     private ref: ElementRef

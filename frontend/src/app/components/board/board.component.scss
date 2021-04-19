@@ -18,6 +18,8 @@ app-board {
     grid-template-columns: repeat($columns, $cell-dimension);
     grid-template-rows: repeat($rows, $cell-dimension);
     box-sizing: border-box;
+    grid-row-gap: 2px;
+    grid-column-gap: 2px;
 
     .cell {
       border-radius: 2px;

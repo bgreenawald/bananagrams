@@ -4,9 +4,12 @@ import { SocketService } from './../../services/socket.service';
 import { HelperService } from './../../services/helper.service';
 import { Observable } from 'rxjs';
 import { skip, take } from 'rxjs/operators';
-import { AppComponent } from '../../app.component';
 import { Store, select } from '@ngrx/store';
 import { AppState } from './../../app.state';
+
+import * as fromStore from './../../store';
+import * as Models from './../../models';
+
 
 @Component({
   selector: 'app-modal',
@@ -17,37 +20,53 @@ export class ModalComponent implements OnInit {
   public open: boolean;
   public modalType: string;
   public gameID: string;
-  public winningWords: any[];
+  public winningWords: any[] = [];
   public winningPlayer: string;
   private _openModal$ = this.messageBusService.openModal$;
   private _globalClick$ = this._helperService.globalClick$;
-  public store$: Observable<any>;
-  private _message$ = this._app.getMessages();
+  public winningPlayer$ = this._store.pipe(select(fromStore.getWinningPlayer));
 
   constructor(
-    private _app: AppComponent,
     private _helperService: HelperService,
     private messageBusService: MessageBusService,
     private socketService: SocketService,
     private _ref: ElementRef,
-    private store: Store<AppState>
+    private _store: Store<Models.GameState>
   ) {
-    this.store$ = store.pipe(select('bananagrams'));
   }
 
   ngOnInit(): void {
     this._listenOpenModals();
     this._listenCloseModals();
-    this.gameID = this._app.getGameID();
-    console.log(this.store$)
-    this.socketSubscribe();
+    this._listenStore();
   }
 
   private _listenOpenModals = () => {
     this._openModal$.subscribe((modalType: string) => {
       this.open = true;
       this.modalType = modalType;
-    })
+    });
+  }
+
+  private _listenStore = () => {
+    this._store
+      .pipe(select(fromStore.selectGameID))
+      .subscribe(gameID => {
+        this.gameID = gameID;
+      });
+
+    this._store.pipe(select(fromStore.getWinningPlayer))
+      .subscribe(winningPlayer => {
+        this.winningPlayer = winningPlayer;
+      });
+
+    this._store.pipe(select(fromStore.getWinningWords))
+      .subscribe(words => {
+        if (!words) { return; }
+        words.forEach((wordPair, index) => {
+          this.winningWords.push([wordPair[0], wordPair[1]]);
+        });
+      });
   }
 
   handleReset = () => {
@@ -56,6 +75,7 @@ export class ModalComponent implements OnInit {
 
   handleStartNewGame = () => {
     this.socketService.reset(this.gameID);
+    this._store.dispatch(new fromStore.ResetGame(this.gameID));
   }
 
   handleClose = () => {
@@ -77,21 +97,7 @@ export class ModalComponent implements OnInit {
 
   _listenCloseModals = () => {
     this._globalClick$.subscribe(click => {
-      if (this.open && (this.modalType !== "over")) this.open = false;
-    })
-  }
-
-  socketSubscribe = () => {
-    this._message$
-      .subscribe(value => {
-        if (value.message === "Game continued.") {
-          this.open = false;
-        }
-        else if (value.data.state === "OVER") {
-          this.winningWords = value.data.winning_words
-          this.winningPlayer = value.data.winning_player
-        }
-      },
-    )
+      if (this.open && (this.modalType !== 'over')) { this.open = false; }
+    });
   }
 }

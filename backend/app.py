@@ -116,7 +116,9 @@ def emit_game(game_name: str, game: Game, msg: str):
         },
         room=game_name,
     )
-    logger.info(f"{request.sid} has successfully rendered their game with messagee {msg}")
+    logger.info(
+        f"{request.sid} has successfully rendered their game with messagee {msg}"
+    )
 
 
 @socketio.on("load_game")
@@ -180,8 +182,13 @@ def player_join(data: Dict[Any, Any]):
         try:
             game = all_games[game_name]
         except KeyError:
-            logger.warning(f"Could not find the game named {game_name}. from player_join")
-            emit_error(game_name, f"Could not find the game named {game_name}. from player_join")
+            logger.warning(
+                f"Could not find the game named {game_name}. from player_join"
+            )
+            emit_error(
+                game_name,
+                f"Could not find the game named {game_name}. from player_join",
+            )
             return
 
         # See if the player has already joined
@@ -434,7 +441,9 @@ def reset(data: Dict[Any, Any]):
             game = all_games[game_name]
         except KeyError:
             logger.warning(f"Could not find the game named {game_name}. from reset")
-            emit_error(game_name, f"Could not find the game named {game_name}. from reset")
+            emit_error(
+                game_name, f"Could not find the game named {game_name}. from reset"
+            )
             return
 
         game.reset()

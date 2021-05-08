@@ -11,7 +11,7 @@ flask = "^1.1.1"
 flask_socketio = "^4.2.1"
 flask_cors = "^3.0.8"
 Flask-Scss = "^0.5"
-eventlet = "^0.25.2"
+eventlet = "^0.31.0"
 apscheduler = "^3.6.3"
 gunicorn = {extras = ["eventlet"], version = "^20.0.4"}
 jsonschema = "^3.2.0"

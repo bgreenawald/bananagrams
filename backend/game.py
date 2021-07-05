@@ -321,3 +321,26 @@ class Game(object):
                 self.winning_words = None
         finally:
             self.lock.release()
+
+    def change_player_id(self, old_id: str, new_id: str):
+        """Change a player ID.
+
+        Args:
+            old_id (str): The old player ID.
+            new_id (str): The new player ID.
+
+        Raises:
+            GameException: The old player ID does not exist.
+            GameException: The new player ID already exists.
+
+        """
+        self.lock.acquire(timeout=2)
+
+        try:
+            if old_id not in self.players:
+                raise GameException("Update player ID failed, old ID does not exist.")
+            if new_id in self.players:
+                raise GameException("Update player ID failed, new ID already exists.")
+            self.players[new_id] = self.players.pop(old_id)
+        finally:
+            self.lock.release()

@@ -65,27 +65,7 @@ class Game(object):
         self.test_mode: bool = test_mode
 
         # Tile generation
-        self.tiles = []
-        if test_mode:
-            # For test mode, use a minimal set of tiles for quick testing
-            test_tiles = [
-                "A",
-                "E",
-                "T",
-                "S",
-                "R",
-                "N",
-                "O",
-                "I",
-                "L",
-                "C",
-            ]
-            self.tiles = test_tiles.copy()
-        else:
-            for count, letters in TILE_FREQUENCIES.items():
-                for letter in letters:
-                    for _ in range(count):
-                        self.tiles.append(letter)
+        self.tiles = self._generate_tiles()
         random.shuffle(self.tiles)
 
         # General game fields
@@ -107,11 +87,13 @@ class Game(object):
         # Lock for synchronization
         self.lock = Lock()
 
-    def reset(
-        self,
-    ):
-        # Tile generation
-        self.tiles = []
+    def _generate_tiles(self) -> List[str]:
+        """Generate the initial set of tiles for the game.
+
+        Returns:
+            List[str]: List of tiles for the game.
+        """
+        tiles = []
         if self.test_mode:
             # For test mode, use a minimal set of tiles for quick testing
             test_tiles = [
@@ -126,12 +108,19 @@ class Game(object):
                 "L",
                 "C",
             ]
-            self.tiles = test_tiles.copy()
+            tiles = test_tiles.copy()
         else:
             for count, letters in TILE_FREQUENCIES.items():
                 for letter in letters:
                     for _ in range(count):
-                        self.tiles.append(letter)
+                        tiles.append(letter)
+        return tiles
+
+    def reset(
+        self,
+    ):
+        # Tile generation
+        self.tiles = self._generate_tiles()
         random.shuffle(self.tiles)
 
         # General game fields
@@ -181,7 +170,8 @@ class Game(object):
         Args:
             player_id (str): The ID of the player to add.
         """
-        self.lock.acquire(timeout=2)
+        if not self.lock.acquire(timeout=2):
+            raise GameException("Could not acquire game lock - operation timed out")
         try:
             num_players = len(self.players)
             if num_players == 8:
@@ -198,7 +188,8 @@ class Game(object):
 
     def start_game(self):
         """Starts the game by setting the number of players and divvying out tiles."""
-        self.lock.acquire(timeout=2)
+        if not self.lock.acquire(timeout=2):
+            raise GameException("Could not acquire game lock - operation timed out")
         try:
             if self.state != State.IDLE:
                 raise GameException(
@@ -236,8 +227,9 @@ class Game(object):
 
         for player in self.players:
             for _ in range(num_tiles):
-                if len(self.tiles) > 0:  # Ensure we don't pop from empty list
-                    self.players[player].append(self.tiles.pop())
+                if len(self.tiles) == 0:
+                    raise GameException("Not enough tiles available to distribute to all players")
+                self.players[player].append(self.tiles.pop())
 
         self.tiles_remaining = len(self.tiles)
 
@@ -248,17 +240,14 @@ class Game(object):
         Args:
             test (bool): Bypasses the time restriction for testing, defaults to False.
         """
-        self.lock.acquire(timeout=2)
+        if not self.lock.acquire(timeout=2):
+            raise GameException("Could not acquire game lock - operation timed out")
         try:
             if self.state != State.ACTIVE:
-                raise GameException(
-                    f"Cannot peel, game state is {self.state}. Should be 'ACTIVE'"
-                )
+                raise GameException(f"Cannot peel, game state is {self.state}. Should be 'ACTIVE'")
             else:
                 # Make sure a peel hasn't happened within a fraction of a second to prevent overlap
-                if (
-                    datetime.datetime.now() - self.last_peel
-                ).seconds <= 0.75 and not test:
+                if (datetime.datetime.now() - self.last_peel).total_seconds() <= 0.75 and not test:
                     raise GameException("Peel occuring too frequently.")
 
                 # Update the time of the last peel
@@ -268,13 +257,16 @@ class Game(object):
                 if self.num_players > self.tiles_remaining:
                     raise GameException("Not enough tiles to deal.")
 
+                # Check if this peel will transition to endgame
+                will_be_endgame = (self.tiles_remaining - self.num_players) < self.num_players
+
                 # Give a new tile to each player.
                 for player in self.players:
                     self.players[player].append(self.tiles.pop())
                 self.tiles_remaining = len(self.tiles)
 
-                # See if we there are enough tiles left for another peel
-                if self.tiles_remaining < self.num_players:
+                # Update state if necessary
+                if will_be_endgame:
                     self.state = State.ENDGAME
 
         finally:
@@ -290,7 +282,8 @@ class Game(object):
         Raises:
             GameException: The player does not have an instance of that tile.
         """
-        self.lock.acquire(timeout=2)
+        if not self.lock.acquire(timeout=2):
+            raise GameException("Could not acquire game lock - operation timed out")
         try:
             if self.state not in [State.ACTIVE, State.ENDGAME]:
                 raise GameException(
@@ -300,8 +293,12 @@ class Game(object):
                 if letter not in self.players[player]:
                     raise GameException("Player does not have this letter to remove.")
 
-                # Add three new tiles to the player, or all remaining tiles if less than 3 remain.
-                for _ in range(min(3, self.tiles_remaining)):
+                # Check if this swap will transition to endgame
+                tiles_to_give = min(3, self.tiles_remaining)
+                will_be_endgame = (self.tiles_remaining - tiles_to_give + 1) < self.num_players
+
+                # Add new tiles to the player
+                for _ in range(tiles_to_give):
                     self.players[player].append(self.tiles.pop())
 
                 # Remove one instance of the given letter from the player
@@ -314,8 +311,8 @@ class Game(object):
                 # Update number of tiles
                 self.tiles_remaining = len(self.tiles)
 
-                # Check if peels can still occur
-                if self.tiles_remaining < self.num_players:
+                # Update state if necessary
+                if will_be_endgame:
                     self.state = State.ENDGAME
         finally:
             self.lock.release()
@@ -328,7 +325,8 @@ class Game(object):
             player_id (str): The ID of the potentially winning player.
             word_list (List[str]): The list of the winning words.
         """
-        self.lock.acquire(timeout=2)
+        if not self.lock.acquire(timeout=2):
+            raise GameException("Could not acquire game lock - operation timed out")
         try:
             winning_words = []
             if self.state != State.ENDGAME:
@@ -348,7 +346,8 @@ class Game(object):
 
     def continue_game(self):
         """Continue the game (false alarm on banagrams)"""
-        self.lock.acquire(timeout=2)
+        if not self.lock.acquire(timeout=2):
+            raise GameException("Could not acquire game lock - operation timed out")
         try:
             if self.state != State.OVER:
                 raise GameException(

@@ -4,7 +4,6 @@ from enum import Enum
 from threading import Lock
 from typing import Any, Dict, List
 
-
 TILE_FREQUENCIES = {
     2: ["J", "K", "Q", "X", "Z"],
     3: ["B", "C", "F", "H", "M", "P", "V", "W", "Y"],
@@ -25,8 +24,7 @@ with open("words/words.txt", "r") as file:
 
 
 class State(Enum):
-    """Defines the current state of a turn.
-    """
+    """Defines the current state of a turn."""
 
     # Waiting for players to join the game
     IDLE = "IDLE"
@@ -62,15 +60,32 @@ class Game(object):
 
     """
 
-    def __init__(self, id: str):
+    def __init__(self, id: str, test_mode: bool = False):
         self.id: str = id
+        self.test_mode: bool = test_mode
 
         # Tile generation
         self.tiles = []
-        for count, letters in TILE_FREQUENCIES.items():
-            for letter in letters:
-                for _ in range(count):
-                    self.tiles.append(letter)
+        if test_mode:
+            # For test mode, use a minimal set of tiles for quick testing
+            test_tiles = [
+                "A",
+                "E",
+                "T",
+                "S",
+                "R",
+                "N",
+                "O",
+                "I",
+                "L",
+                "C",
+            ]
+            self.tiles = test_tiles.copy()
+        else:
+            for count, letters in TILE_FREQUENCIES.items():
+                for letter in letters:
+                    for _ in range(count):
+                        self.tiles.append(letter)
         random.shuffle(self.tiles)
 
         # General game fields
@@ -92,13 +107,31 @@ class Game(object):
         # Lock for synchronization
         self.lock = Lock()
 
-    def reset(self,):
+    def reset(
+        self,
+    ):
         # Tile generation
         self.tiles = []
-        for count, letters in TILE_FREQUENCIES.items():
-            for letter in letters:
-                for _ in range(count):
-                    self.tiles.append(letter)
+        if self.test_mode:
+            # For test mode, use a minimal set of tiles for quick testing
+            test_tiles = [
+                "A",
+                "E",
+                "T",
+                "S",
+                "R",
+                "N",
+                "O",
+                "I",
+                "L",
+                "C",
+            ]
+            self.tiles = test_tiles.copy()
+        else:
+            for count, letters in TILE_FREQUENCIES.items():
+                for letter in letters:
+                    for _ in range(count):
+                        self.tiles.append(letter)
         random.shuffle(self.tiles)
 
         # General game fields
@@ -164,8 +197,7 @@ class Game(object):
             self.lock.release()
 
     def start_game(self):
-        """Starts the game by setting the number of players and divvying out tiles.
-        """
+        """Starts the game by setting the number of players and divvying out tiles."""
         self.lock.acquire(timeout=2)
         try:
             if self.state != State.IDLE:
@@ -174,6 +206,9 @@ class Game(object):
                 )
             else:
                 self.num_players = len(self.players)
+                # In test mode, allow single player games
+                if not self.test_mode and self.num_players < 2:
+                    raise GameException("Need at least 2 players to start a game")
                 self._divy_out_tiles()
                 self.state = State.ACTIVE
         finally:
@@ -185,19 +220,24 @@ class Game(object):
         Raises:
             GameException: Invalid number of players.
         """
-        # Give out number of tiles based on number of players
-        if 2 <= self.num_players <= 4:
-            num_tiles = 21
-        elif 5 <= self.num_players <= 6:
-            num_tiles = 15
-        elif 7 <= self.num_players <= 8:
-            num_tiles = 11
+        # In test mode, give fewer tiles for quick testing
+        if self.test_mode:
+            num_tiles = 7  # Small number for quick testing
         else:
-            raise GameException("Invalid number of players.")
+            # Give out number of tiles based on number of players
+            if 2 <= self.num_players <= 4:
+                num_tiles = 21
+            elif 5 <= self.num_players <= 6:
+                num_tiles = 15
+            elif 7 <= self.num_players <= 8:
+                num_tiles = 11
+            else:
+                raise GameException("Invalid number of players.")
 
         for player in self.players:
             for _ in range(num_tiles):
-                self.players[player].append(self.tiles.pop())
+                if len(self.tiles) > 0:  # Ensure we don't pop from empty list
+                    self.players[player].append(self.tiles.pop())
 
         self.tiles_remaining = len(self.tiles)
 
@@ -307,8 +347,7 @@ class Game(object):
             self.lock.release()
 
     def continue_game(self):
-        """Continue the game (false alarm on banagrams)
-        """
+        """Continue the game (false alarm on banagrams)"""
         self.lock.acquire(timeout=2)
         try:
             if self.state != State.OVER:

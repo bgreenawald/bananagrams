@@ -323,3 +323,51 @@ class testGameMethods(unittest.TestCase):
             self.assertEqual(g.winning_player, None)
         with self.subTest("Test winning words reset."):
             self.assertEqual(g.winning_words, None)
+
+    def test_test_mode(self):
+        # Test regular game initialization
+        g_regular = Game("regular")
+        with self.subTest("Test regular game has full tile set"):
+            self.assertEqual(len(g_regular.tiles), 144)
+        with self.subTest("Test regular game test_mode flag"):
+            self.assertFalse(g_regular.test_mode)
+
+        # Test test mode game initialization
+        g_test = Game("test", test_mode=True)
+        with self.subTest("Test mode game has minimal tiles"):
+            self.assertEqual(len(g_test.tiles), 20)
+        with self.subTest("Test test mode flag is set"):
+            self.assertTrue(g_test.test_mode)
+
+        # Test single player start in test mode
+        g_test.join_game("single_player")
+        with self.subTest("Test single player can start in test mode"):
+            try:
+                g_test.start_game()
+            except GameException:
+                self.fail("Should allow single player start in test mode")
+            else:
+                pass
+
+        with self.subTest("Test player gets fewer tiles in test mode"):
+            self.assertEqual(len(g_test.players["single_player"]), 7)
+
+        with self.subTest("Test game state transitions correctly in test mode"):
+            self.assertEqual(g_test.state, State.ACTIVE)
+
+        # Test that regular game still requires 2+ players
+        g_regular.join_game("single_player")
+        with self.subTest("Test regular game still requires 2+ players"):
+            try:
+                g_regular.start_game()
+            except GameException:
+                pass
+            else:
+                self.fail("Regular game should require at least 2 players")
+
+        # Test reset maintains test mode
+        g_test.reset()
+        with self.subTest("Test reset maintains test mode tiles count"):
+            self.assertEqual(len(g_test.tiles), 20)
+        with self.subTest("Test reset maintains test mode flag"):
+            self.assertTrue(g_test.test_mode)

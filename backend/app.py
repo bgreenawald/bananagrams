@@ -7,12 +7,11 @@ from typing import Any, Dict
 
 import simplejson
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask, json, request, Response
+from flask import Flask, Response, json, request
 from flask_cors import CORS
-from flask_socketio import emit, join_room, SocketIO
-from jsonschema import validate, ValidationError
-
+from flask_socketio import SocketIO, emit, join_room
 from game import Game, GameException
+from jsonschema import ValidationError, validate
 
 # Initialize the application
 app = Flask(__name__, static_url_path="", static_folder="static")
@@ -85,15 +84,13 @@ def on_join(data: Dict[str, Any]):
 
 @socketio.on("connect")
 def on_connect():
-    """Called on client connect.
-    """
+    """Called on client connect."""
     logger.info(f"{request.sid} has connected.")
 
 
 @socketio.on("disconnect")
 def on_disconnect():
-    """Called on client disconnect.
-    """
+    """Called on client disconnect."""
     logger.info(f"{request.sid} has disconnected.")
 
 
@@ -126,12 +123,16 @@ def load_game(data: Dict[Any, Any]):
     """Loads the current game game, or creates on if none exists.
     Args:
         data (Dict[Any, Any]): {
-            "game": (Any) The name of the game.
+            "name": (Any) The name of the game.
+            "test_mode": (bool, optional) Whether to create game in test mode.
         }
     """
     schema = {
         "type": "object",
-        "properties": {"name": {"type": ["string", "number"]}},
+        "properties": {
+            "name": {"type": ["string", "number"]},
+            "test_mode": {"type": "boolean"},
+        },
         "required": ["name"],
     }
     try:
@@ -143,10 +144,13 @@ def load_game(data: Dict[Any, Any]):
             logger.error("No game specified in input. from load_game")
     else:
         game_name = data["name"]
+        test_mode = data.get("test_mode", False)
 
         if game_name not in all_games:
-            cur_game = Game(game_name)
+            cur_game = Game(game_name, test_mode=test_mode)
             all_games[game_name] = cur_game
+            if test_mode:
+                emit_game(game_name, cur_game, "Test game created.")
         else:
             game = all_games[game_name]
             emit_game(game_name, game, "Game loaded.")
@@ -450,9 +454,57 @@ def reset(data: Dict[Any, Any]):
         emit_game(game_name, game, f"Game '{game_name}' reset.")
 
 
+@socketio.on("create_test_game")
+def create_test_game(data: Dict[Any, Any]):
+    """Creates a new test game with minimal tiles and allows single player.
+
+    Args:
+        data (Dict[Any, Any]): {
+            "name": (Any) The name of the game.
+            "player_id": (Any) ID of the player to automatically join.
+        }
+    """
+    schema = {
+        "type": "object",
+        "properties": {
+            "name": {"type": ["string", "number"]},
+            "player_id": {"type": ["string", "number"]},
+        },
+        "required": ["name", "player_id"],
+    }
+    try:
+        validate(data, schema=schema)
+    except ValidationError as e:
+        if "name" in data:
+            emit_error(data["name"], str(e))
+        else:
+            logger.error("No game specified in input. from create_test_game")
+    else:
+        game_name = data["name"]
+        player_id = data["player_id"]
+
+        # Create test game
+        test_game = Game(game_name, test_mode=True)
+        all_games[game_name] = test_game
+
+        # Automatically join the player and start the game
+        try:
+            test_game.join_game(player_id)
+            test_game.start_game()  # Auto-start test games
+            emit_game(
+                game_name,
+                test_game,
+                f"Test game created, player {player_id} joined, and game started!",
+            )
+        except GameException as e:
+            logger.error("Exception occurred while creating test game", exc_info=True)
+            emit_error(game_name, str(e))
+
+
 # ---------------------------------------
 # Other functions
 # ---------------------------------------
+
 
 # Schedule cleanup
 def _delete_old_games():

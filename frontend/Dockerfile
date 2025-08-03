@@ -1,28 +1,25 @@
-# Build stage
-FROM node:20-slim AS builder
+FROM node:18-alpine AS build
 
+# Set working directory
 WORKDIR /app
 
 # Copy package files
-COPY package.json ./
+COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci --only=production
 
-# Copy application code
+# Copy source code
 COPY . .
 
-# Build the Angular application
+# Build the application
 RUN npm run build
 
-# Production stage
+# Production stage with nginx
 FROM nginx:alpine
 
-# Remove default nginx website
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy built application from builder stage
-COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html/
+# Copy built assets from build stage
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf

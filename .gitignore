@@ -34,3 +34,4 @@ htmlcov/
 */node_modules/
 .python-version
 frontend/.angular
+frontend/dist

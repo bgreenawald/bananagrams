@@ -73,14 +73,13 @@ const players = computed(() => gameStore.players)
 
 const canPeel = computed(() => {
   return gameStore.isActive && 
-         playerStore.tiles.length === 0 && 
+         playerStore.benchTiles.length === 0 && 
          boardStore.getOccupiedCells().length > 0
 })
 
 const canCallBananagrams = computed(() => {
-  return gameStore.isActive && 
-         playerStore.tiles.length === 0 && 
-         tilesRemaining.value === 0 &&
+  return gameStore.isEndgame && 
+         playerStore.benchTiles.length === 0 && 
          boardStore.getOccupiedCells().length > 0
 })
 
@@ -111,7 +110,7 @@ function handleBananagrams() {
     return
   }
 
-  socketStore.callBananagrams(gameId.value)
+  socketStore.callBananagrams(gameId.value, words)
 }
 
 function handleSelectAll() {

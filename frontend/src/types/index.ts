@@ -1,6 +1,7 @@
 export interface Tile {
   letter: string
   id: string
+  onBoard?: boolean // Track if tile is placed on board
 }
 
 export interface Player {
@@ -19,6 +20,8 @@ export interface GameState {
   tiles_remaining?: number
   winning_player?: string
   winning_words?: string[]
+  winner?: string // Alternative name for winning_player
+  winningWords?: string[] // Alternative name for winning_words
 }
 
 export interface BoardCell {

@@ -103,7 +103,7 @@ function handleReset() {
   // Move all board tiles back to bench
   const boardTiles = boardStore.getAllTiles()
   boardTiles.forEach(({ tile }) => {
-    playerStore.addTile(tile)
+    playerStore.markTileOnBoard(tile.id, false)
   })
   boardStore.clearBoard()
   socketStore.resetBoard(gameStore.gameId)

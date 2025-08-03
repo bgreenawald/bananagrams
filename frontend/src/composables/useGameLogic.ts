@@ -7,7 +7,7 @@ export function useGameLogic() {
 
   function validateBoard() {
     // Check if bench is empty
-    if (playerStore.tiles.length > 0) {
+    if (playerStore.benchTiles.length > 0) {
       return { valid: false, error: 'You must use all tiles from your bench' }
     }
 

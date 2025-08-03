@@ -26,7 +26,10 @@ export const usePlayerStore = defineStore('player', () => {
   }
 
   function setTiles(newTiles: Tile[]) {
+    console.log(`[PLAYER STORE] setTiles called with ${newTiles.length} tiles`)
+    console.log(`[PLAYER STORE] Old tiles count: ${tiles.value.length}`)
     tiles.value = newTiles
+    console.log(`[PLAYER STORE] New tiles count: ${tiles.value.length}`)
   }
 
   function addTile(tile: Tile) {
@@ -37,10 +40,21 @@ export const usePlayerStore = defineStore('player', () => {
     tiles.value = tiles.value.filter(t => t.id !== tileId)
   }
 
+  function markTileOnBoard(tileId: string, onBoard: boolean = true) {
+    const tile = tiles.value.find(t => t.id === tileId)
+    if (tile) {
+      tile.onBoard = onBoard
+    }
+  }
+
   function updateTiles(newTiles: Tile[]) {
+    console.log(`[PLAYER STORE] updateTiles called with ${newTiles.length} tiles`)
+    console.log(`[PLAYER STORE] Current tiles before update: ${tiles.value.length}`)
     const existingIds = new Set(tiles.value.map(t => t.id))
     const newTilesToAdd = newTiles.filter(t => !existingIds.has(t.id))
+    console.log(`[PLAYER STORE] Adding ${newTilesToAdd.length} new tiles`)
     tiles.value = [...tiles.value, ...newTilesToAdd]
+    console.log(`[PLAYER STORE] Final tiles count: ${tiles.value.length}`)
   }
 
   function selectTile(tileId: string) {
@@ -78,10 +92,14 @@ export const usePlayerStore = defineStore('player', () => {
     selectedTiles.value.clear()
   }
 
+  // Computed property for bench tiles (tiles not on board)
+  const benchTiles = computed(() => tiles.value.filter(t => !t.onBoard))
+
   return {
     playerName,
     playerId,
     tiles,
+    benchTiles,
     selectedTiles,
     currentPlayer,
     tileCount,
@@ -90,6 +108,7 @@ export const usePlayerStore = defineStore('player', () => {
     setTiles,
     addTile,
     removeTile,
+    markTileOnBoard,
     updateTiles,
     selectTile,
     deselectTile,

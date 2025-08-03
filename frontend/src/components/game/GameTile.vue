@@ -86,7 +86,7 @@ function handleDragEnd() {
 }
 
 function handleSwap() {
-  socketStore.swapTile(gameStore.gameId, props.tile.id)
+  socketStore.swapTile(gameStore.gameId, props.tile.letter)
   showSwapButton.value = false
 }
 </script>

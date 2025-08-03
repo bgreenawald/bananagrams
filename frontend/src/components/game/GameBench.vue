@@ -34,7 +34,12 @@ import { useDragDrop } from '@/composables/useDragDrop'
 const playerStore = usePlayerStore()
 const { handleBenchDrop } = useDragDrop()
 
-const tiles = computed(() => playerStore.tiles)
+const tiles = computed(() => {
+  console.log(`[BENCH DEBUG] Bench tiles computed, count: ${playerStore.benchTiles.length}`)
+  console.log(`[BENCH DEBUG] Total tiles: ${playerStore.tiles.length}, Bench tiles: ${playerStore.benchTiles.length}`)
+  console.log(`[BENCH DEBUG] Bench tiles:`, playerStore.benchTiles.map(t => `${t.letter}(${t.id.slice(-8)})`))
+  return playerStore.benchTiles
+})
 const minSlots = 20
 
 const emptySlots = computed(() => {

@@ -81,7 +81,7 @@ export function useDragDrop() {
         socketStore.moveTile(gameStore.gameId, move.fromRow, move.fromCol, move.toRow, move.toCol)
       } else {
         // Move from bench to board
-        playerStore.removeTile(move.tile.id)
+        playerStore.markTileOnBoard(move.tile.id, true)
         boardStore.placeTile(move.tile, move.toRow, move.toCol)
         socketStore.placeTile(gameStore.gameId, move.tile.id, move.toRow, move.toCol)
       }
@@ -101,7 +101,7 @@ export function useDragDrop() {
       // Move from board to bench
       const tile = boardStore.removeTile(dragData.sourceRow, dragData.sourceCol)
       if (tile) {
-        playerStore.addTile(tile)
+        playerStore.markTileOnBoard(tile.id, false)
         // TODO: Send socket event for removing tile from board
       }
     }

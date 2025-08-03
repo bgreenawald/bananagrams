@@ -23,13 +23,35 @@
           <p v-if="error" class="error">{{ error }}</p>
         </div>
 
-        <button
-          @click="createGame"
-          :disabled="!isValidGameId"
-          class="create-btn"
-        >
-          Create New Game
-        </button>
+        <div class="input-group">
+          <label class="checkbox-label">
+            <input
+              v-model="testMode"
+              type="checkbox"
+              class="checkbox"
+            />
+            Test Mode (Single player, fewer tiles)
+          </label>
+        </div>
+
+        <div class="button-group">
+          <button
+            @click="createGame"
+            :disabled="!isValidGameId"
+            class="create-btn"
+          >
+            Create New Game
+          </button>
+          
+          <button
+            v-if="testMode"
+            @click="createTestGame"
+            :disabled="!isValidGameId"
+            class="test-btn"
+          >
+            Quick Test Game
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -39,12 +61,17 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '@/stores/game'
+import { useSocketStore } from '@/stores/socket'
+import { usePlayerStore } from '@/stores/player'
 
 const router = useRouter()
 const gameStore = useGameStore()
+const socketStore = useSocketStore()
+const playerStore = usePlayerStore()
 
 const gameId = ref('')
 const error = ref('')
+const testMode = ref(false)
 
 const isValidGameId = computed(() => {
   return /^\d{4}$/.test(gameId.value)
@@ -75,7 +102,51 @@ const createGame = () => {
   }
   
   gameStore.setGameId(gameId.value)
-  router.push({ name: 'lobby', params: { id: gameId.value } })
+  router.push({ 
+    name: 'lobby', 
+    params: { id: gameId.value },
+    query: testMode.value ? { testMode: 'true' } : {}
+  })
+}
+
+const createTestGame = async () => {
+  if (!isValidGameId.value) {
+    error.value = 'Please enter a valid 4-digit game ID'
+    return
+  }
+  
+  // For test mode, we can auto-generate a player name or prompt for one
+  const testPlayerName = `TestPlayer-${Math.floor(Math.random() * 1000)}`
+  playerStore.setPlayerName(testPlayerName)
+  
+  gameStore.setGameId(gameId.value)
+  
+  // Connect socket if not already connected and wait for connection
+  if (!socketStore.connected) {
+    socketStore.connect()
+    // Wait for connection
+    await new Promise((resolve) => {
+      const checkConnection = () => {
+        if (socketStore.connected) {
+          resolve(true)
+        } else {
+          setTimeout(checkConnection, 100)
+        }
+      }
+      checkConnection()
+    })
+  }
+  
+  // Create test game - this will auto-start the game
+  socketStore.createTestGame(gameId.value, testPlayerName)
+  
+  // Wait a moment for the game state to be received, then navigate
+  setTimeout(() => {
+    router.push({ 
+      name: 'game', 
+      params: { id: gameId.value }
+    })
+  }, 500)
 }
 </script>
 
@@ -115,6 +186,12 @@ const createGame = () => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .input-group {
@@ -187,5 +264,41 @@ input {
 .error {
   color: #f44336;
   font-size: 0.9rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.test-btn {
+  padding: 1rem;
+  background-color: #FF9800;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: #F57C00;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 }
 </style>

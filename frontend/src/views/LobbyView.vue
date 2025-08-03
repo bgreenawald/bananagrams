@@ -4,7 +4,7 @@
       <h1 class="title">Game Lobby</h1>
       <p class="game-id">Game ID: {{ gameId }}</p>
 
-      <div v-if="!playerName" class="name-form">
+      <div v-if="!playerName && !skipNameEntry" class="name-form">
         <h2>Enter your name to join</h2>
         <div class="input-group">
           <input
@@ -34,13 +34,16 @@
         </div>
 
         <div class="actions">
+          <p v-if="isTestMode" class="test-mode-indicator">🧪 Test Mode - Single Player Allowed</p>
           <button
             v-if="gameState === 'IDLE'"
             @click="startGame"
-            :disabled="players.length < 2"
+            :disabled="players.length < (isTestMode ? 1 : 2)"
             class="start-btn"
           >
-            {{ players.length < 2 ? 'Waiting for players...' : 'Start Game' }}
+            {{ players.length < (isTestMode ? 1 : 2) ? 
+              (isTestMode ? 'Ready to start!' : 'Waiting for players...') : 
+              'Start Game' }}
           </button>
           <p v-else-if="gameState === 'ACTIVE'" class="status">
             Game in progress...
@@ -65,6 +68,8 @@ const playerStore = usePlayerStore()
 const socketStore = useSocketStore()
 
 const gameId = computed(() => route.params.id as string)
+const isTestMode = computed(() => route.query.testMode === 'true')
+const skipNameEntry = computed(() => route.query.skipNameEntry === 'true')
 const nameInput = ref('')
 const playerName = computed(() => playerStore.playerName)
 const players = computed(() => gameStore.players)
@@ -98,11 +103,12 @@ const joinGame = () => {
 }
 
 const joinGameWithName = (name: string) => {
-  socketStore.joinGame(gameId.value, name)
+  socketStore.joinGame(gameId.value, name, isTestMode.value)
 }
 
 const startGame = () => {
-  if (players.value.length >= 2) {
+  const minPlayers = isTestMode.value ? 1 : 2
+  if (players.value.length >= minPlayers) {
     socketStore.startGame(gameId.value)
   }
 }
@@ -259,5 +265,16 @@ const startGame = () => {
   font-size: 1.1rem;
   color: #2196F3;
   font-weight: 600;
+}
+
+.test-mode-indicator {
+  background-color: #FFF3E0;
+  color: #FF9800;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid #FFE0B2;
 }
 </style>

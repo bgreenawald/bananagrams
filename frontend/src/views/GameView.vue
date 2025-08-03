@@ -10,9 +10,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { onMounted, onUnmounted, watch, ref } from 'vue'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useGameStore } from '@/stores/game'
+import { getRouteParam } from '@/utils/route'
 import GameBoard from '@/components/game/GameBoard.vue'
 import GameBench from '@/components/game/GameBench.vue'
 import GameControls from '@/components/game/GameControls.vue'
@@ -22,17 +23,30 @@ const route = useRoute()
 const router = useRouter()
 const gameStore = useGameStore()
 
-const gameId = route.params.id as string
+const gameId = getRouteParam(route, 'id')
+const beforeUnloadHandler = ref<((e: BeforeUnloadEvent) => void) | null>(null)
 
 onMounted(() => {
+  if (!gameId) {
+    router.push({ name: 'landing' })
+    return
+  }
+  
   gameStore.setGameId(gameId)
   
-  // Warn before leaving page
-  window.addEventListener('beforeunload', handleBeforeUnload)
+  // Create and store the event handler reference
+  beforeUnloadHandler.value = handleBeforeUnload
+  window.addEventListener('beforeunload', beforeUnloadHandler.value)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('beforeunload', handleBeforeUnload)
+  removeBeforeUnloadListener()
+})
+
+// Also remove listener when leaving route (covers route changes)
+onBeforeRouteLeave(() => {
+  removeBeforeUnloadListener()
+  return true
 })
 
 watch(() => gameStore.gameState?.state, (newState) => {
@@ -47,6 +61,13 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
   if (gameStore.isActive) {
     e.preventDefault()
     e.returnValue = ''
+  }
+}
+
+function removeBeforeUnloadListener() {
+  if (beforeUnloadHandler.value) {
+    window.removeEventListener('beforeunload', beforeUnloadHandler.value)
+    beforeUnloadHandler.value = null
   }
 }
 </script>

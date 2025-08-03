@@ -14,7 +14,7 @@
               type="text"
               maxlength="4"
               placeholder="Enter 4-digit ID"
-              @input="validateGameId"
+              @input="validateGameIdInput"
             />
             <button @click="generateGameId" class="generate-btn">
               Generate
@@ -63,23 +63,31 @@ import { useRouter } from 'vue-router'
 import { useGameStore } from '@/stores/game'
 import { useSocketStore } from '@/stores/socket'
 import { usePlayerStore } from '@/stores/player'
+import { useValidation } from '@/composables/useValidation'
 
 const router = useRouter()
 const gameStore = useGameStore()
 const socketStore = useSocketStore()
 const playerStore = usePlayerStore()
+const { validateGameId, sanitizeInput } = useValidation()
 
 const gameId = ref('')
 const error = ref('')
 const testMode = ref(false)
 
 const isValidGameId = computed(() => {
-  return /^\d{4}$/.test(gameId.value)
+  const validation = validateGameId(gameId.value)
+  return validation.valid
 })
 
-const validateGameId = () => {
-  gameId.value = gameId.value.replace(/\D/g, '').slice(0, 4)
-  error.value = ''
+const validateGameIdInput = () => {
+  // Sanitize and format input
+  const cleaned = gameId.value.replace(/\D/g, '').slice(0, 4)
+  gameId.value = sanitizeInput(cleaned)
+  
+  // Validate
+  const validation = validateGameId(gameId.value)
+  error.value = validation.valid ? '' : validation.error || ''
 }
 
 const generateGameId = async () => {
@@ -96,57 +104,53 @@ const generateGameId = async () => {
 }
 
 const createGame = () => {
-  if (!isValidGameId.value) {
-    error.value = 'Please enter a valid 4-digit game ID'
+  const validation = validateGameId(gameId.value)
+  if (!validation.valid) {
+    error.value = validation.error || 'Invalid game ID'
     return
   }
   
-  gameStore.setGameId(gameId.value)
+  const sanitizedId = sanitizeInput(gameId.value)
+  gameStore.setGameId(sanitizedId)
   router.push({ 
     name: 'lobby', 
-    params: { id: gameId.value },
+    params: { id: sanitizedId },
     query: testMode.value ? { testMode: 'true' } : {}
   })
 }
 
 const createTestGame = async () => {
-  if (!isValidGameId.value) {
-    error.value = 'Please enter a valid 4-digit game ID'
+  const validation = validateGameId(gameId.value)
+  if (!validation.valid) {
+    error.value = validation.error || 'Invalid game ID'
     return
   }
   
-  // For test mode, we can auto-generate a player name or prompt for one
-  const testPlayerName = `TestPlayer-${Math.floor(Math.random() * 1000)}`
-  playerStore.setPlayerName(testPlayerName)
-  
-  gameStore.setGameId(gameId.value)
-  
-  // Connect socket if not already connected and wait for connection
-  if (!socketStore.connected) {
-    socketStore.connect()
-    // Wait for connection
-    await new Promise((resolve) => {
-      const checkConnection = () => {
-        if (socketStore.connected) {
-          resolve(true)
-        } else {
-          setTimeout(checkConnection, 100)
-        }
-      }
-      checkConnection()
-    })
+  try {
+    // For test mode, we can auto-generate a player name or prompt for one
+    const testPlayerName = `TestPlayer-${Math.floor(Math.random() * 1000)}`
+    playerStore.setPlayerName(testPlayerName)
+    
+    gameStore.setGameId(gameId.value)
+    
+    // Connect socket with proper error handling
+    await socketStore.connect()
+    
+    // Create test game - this will auto-start the game
+    socketStore.createTestGame(gameId.value, testPlayerName)
+    
+    // Wait a moment for the game state to be received, then navigate
+    setTimeout(() => {
+      router.push({ 
+        name: 'game', 
+        params: { id: gameId.value }
+      })
+    }, 500)
+  } catch (connectionError) {
+    const errorMessage = connectionError instanceof Error ? connectionError.message : String(connectionError)
+    error.value = `Connection failed: ${errorMessage}`
+    console.error('Failed to connect:', connectionError)
   }
-  
-  // Create test game - this will auto-start the game
-  socketStore.createTestGame(gameId.value, testPlayerName)
-  
-  // Wait a moment for the game state to be received, then navigate
-  setTimeout(() => {
-    router.push({ 
-      name: 'game', 
-      params: { id: gameId.value }
-    })
-  }, 500)
 }
 </script>
 

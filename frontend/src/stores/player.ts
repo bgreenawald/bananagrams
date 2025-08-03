@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Tile } from '@/types'
 import { useGameStore } from './game'
+import { logger } from '@/utils/logger'
 
 export const usePlayerStore = defineStore('player', () => {
   const playerName = ref<string>('')
@@ -26,10 +27,11 @@ export const usePlayerStore = defineStore('player', () => {
   }
 
   function setTiles(newTiles: Tile[]) {
-    console.log(`[PLAYER STORE] setTiles called with ${newTiles.length} tiles`)
-    console.log(`[PLAYER STORE] Old tiles count: ${tiles.value.length}`)
+    logger.tileUpdate(
+      `Setting ${newTiles.length} tiles (was ${tiles.value.length})`,
+      { newCount: newTiles.length, oldCount: tiles.value.length }
+    )
     tiles.value = newTiles
-    console.log(`[PLAYER STORE] New tiles count: ${tiles.value.length}`)
   }
 
   function addTile(tile: Tile) {
@@ -48,13 +50,20 @@ export const usePlayerStore = defineStore('player', () => {
   }
 
   function updateTiles(newTiles: Tile[]) {
-    console.log(`[PLAYER STORE] updateTiles called with ${newTiles.length} tiles`)
-    console.log(`[PLAYER STORE] Current tiles before update: ${tiles.value.length}`)
     const existingIds = new Set(tiles.value.map(t => t.id))
     const newTilesToAdd = newTiles.filter(t => !existingIds.has(t.id))
-    console.log(`[PLAYER STORE] Adding ${newTilesToAdd.length} new tiles`)
+    
+    logger.tileUpdate(
+      `Updating tiles: adding ${newTilesToAdd.length} new tiles`,
+      {
+        receivedTiles: newTiles.length,
+        currentTiles: tiles.value.length,
+        newTiles: newTilesToAdd.length,
+        finalCount: tiles.value.length + newTilesToAdd.length
+      }
+    )
+    
     tiles.value = [...tiles.value, ...newTilesToAdd]
-    console.log(`[PLAYER STORE] Final tiles count: ${tiles.value.length}`)
   }
 
   function selectTile(tileId: string) {

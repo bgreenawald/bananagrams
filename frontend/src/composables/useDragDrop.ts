@@ -3,6 +3,7 @@ import { usePlayerStore } from '@/stores/player'
 import { useBoardStore } from '@/stores/board'
 import { useUIStore } from '@/stores/ui'
 import { useSocketStore } from '@/stores/socket'
+import { logger } from '@/utils/logger'
 import type { Tile } from '@/types'
 
 export function useDragDrop() {
@@ -11,11 +12,22 @@ export function useDragDrop() {
   const boardStore = useBoardStore()
   const uiStore = useUIStore()
   const socketStore = useSocketStore()
+  
+  // Validation helper to ensure tile state consistency
+  function validateTileOperation(tileId: string, operation: string): boolean {
+    const tile = findTileById(tileId)
+    if (!tile) {
+      logger.error(`${operation}: Tile ${tileId} not found`, 'Drag Drop')
+      return false
+    }
+    return true
+  }
 
   function handleCellDrop(targetRow: number, targetCol: number) {
     const dragData = uiStore.dragData
     if (!dragData) return
 
+    if (!validateTileOperation(dragData.tileId, 'Cell Drop')) return
     const draggedTile = findTileById(dragData.tileId)
     if (!draggedTile) return
 
@@ -73,17 +85,43 @@ export function useDragDrop() {
       }
     }
 
-    // Execute all moves
+    // Execute all moves with validation
     for (const move of moves) {
-      if (move.fromRow !== undefined && move.fromCol !== undefined) {
-        // Move from board to board
-        boardStore.moveTile(move.fromRow, move.fromCol, move.toRow, move.toCol)
-        socketStore.moveTile(gameStore.gameId, move.fromRow, move.fromCol, move.toRow, move.toCol)
-      } else {
-        // Move from bench to board
-        playerStore.markTileOnBoard(move.tile.id, true)
-        boardStore.placeTile(move.tile, move.toRow, move.toCol)
-        socketStore.placeTile(gameStore.gameId, move.tile.id, move.toRow, move.toCol)
+      try {
+        if (move.fromRow !== undefined && move.fromCol !== undefined) {
+          // Move from board to board
+          const success = boardStore.moveTile(move.fromRow, move.fromCol, move.toRow, move.toCol)
+          if (success) {
+            socketStore.moveTile(gameStore.gameId, move.fromRow, move.fromCol, move.toRow, move.toCol)
+          } else {
+            logger.error(
+              `Failed to move tile from (${move.fromRow}, ${move.fromCol}) to (${move.toRow}, ${move.toCol})`,
+              'Drag Drop',
+              { tile: move.tile, fromRow: move.fromRow, fromCol: move.fromCol, toRow: move.toRow, toCol: move.toCol }
+            )
+          }
+        } else {
+          // Move from bench to board
+          // Check if target cell is actually empty
+          if (boardStore.getTileAt(move.toRow, move.toCol)) {
+            logger.error(
+              `Target cell (${move.toRow}, ${move.toCol}) is occupied`,
+              'Drag Drop',
+              { targetRow: move.toRow, targetCol: move.toCol }
+            )
+            continue
+          }
+          
+          playerStore.markTileOnBoard(move.tile.id, true)
+          boardStore.placeTile(move.tile, move.toRow, move.toCol)
+          socketStore.placeTile(gameStore.gameId, move.tile.id, move.toRow, move.toCol)
+        }
+      } catch (error) {
+        logger.error(
+          `Error executing move for tile ${move.tile.id}`,
+          'Drag Drop',
+          { error, tile: move.tile, move }
+        )
       }
     }
 

@@ -46,6 +46,12 @@
             <!-- Error Message -->
             <div v-else-if="modalType === 'error'">
               <p>{{ modalData?.message }}</p>
+              <div v-if="modalData?.technical" class="technical-details">
+                <details>
+                  <summary>Technical Details</summary>
+                  <pre>{{ modalData.technical }}</pre>
+                </details>
+              </div>
               <div class="modal-actions">
                 <button @click="close" class="btn btn-primary">OK</button>
               </div>
@@ -240,6 +246,36 @@ function submitReview() {
   
   &:hover {
     opacity: 0.8;
+  }
+}
+
+.technical-details {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+
+  summary {
+    cursor: pointer;
+    font-weight: 500;
+    color: #6c757d;
+    
+    &:hover {
+      color: #495057;
+    }
+  }
+
+  pre {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    font-size: 0.8rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 }
 

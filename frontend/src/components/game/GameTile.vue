@@ -68,15 +68,24 @@ function handleDragStart(e: DragEvent) {
   })
   
   // Set drag data
-  e.dataTransfer!.effectAllowed = 'move'
-  e.dataTransfer!.setData('text/plain', props.tile.id)
-  
-  // Create custom drag image
-  const dragImage = (e.target as HTMLElement).cloneNode(true) as HTMLElement
-  dragImage.style.opacity = '0.8'
-  document.body.appendChild(dragImage)
-  e.dataTransfer!.setDragImage(dragImage, 25, 25)
-  setTimeout(() => document.body.removeChild(dragImage), 0)
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', props.tile.id)
+    
+    // Create custom drag image
+    const target = e.target as HTMLElement
+    if (target) {
+      const dragImage = target.cloneNode(true) as HTMLElement
+      dragImage.style.opacity = '0.8'
+      document.body.appendChild(dragImage)
+      e.dataTransfer.setDragImage(dragImage, 25, 25)
+      setTimeout(() => {
+        if (document.body.contains(dragImage)) {
+          document.body.removeChild(dragImage)
+        }
+      }, 0)
+    }
+  }
 }
 
 function handleDragEnd() {

@@ -18,6 +18,7 @@
             Join Game
           </button>
         </div>
+        <p v-if="nameError" class="error-message">{{ nameError }}</p>
       </div>
 
       <div v-else class="lobby-info">
@@ -76,6 +77,7 @@ const gameId = computed(() => getRouteParam(route, 'id'))
 const isTestMode = computed(() => getRouteQueryBoolean(route, 'testMode'))
 const skipNameEntry = computed(() => getRouteQueryBoolean(route, 'skipNameEntry'))
 const nameInput = ref('')
+const nameError = ref('')
 const playerName = computed(() => playerStore.playerName)
 const players = computed(() => gameStore.players)
 const gameState = computed(() => gameStore.gameState?.state)
@@ -116,10 +118,12 @@ const joinGame = () => {
   const validation = validatePlayerName(rawName)
   
   if (!validation.valid) {
-    // You could show this error in the UI if needed
-    console.error('Invalid player name:', validation.error)
+    nameError.value = validation.error
     return
   }
+  
+  // Clear any previous error when validation passes
+  nameError.value = ''
   
   const sanitizedName = sanitizeInput(rawName)
   playerStore.setPlayerName(sanitizedName)
@@ -226,6 +230,14 @@ const startGame = () => {
       cursor: not-allowed;
     }
   }
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  font-weight: 500;
 }
 
 .lobby-info {

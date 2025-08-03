@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '@/stores/game'
 import { useSocketStore } from '@/stores/socket'
@@ -139,13 +139,38 @@ const createTestGame = async () => {
     // Create test game - this will auto-start the game
     socketStore.createTestGame(gameId.value, testPlayerName)
     
-    // Wait a moment for the game state to be received, then navigate
-    setTimeout(() => {
-      router.push({ 
-        name: 'game', 
-        params: { id: gameId.value }
-      })
-    }, 500)
+    // Watch for game state changes to navigate when game becomes active
+    let hasNavigated = false
+    const unwatch = watch(() => gameStore.isActive, (isActive) => {
+      if (isActive && !hasNavigated) {
+        hasNavigated = true
+        unwatch() // Stop watching once we navigate
+        router.push({ 
+          name: 'game', 
+          params: { id: gameId.value }
+        })
+      }
+    }, { immediate: true })
+    
+    // Fallback timeout in case game state doesn't update properly
+    const timeoutId = setTimeout(() => {
+      if (!hasNavigated) {
+        hasNavigated = true
+        unwatch()
+        console.warn('Game state update timeout, navigating anyway')
+        router.push({ 
+          name: 'game', 
+          params: { id: gameId.value }
+        })
+      }
+    }, 3000) // 3 second fallback
+    
+    // Clean up timeout if navigation happens before timeout
+    watch(() => hasNavigated, (navigated) => {
+      if (navigated) {
+        clearTimeout(timeoutId)
+      }
+    })
   } catch (connectionError) {
     const errorMessage = connectionError instanceof Error ? connectionError.message : String(connectionError)
     error.value = `Connection failed: ${errorMessage}`

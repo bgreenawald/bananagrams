@@ -56,15 +56,6 @@ export function useValidation() {
         return !/<[^>]*>/g.test(str)
       },
       message: 'HTML tags are not allowed'
-    }),
-
-    noSqlInjection: (): ValidationRule => ({
-      test: (value: any) => {
-        const str = String(value).toLowerCase()
-        const sqlKeywords = ['select', 'insert', 'update', 'delete', 'drop', 'union', 'script']
-        return !sqlKeywords.some(keyword => str.includes(keyword))
-      },
-      message: 'Invalid characters detected'
     })
   }
 
@@ -93,8 +84,7 @@ export function useValidation() {
     return validate(value, [
       rules.required('Game ID is required'),
       rules.gameId(),
-      rules.noHtml(),
-      rules.noSqlInjection()
+      rules.noHtml()
     ])
   }
 
@@ -102,15 +92,24 @@ export function useValidation() {
     return validate(value, [
       rules.required('Player name is required'),
       rules.playerName(),
-      rules.noHtml(),
-      rules.noSqlInjection()
+      rules.noHtml()
     ])
   }
 
   function sanitizeInput(value: string): string {
     return value
       .trim()
-      .replace(/[<>'"]/g, '') // Remove potentially dangerous characters
+      .replace(/[<>&'"]/g, (match) => {
+        // HTML escape dangerous characters
+        const escapeMap: Record<string, string> = {
+          '<': '&lt;',
+          '>': '&gt;',
+          '&': '&amp;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }
+        return escapeMap[match] || match
+      })
       .replace(/\s+/g, ' ') // Normalize whitespace
   }
 

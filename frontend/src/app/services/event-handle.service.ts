@@ -1,10 +1,8 @@
-import { Injectable, TemplateRef } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HelperService } from './helper.service';
 import { ErrorService } from './error.service';
 import { Subject } from 'rxjs';
-import { AppRoutingModule } from '../app-routing.module';
-import { TileComponent } from '../components/tile/tile.component';
-import { MessageBusService } from '../services/message-bus.service';
+import { MessageBusService } from './message-bus.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +10,9 @@ import { MessageBusService } from '../services/message-bus.service';
 export class EventHandleService {
   // HTMLElement is of type app-tile
   public selectedTiles: HTMLElement[] = [];
-  public tilesToDrag = [];
+  public tilesToDrag: any[] = [];
   private _emptyCellColumns: number[] = [];
-  private _removeCells = new Subject();
+  private _removeCells = new Subject<number[]>();
   public removeCell$ = this._removeCells.asObservable();
 
   constructor(
@@ -23,16 +21,16 @@ export class EventHandleService {
     private _messageBusService: MessageBusService
   ) { }
 
-  handleClick = (e, appTile?) => {
+  handleClick = (e: Event, appTile?: HTMLElement) => {
     e.preventDefault();
-    const tile = this.getTile(e.target, appTile);
+    const tile = this.getTile(e.target as HTMLElement, appTile);
 
     this.errorService.clearError();
     this.toggleSelectedClass(tile);
   }
 
-  getTile = (targetElement, appTile) => {
-    let tile;
+  getTile = (targetElement: HTMLElement, appTile?: HTMLElement): HTMLElement | null => {
+    let tile: HTMLElement | null = null;
     if (targetElement.tagName === 'APP-TILE') {
       tile = targetElement;
     }
@@ -42,8 +40,8 @@ export class EventHandleService {
     return tile;
   }
 
-  toggleSelectedClass = (tile: HTMLElement) => {
-    if (!!tile) {
+  toggleSelectedClass = (tile: HTMLElement | null) => {
+    if (tile) {
       const classes = tile.classList;
       if (classes.contains('selected')) {
         classes.remove('selected');
@@ -54,22 +52,26 @@ export class EventHandleService {
     }
   }
 
-  handleDragStart = (e) => {
-    const currentTile = e.target;
+  handleDragStart = (e: DragEvent) => {
+    const currentTile = e.target as HTMLElement;
     if (!this.selectedTiles.includes(currentTile)) {
       // dataset.tileId is casing is determined by the DOM.
-      const tileID = e.target.dataset.tileId;
+      const tileID = (e.target as HTMLElement).dataset['tileId'];
       const tile = document.querySelector(`app-tile[data-tile-id='${tileID}']`);
-      tile.classList.add('selected');
+      if (tile) {
+        tile.classList.add('selected');
+      }
     }
 
-    e.target.style.cursor = 'grabbing';
-    e.dataTransfer.dropEffect = 'copy';
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text', e.target.dataset.tileId);
+    (e.target as HTMLElement).style.cursor = 'grabbing';
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy';
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text', (e.target as HTMLElement).dataset['tileId'] || '');
+    }
   }
 
-  handleDragEnd = e => {
+  handleDragEnd = (e: DragEvent) => {
     e.preventDefault();
     this.selectedTiles.forEach(tile => {
       tile.classList.remove('selected');
@@ -77,43 +79,51 @@ export class EventHandleService {
     this.selectedTiles = [];
   }
 
-  handleDoubleClick = e => {
+  handleDoubleClick = (e: Event) => {
     e.preventDefault();
     return false;
   }
 
-  handleDragEnter = e => {
+  handleDragEnter = (e: DragEvent) => {
     e.preventDefault();
-    if (e.target.children.length === 0) {
-      e.target.classList.add('over');
-    }
-
-  }
-
-  handleDragLeave = e => {
-    e.preventDefault();
-    if (e.target.classList.contains('over')) {
-      e.target.classList.remove('over');
+    const target = e.target as HTMLElement;
+    if (target.children.length === 0) {
+      target.classList.add('over');
     }
   }
 
-  handleDragOver = e => {
+  handleDragLeave = (e: DragEvent) => {
+    e.preventDefault();
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('over')) {
+      target.classList.remove('over');
+    }
+  }
+
+  handleDragOver = (e: DragEvent) => {
     if (e.preventDefault) { e.preventDefault(); }
-    e.dataTransfer.dropEffect = 'move';
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'move';
+    }
     return false;
   }
 
-  handleOnMouseDown = e => {
+  handleOnMouseDown = (e: MouseEvent) => {
     if (e.preventDefault) { e.preventDefault(); }
     return false;
   }
 
   handleSwap = (activeTileID: number, tilesArray: string[]) => {
     const tileToRemove = document.querySelector(`app-tile[data-tile-id="${activeTileID}"]`);
+    if (!tileToRemove) return '';
+    
     const parentCell = tileToRemove.parentElement;
-    const letter = tileToRemove.children[0].textContent;
+    const letterElement = tileToRemove.children[0] as HTMLElement;
+    const letter = letterElement ? letterElement.textContent || '' : '';
 
-    this.clearParentCell(parentCell);
+    if (parentCell) {
+      this.clearParentCell(parentCell);
+    }
     this._removeCells.next(this._emptyCellColumns);
     this._emptyCellColumns = [];
 
@@ -127,14 +137,13 @@ export class EventHandleService {
     });
   }
 
-  handleDrop = e => {
+  handleDrop = (e: DragEvent) => {
     e.preventDefault();
 
-    let cellsToClear: number[]; // array with the identifying column numbers of the cells to delete
-    const primaryDestinationCell = e.target;
+    const primaryDestinationCell = e.target as HTMLElement;
 
     // Get the tile ID and handle the null case
-    const id = e.dataTransfer.getData('text');
+    const id = e.dataTransfer?.getData('text') || '';
 
     if (id === null || id.trim() === '') {
       if (primaryDestinationCell.classList.contains('over')) {
@@ -144,13 +153,15 @@ export class EventHandleService {
     }
 
     const primaryTile = document.querySelector(`app-tile[data-tile-id="${id}"]`);
-    const [rowChange, columnChange] = this.calculateDistanceChange(primaryTile, primaryDestinationCell);
+    if (!primaryTile) return;
+
+    const [rowChange, columnChange] = this.calculateDistanceChange(primaryTile as HTMLElement, primaryDestinationCell);
 
     // move additional cells
     const selectedTiles = Array.from(document.querySelectorAll('app-tile.selected'));
     if (selectedTiles.length > 0) {
       selectedTiles.forEach((tile, i) => {
-        this.moveTile(tile, rowChange, columnChange);
+        this.moveTile(tile as HTMLElement, rowChange, columnChange);
       });
     }
 
@@ -161,14 +172,12 @@ export class EventHandleService {
     primaryDestinationCell.classList.remove('over');
   }
 
+  calculateDistanceChange = (primaryTile: HTMLElement, primaryDestinationCell: HTMLElement): [number, number] => {
+    const sourceRow = Number(primaryTile.parentElement?.dataset['row'] || 0);
+    const sourceColumn = Number(primaryTile.parentElement?.dataset['column'] || 0);
 
-  calculateDistanceChange = (primaryTile, primaryDestinationCell) => {
-    const sourceRow = Number(primaryTile.parentElement.dataset.row);
-    const sourceColumn = Number(primaryTile.parentElement.dataset.column);
-
-
-    const destinationRow = Number(primaryDestinationCell.dataset.row);
-    const destinationColumn = Number(primaryDestinationCell.dataset.column);
+    const destinationRow = Number(primaryDestinationCell.dataset['row'] || 0);
+    const destinationColumn = Number(primaryDestinationCell.dataset['column'] || 0);
 
     const rowChange = destinationRow - sourceRow;
     const columnChange = destinationColumn - sourceColumn;
@@ -176,20 +185,25 @@ export class EventHandleService {
     return [rowChange, columnChange];
   }
 
-  moveTile = (tile, rowChange, columnChange) => {
-    const tileID = tile.dataset.tileId;
+  moveTile = (tile: HTMLElement, rowChange: number, columnChange: number) => {
+    const tileID = tile.dataset['tileId'];
     const currentTile = document.querySelector(`app-tile[data-tile-id="${tileID}"]`);
-    const letter = currentTile.querySelector('span').textContent;
+    if (!currentTile) return;
+
+    const letterSpan = currentTile.querySelector('span');
+    const letter = letterSpan ? letterSpan.textContent || '' : '';
 
     const newChildTile = {
-      id: tileID,
+      id: tileID || '',
       letter
     };
 
     // tile is of type app-tile
     const parentCell = tile.parentElement;
-    const sourceRow = Number(parentCell.dataset.row);
-    const sourceColumn = Number(parentCell.dataset.column);
+    if (!parentCell) return;
+
+    const sourceRow = Number(parentCell.dataset['row'] || 0);
+    const sourceColumn = Number(parentCell.dataset['column'] || 0);
 
     const destinationRow = rowChange + sourceRow;
     const destinationColumn = columnChange + sourceColumn;
@@ -197,6 +211,9 @@ export class EventHandleService {
     const secondaryDestination = document.querySelector(
       `#board app-cell[data-row="${destinationRow}"][data-column="${destinationColumn}"]`
     );
+    
+    if (!secondaryDestination) return;
+
     const destinationCell = {
       row: destinationRow,
       column: destinationColumn
@@ -208,20 +225,21 @@ export class EventHandleService {
         newChildTile, destinationCell);
       // if bench cell, remove
       this.clearParentCell(parentCell);
-      tile.dataset.row = destinationRow;
-      tile.dataset.column = destinationColumn;
+      tile.dataset['row'] = destinationRow.toString();
+      tile.dataset['column'] = destinationColumn.toString();
     }
   }
 
   clearParentCell = (parentCell: HTMLElement) => {
-    if (parentCell.parentElement.id === 'bench') {
-      this._emptyCellColumns.push(Number(parentCell.dataset.column));
+    const parentElement = parentCell.parentElement;
+    if (parentElement && parentElement.id === 'bench') {
+      this._emptyCellColumns.push(Number(parentCell.dataset['column'] || 0));
     }
     // else, clear child tile
     else {
       this._messageBusService.removeChildTile({
-        row: parseInt(parentCell.dataset.row),
-        column: parseInt(parentCell.dataset.column)
+        row: parseInt(parentCell.dataset['row'] || '0'),
+        column: parseInt(parentCell.dataset['column'] || '0')
       });
     }
   }

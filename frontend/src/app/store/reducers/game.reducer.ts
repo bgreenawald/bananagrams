@@ -1,62 +1,88 @@
-import { Action, createReducer, on, ActionsSubject } from '@ngrx/store';
-import * as Actions from './../actions/game.actions';
-import * as Models from './../../models';
+import { createReducer, on } from '@ngrx/store';
+import * as GameActions from '../actions/game.actions';
+import { GameState } from '../../interfaces';
 
+// Extended game state interface for store
+export interface StoreGameState {
+  selectedTiles: any[];
+  playerID: string;
+  loaded: boolean;
+  loading: boolean;
+  gameData: any;
+  id?: string;
+  unavailableIDs?: string[];
+  error?: string;
+}
 
-// The game state syncs it's data with the server.
-const initialState: any = {
-    selectedTiles: [],
-    playerID: '',
-    loaded: false,  // TODO move the loading booleans into the user reducers ?
-    loading: false,
-    gameData: {}
+const initialState: StoreGameState = {
+  selectedTiles: [],
+  playerID: '',
+  loaded: false,
+  loading: false,
+  gameData: {}
 };
 
-export function gameReducer(state: Models.GameState = initialState, action: Actions.GameActionTypes): any {
-    switch (action.type) {
-        case Actions.UPDATE_STORE:
-            return { ...state, ...action.payload };
-        case Actions.LOADING:
-            return {
-                ...state,
-                loading: true,
-                loaded: false,
-                ...action.payload
-            };
-        case Actions.LOAD_GAME_SUCCESS:
-            return {
-                ...state,
-                loading: false,
-                loaded: true
-            };
-        case Actions.LOAD_GAME_FAIL:
-            return {
-                ...state,
-                loading: false,
-                loaded: true,
-                error: action.errorMessage
-            };
-        case Actions.UPDATE_SOCKET_DATA:
-            return {
-                ...state,
-                gameData: action.payload
-            };
-        case Actions.SET_PLAYER_ID:
-            return {
-                ...state,
-                playerID: action.playerName
-            };
-        case Actions.SET_GAME_ID:
-            return {
-                ...state,
-                id: action.gameID
-            };
-        case Actions.SET_RESERVED_GAME_IDS:
-            return {
-                ...state,
-                unavailableIDs: action.gameIDs
-            };
-        default:
-            return state;
-    }
-}
+export const gameReducer = createReducer(
+  initialState,
+  
+  // Legacy update store action
+  on(GameActions.updateStore, (state, { payload }) => ({
+    ...state,
+    ...payload
+  })),
+
+  // Loading states
+  on(GameActions.loading, (state, { payload }) => ({
+    ...state,
+    loading: true,
+    loaded: false,
+    ...payload
+  })),
+
+  on(GameActions.loadGameSuccess, (state) => ({
+    ...state,
+    loading: false,
+    loaded: true
+  })),
+
+  on(GameActions.loadGameFail, (state, { errorMessage }) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: errorMessage
+  })),
+
+  // Socket data updates
+  on(GameActions.updateSocketData, (state, { payload }) => ({
+    ...state,
+    gameData: payload
+  })),
+
+  // Player and game ID management
+  on(GameActions.setPlayerId, (state, { playerName }) => ({
+    ...state,
+    playerID: playerName
+  })),
+
+  on(GameActions.setGameId, (state, { gameID }) => ({
+    ...state,
+    id: gameID
+  })),
+
+  // Reserved game IDs
+  on(GameActions.setReservedGameIds, (state, { gameIDs }) => ({
+    ...state,
+    unavailableIDs: gameIDs
+  })),
+
+  // Socket connection states
+  on(GameActions.failOpenSocket, (state, { error }) => ({
+    ...state,
+    error
+  })),
+
+  on(GameActions.socketReady, (state) => ({
+    ...state,
+    // Socket is ready - could add connection status here
+  }))
+);

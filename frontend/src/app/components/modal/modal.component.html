@@ -1,9 +1,8 @@
 <ng-container *ngIf="open">
   <div class="overlay"></div>
   <div class="modal">
-    <p *ngFor="let each in store$">each</p>
     <span class="close-button" (click)="handleClose()">x</span>
-    <ngTemplate [ngSwitch]="modalType">
+    <ng-container [ngSwitch]="modalType">
       <div class="content" id="resetConfirm" *ngSwitchCase="'resetConfirm'">
         <h3>Are you sure you'd like to erase your current board? </h3>
         <button (click)="handleReset()">Yes, reset</button>
@@ -36,6 +35,6 @@
       <div class="content" id="lobbyBack" *ngSwitchDefault>
         {{modalType}}
       </div>
-    </ngTemplate>
+    </ng-container>
   </div>
 </ng-container>

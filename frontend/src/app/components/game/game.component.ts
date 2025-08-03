@@ -1,7 +1,6 @@
-import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-
-import { Socket } from 'ngx-socket-io';
 
 import { Observable, of, fromEvent, throwError, Subject, timer } from 'rxjs';
 import { catchError, map, tap, first, takeUntil, take, takeWhile, distinct, debounce, filter } from 'rxjs/operators';
@@ -12,51 +11,53 @@ import { Actions, ofType } from '@ngrx/effects';
 import { ErrorService } from '../../services/error.service';
 import { SocketService } from '../../services/socket.service';
 import { MessageBusService } from '../../services/message-bus.service';
-
 import { EventHandleService } from '../../services/event-handle.service';
 
-import { Tile } from '../../models';
-import * as Models from '../../models';
+import { Tile } from '../../interfaces';
 import * as Selectors from '../../store/selectors';
-import * as GameActions from '../../store/actions';
+import * as GameActions from '../../store/actions/game.actions';
+import * as UserActions from '../../store/actions/user.actions';
 
+import { MenuGameplayComponent } from '../menu-gameplay/menu-gameplay.component';
+import { CellComponent } from '../cell/cell.component';
+import { BoardComponent } from '../board/board.component';
+import { ModalComponent } from '../modal/modal.component';
 
 @Component({
   selector: 'app-game',
+  standalone: true,
+  imports: [CommonModule, MenuGameplayComponent, CellComponent, BoardComponent, ModalComponent],
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private eventHandleService = inject(EventHandleService);
+  private errorService = inject(ErrorService);
+  private messageBusService = inject(MessageBusService);
+  private socketService = inject(SocketService);
+  private _store = inject(Store);
+  private _action$ = inject(Actions);
 
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private socket: Socket,
-    private eventHandleService: EventHandleService,
-    private errorService: ErrorService,
-    private messageBusService: MessageBusService,
-    private socketService: SocketService,
-    private _store: Store<Models.GameState>,
-    private _action$: Actions<GameActions.GameActionTypes>,
-  ) { }
   public benchTiles: Tile[] = [];
-  public error: string;
-  public gameID: string; // numerical game id formatted as a string
+  public error: string = '';
+  public gameID: string = ''; // numerical game id formatted as a string
   public modal: {
     message: string
-  };
+  } = { message: '' };
   public playerJoined = false;
-  public playerID: string;
-  public playersTiles: string[];
-  public tiles: string[];
+  public playerID: string = '';
+  public playersTiles: string[] = [];
+  public tiles: string[] = [];
   public modalOpen = false;
-  public confirmMessage: string;
+  public confirmMessage: string = '';
 
   private openModal$ = this.messageBusService.openModal$;
   private _modifyCell$ = this.eventHandleService.removeCell$;
-  private _ngDestroyed$ = new Subject();
+  private _ngDestroyed$ = new Subject<void>();
+
   @HostListener('window:beforeunload', ['$event'])
   confirmExit($event: any) {
     $event.preventDefault();
@@ -73,6 +74,7 @@ export class GameComponent implements OnInit {
 
   public ngOnDestroy(): void {
     this._ngDestroyed$.next();
+    this._ngDestroyed$.complete();
   }
 
   private _rejoinRoom = () => {
@@ -83,21 +85,19 @@ export class GameComponent implements OnInit {
       .subscribe(isLoaded => {
 
         if (!isLoaded) {
-
           this._store
             .select(Selectors.selectGameID)
             .subscribe(gameID => {
               this.gameID = gameID;
             });
 
-          this._store.dispatch(new GameActions.JoinRoom(this.gameID));
-          this._store.dispatch(new GameActions.LoadOrCreateGame(this.gameID));
-
+          this._store.dispatch(GameActions.joinRoom({ gameID: this.gameID }));
+          this._store.dispatch(GameActions.loadOrCreateGame({ gameID: this.gameID }));
         }
       });
   }
 
-  private _loadGameData = (gameID) => {
+  private _loadGameData = (gameID: string) => {
     this._store.pipe(
       take(1),
       select(Selectors.selectLoadedStatus)
@@ -107,12 +107,8 @@ export class GameComponent implements OnInit {
           .select(Selectors.selectGameID)
           .subscribe(gameID => {
             this.gameID = gameID;
-            this._store.dispatch(new GameActions.LoadOrCreateGame(gameID));
+            this._store.dispatch(GameActions.loadOrCreateGame({ gameID }));
           });
-      }
-
-      else {
-
       }
     });
   }
@@ -122,9 +118,8 @@ export class GameComponent implements OnInit {
   }
 
   _getPlayerID = () => {
-    this.playerID = localStorage.getItem('player_id');
+    this.playerID = localStorage.getItem('player_id') || '';
   }
-
 
   setTiles = (tiles: string[]) => {
     if (tiles.length <= 0) { return; }
@@ -149,13 +144,13 @@ export class GameComponent implements OnInit {
     return newTiles;
   }
 
-  updateTiles = (tiles) => {
+  updateTiles = (tiles: string[]) => {
     const newTiles = this.findDifference(tiles);
     let lastTileIndex = this.tiles.length - 1;
     newTiles.forEach(tile => {
       this.benchTiles.push({
         letter: tile,
-        id: lastTileIndex++
+        id: (lastTileIndex++).toString()
       });
     });
     this.tiles = tiles;
@@ -163,20 +158,22 @@ export class GameComponent implements OnInit {
 
   _listenUpdateTiles = () => {
     this._action$.pipe(
-      ofType(GameActions.ADD_PEELED_TILE, GameActions.UPDATE_PEELED_TILES)
+      ofType(GameActions.addPeeledTile, UserActions.updatePeeledTiles),
+      takeUntil(this._ngDestroyed$)
     ).subscribe(() => {
       this._store.select(Selectors.getPlayerTiles)
         .subscribe(allNewTiles => {
           this.updateTiles(allNewTiles);
         });
       console.log('adding new tile');
-
     });
   }
 
   tileEventListen = () => {
     // Listen into observable for events, which give index of tile to remove from bench
-    this._modifyCell$.subscribe((cellIndexArray: number[]) => {
+    this._modifyCell$.pipe(
+      takeUntil(this._ngDestroyed$)
+    ).subscribe((cellIndexArray: number[]) => {
       if (cellIndexArray.length > 1) { cellIndexArray.sort(((a, b) => b - a)); }
       cellIndexArray.forEach(index => {
         this.benchTiles.splice(index, 1);
@@ -190,7 +187,8 @@ export class GameComponent implements OnInit {
       .select(Selectors.getPlayerTiles)
       .pipe(
         filter(tiles => !!tiles),
-        first()
+        first(),
+        takeUntil(this._ngDestroyed$)
       )
       .subscribe(tiles => {
         this.tiles = tiles;
@@ -203,7 +201,7 @@ export class GameComponent implements OnInit {
     tiles.forEach(tile => {
       this.benchTiles.push({
         letter: tile,
-        id: i++
+        id: (i++).toString()
       });
     });
   }

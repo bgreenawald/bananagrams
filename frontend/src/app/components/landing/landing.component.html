@@ -1,10 +1,10 @@
 <div class="landing flex">
   <h1>Chalkful</h1>
   <p class="caption">
-    Welcome to Chalkful, the destination for Bananagrams online! Once you start, you will recieve a URL to share with your friends so they can join the game.
+    Welcome to Chalkful, the destination for Bananagrams online! Once you start, you will receive a URL to share with your friends so they can join the game.
   </p>
-  <input #gameID id="game_id" type="text" [value]="suggestedID" (keydown.enter)="createGame(gameID.value)">
-  <button id="game_id_submit" class="btn primary" type="submit" (click)="createGame(gameID.value)">Create New
+  <input #gameID id="game_id" type="text" [value]="suggestedID" (keydown.enter)="joinGame(gameID.value)">
+  <button id="game_id_submit" class="btn primary" type="submit" (click)="joinGame(gameID.value)">Create New
     Game</button>
   <div class="error-container">
     <p *ngIf="error" class='error-content'>{{error}}</p>

@@ -1,44 +1,18 @@
 import { Injectable } from '@angular/core';
-
-import { Socket } from 'ngx-socket-io';
 import { Observable } from 'rxjs';
-import * as GameActions from './../store/actions/game.actions';
+import { io, Socket } from 'socket.io-client';
+
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-
-// would like to refactor like this someday? https://github.com/avatsaev/angular-contacts-app-example/blob/875aa2df7f5f87b6731a1259b63e2b399fa5fb3f/src/app/views/contacts/services/contacts-socket.service.ts
-
-// export class SocketService2 extends Socket {
-//   constructor() {
-//     super({ url: 'http://localhost:3000', options: { origin: '*', transport: ['websocket'] } })
-//   }
-//   public dispatch(messageType: string, payload: any) {
-//     this.emit(messageType, payload);
-//   }
-
-//   public subscribeToMessage(messageType: string): Observable<any> {
-//     return this.fromEvent(messageType)
-//   }
-// }
-
-
-// export class sockService extends Socket {
-//   joinGame$ = this.fromEvent<any>(GameActions.JOIN_ROOM)
-
-//   constructor() {
-//     super({
-//       url: 'https://localhost:3000',
-//       options: { origin: '*', transport: ['websocket'] }
-//     })
-//   }
-// }
-
 export class SocketService {
-  constructor(
-    private socket: Socket
-  ) { }
+  private socket: Socket;
+
+  constructor() {
+    this.socket = io(environment.backendUrl);
+  }
 
   public disconnect = () => {
     this.socket.disconnect();
@@ -70,9 +44,8 @@ export class SocketService {
   }
 
   // listens and receives all incoming socket messages from the server
-  // TODO: why does game loaded fire four times? from here.  But only fires once from the app component?
   public receive = (): Observable<any> => {
-    return Observable.create(observer => {
+    return new Observable(observer => {
       this.socket.on('render_game', resp => {
         observer.next(resp);
       });
@@ -104,6 +77,12 @@ export class SocketService {
       name: gameID,
       letter: tileLetter,
       player_id: playerID
+    });
+  }
+
+  public peel = (gameID: string): void => {
+    this.socket.emit('peel', {
+      name: gameID
     });
   }
 }

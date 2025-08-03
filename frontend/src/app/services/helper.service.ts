@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class HelperService {
-  private _globalClick = new Subject();
+  private _globalClick = new Subject<any>();
   globalClick$ = this._globalClick.asObservable();
 
   constructor(
@@ -16,17 +16,17 @@ export class HelperService {
   cleanBench = () => {
     const bench = document.getElementById('bench');
     const benchCells = Array.from(document.querySelectorAll('#bench app-cell'));
-    const emptyCells = [];
+    const emptyCells: Element[] = [];
 
     benchCells.forEach((cell, i) => {
-      const childTile = cell.children[0].children[0];
+      const childTile = cell.children[0]?.children[0];
       if (!childTile) {
         emptyCells.push(cell);
       }
     });
 
     emptyCells.forEach(cell => {
-      cell.parentNode.removeChild(cell);
+      cell.parentNode?.removeChild(cell);
     });
   }
 
@@ -36,7 +36,7 @@ export class HelperService {
     return id;
   }
 
-  public saveToLocalStorage = (key, rawData) => {
+  public saveToLocalStorage = (key: string, rawData: any) => {
     let data = rawData;
     if (this._isHashMap(data)) {
       data = JSON.stringify(data);
@@ -44,12 +44,11 @@ export class HelperService {
     localStorage.setItem(key, data);
   }
 
-
-  private _isHashMap = (item) => {
+  private _isHashMap = (item: any): boolean => {
     return (!Array.isArray(item) && typeof (item) === 'object');
   }
 
-  globalClick = (message) => {
+  globalClick = (message: any) => {
     this._globalClick.next(message);
   }
 }

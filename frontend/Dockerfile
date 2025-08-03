@@ -1,19 +1,32 @@
-FROM node:14-slim as build-stage
+# Build stage
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
-COPY package*.json /app/
+# Copy package files
+COPY package.json ./
 
-RUN npm install && npm install -g @angular/cli
+# Install dependencies
+RUN npm install
 
-COPY ./ /app/
+# Copy application code
+COPY . .
 
-RUN ng build --prod
+# Build the Angular application
+RUN npm run build
 
-# Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginx:1.15
-COPY --from=build-stage /app/dist/out/ /usr/share/nginx/html
+# Production stage
+FROM nginx:alpine
+
+# Remove default nginx website
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy built application from builder stage
+COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html/
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
-COPY --from=build-stage /app/nginx.conf /etc/nginx/conf.d/default.conf
+CMD ["nginx", "-g", "daemon off;"]

@@ -32,3 +32,4 @@ htmlcov/
 
 # Node modules
 */node_modules/
+.python-version

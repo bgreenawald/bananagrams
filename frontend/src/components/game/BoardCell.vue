@@ -55,8 +55,8 @@ function handleDragLeave() {
 
 function handleDragOver(e: DragEvent) {
   e.preventDefault()
-  if (uiStore.isDragging && !hasTile.value) {
-    e.dataTransfer!.dropEffect = 'move'
+  if (uiStore.isDragging && !hasTile.value && e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'move'
   }
 }
 

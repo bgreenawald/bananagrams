@@ -30,14 +30,20 @@ import { computed } from 'vue'
 import GameTile from './GameTile.vue'
 import { usePlayerStore } from '@/stores/player'
 import { useDragDrop } from '@/composables/useDragDrop'
+import { logger } from '@/utils/logger'
 
 const playerStore = usePlayerStore()
 const { handleBenchDrop } = useDragDrop()
 
 const tiles = computed(() => {
-  console.log(`[BENCH DEBUG] Bench tiles computed, count: ${playerStore.benchTiles.length}`)
-  console.log(`[BENCH DEBUG] Total tiles: ${playerStore.tiles.length}, Bench tiles: ${playerStore.benchTiles.length}`)
-  console.log(`[BENCH DEBUG] Bench tiles:`, playerStore.benchTiles.map(t => `${t.letter}(${t.id.slice(-8)})`))
+  logger.tileUpdate(
+    `Bench tiles computed: ${playerStore.benchTiles.length} tiles`,
+    {
+      totalTiles: playerStore.tiles.length,
+      benchTiles: playerStore.benchTiles.length,
+      tileLetters: playerStore.benchTiles.map(t => t.letter)
+    }
+  )
   return playerStore.benchTiles
 })
 const minSlots = 20
@@ -49,7 +55,9 @@ const emptySlots = computed(() => {
 
 function handleDragOver(e: DragEvent) {
   e.preventDefault()
-  e.dataTransfer!.dropEffect = 'move'
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'move'
+  }
 }
 
 function handleDrop(e: DragEvent) {

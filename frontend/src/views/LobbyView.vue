@@ -18,6 +18,7 @@
             Join Game
           </button>
         </div>
+        <p v-if="nameError" class="error-message">{{ nameError }}</p>
       </div>
 
       <div v-else class="lobby-info">
@@ -60,28 +61,47 @@ import { useRoute, useRouter } from 'vue-router'
 import { useGameStore } from '@/stores/game'
 import { usePlayerStore } from '@/stores/player'
 import { useSocketStore } from '@/stores/socket'
+import { useErrorHandler } from '@/composables/useErrorHandler'
+import { useValidation } from '@/composables/useValidation'
+import { getRouteParam, getRouteQueryBoolean } from '@/utils/route'
 
 const route = useRoute()
 const router = useRouter()
 const gameStore = useGameStore()
 const playerStore = usePlayerStore()
 const socketStore = useSocketStore()
+const { handleAsyncError } = useErrorHandler('Lobby')
+const { validatePlayerName, sanitizeInput } = useValidation()
 
-const gameId = computed(() => route.params.id as string)
-const isTestMode = computed(() => route.query.testMode === 'true')
-const skipNameEntry = computed(() => route.query.skipNameEntry === 'true')
+const gameId = computed(() => getRouteParam(route, 'id'))
+const isTestMode = computed(() => getRouteQueryBoolean(route, 'testMode'))
+const skipNameEntry = computed(() => getRouteQueryBoolean(route, 'skipNameEntry'))
 const nameInput = ref('')
+const nameError = ref('')
 const playerName = computed(() => playerStore.playerName)
 const players = computed(() => gameStore.players)
 const gameState = computed(() => gameStore.gameState?.state)
 
-onMounted(() => {
-  gameStore.setGameId(gameId.value)
-  
-  const savedName = localStorage.getItem('playerName')
-  if (savedName) {
-    playerStore.setPlayerName(savedName)
-    joinGameWithName(savedName)
+onMounted(async () => {
+  try {
+    const currentGameId = gameId.value
+    if (!currentGameId) {
+      router.push({ name: 'landing' })
+      return
+    }
+    
+    gameStore.setGameId(currentGameId)
+    
+    const savedName = localStorage.getItem('playerName')
+    if (savedName) {
+      playerStore.setPlayerName(savedName)
+      await handleAsyncError(
+        socketStore.connect().then(() => joinGameWithName(savedName)),
+        'Auto-join with saved name'
+      )
+    }
+  } catch (error) {
+    console.error('Failed to initialize lobby:', error)
   }
 })
 
@@ -94,16 +114,33 @@ watch(() => gameStore.gameState?.state, (newState) => {
 })
 
 const joinGame = () => {
-  const name = nameInput.value.trim()
-  if (!name) return
+  const rawName = nameInput.value.trim()
+  const validation = validatePlayerName(rawName)
   
-  playerStore.setPlayerName(name)
-  localStorage.setItem('playerName', name)
-  joinGameWithName(name)
+  if (!validation.valid) {
+    nameError.value = validation.error
+    return
+  }
+  
+  // Clear any previous error when validation passes
+  nameError.value = ''
+  
+  const sanitizedName = sanitizeInput(rawName)
+  playerStore.setPlayerName(sanitizedName)
+  localStorage.setItem('playerName', sanitizedName)
+  joinGameWithName(sanitizedName)
 }
 
-const joinGameWithName = (name: string) => {
-  socketStore.joinGame(gameId.value, name, isTestMode.value)
+const joinGameWithName = async (name: string) => {
+  try {
+    await handleAsyncError(
+      socketStore.connect(),
+      'Socket connection for join'
+    )
+    socketStore.joinGame(gameId.value, name, isTestMode.value)
+  } catch (error) {
+    console.error('Failed to join game:', error)
+  }
 }
 
 const startGame = () => {
@@ -193,6 +230,14 @@ const startGame = () => {
       cursor: not-allowed;
     }
   }
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  font-weight: 500;
 }
 
 .lobby-info {

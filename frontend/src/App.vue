@@ -10,8 +10,13 @@ import { useSocketStore } from '@/stores/socket'
 
 const socketStore = useSocketStore()
 
-onMounted(() => {
-  socketStore.connect()
+onMounted(async () => {
+  try {
+    await socketStore.connect()
+  } catch (error) {
+    console.error('Failed to establish socket connection:', error)
+    // Connection will be retried when needed by individual components
+  }
 })
 </script>
 

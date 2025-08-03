@@ -59,6 +59,7 @@ import { useBoardStore } from '@/stores/board'
 import { useUIStore } from '@/stores/ui'
 import { useSocketStore } from '@/stores/socket'
 import { useGameLogic } from '@/composables/useGameLogic'
+import { useErrorHandler } from '@/composables/useErrorHandler'
 
 const gameStore = useGameStore()
 const playerStore = usePlayerStore()
@@ -66,6 +67,7 @@ const boardStore = useBoardStore()
 const uiStore = useUIStore()
 const socketStore = useSocketStore()
 const { validateBoard, extractWords } = useGameLogic()
+const { handleError } = useErrorHandler('Game Controls')
 
 const gameId = computed(() => gameStore.gameId)
 const tilesRemaining = computed(() => gameStore.tilesRemaining)
@@ -84,33 +86,41 @@ const canCallBananagrams = computed(() => {
 })
 
 function handlePeel() {
-  if (!canPeel.value) return
+  try {
+    if (!canPeel.value) return
 
-  const validation = validateBoard()
-  if (!validation.valid) {
-    uiStore.showModal('error', { message: validation.error })
-    return
+    const validation = validateBoard()
+    if (!validation.valid) {
+      uiStore.showModal('error', { message: validation.error })
+      return
+    }
+
+    socketStore.peel(gameId.value)
+  } catch (error) {
+    handleError(error, 'Peel action')
   }
-
-  socketStore.peel(gameId.value)
 }
 
 function handleBananagrams() {
-  if (!canCallBananagrams.value) return
+  try {
+    if (!canCallBananagrams.value) return
 
-  const validation = validateBoard()
-  if (!validation.valid) {
-    uiStore.showModal('error', { message: validation.error })
-    return
+    const validation = validateBoard()
+    if (!validation.valid) {
+      uiStore.showModal('error', { message: validation.error })
+      return
+    }
+
+    const words = extractWords()
+    if (words.length === 0) {
+      uiStore.showModal('error', { message: 'No valid words found on board' })
+      return
+    }
+
+    socketStore.callBananagrams(gameId.value, words)
+  } catch (error) {
+    handleError(error, 'Bananagrams call')
   }
-
-  const words = extractWords()
-  if (words.length === 0) {
-    uiStore.showModal('error', { message: 'No valid words found on board' })
-    return
-  }
-
-  socketStore.callBananagrams(gameId.value, words)
 }
 
 function handleSelectAll() {

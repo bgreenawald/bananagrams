@@ -16,9 +16,16 @@ from jsonschema import ValidationError, validate
 # Initialize the application
 app = Flask(__name__, static_url_path="", static_folder="static")
 app.debug = True
-app.config["SECRET_KEY"] = "secret!"  # NOQA: S105
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY", "dev-secret-key-change-in-production"
+)  # NOQA: S105
 socketio = SocketIO(app)
-socketio.init_app(app, cors_allowed_origins="*")
+socketio.init_app(
+    app,
+    cors_allowed_origins=os.environ.get(
+        "ALLOWED_ORIGINS", "http://localhost:8080,http://localhost:3000"
+    ).split(","),
+)
 
 # Initialize CORS
 CORS(app)
@@ -30,9 +37,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 handler = logging.FileHandler("logs/app.log")
 shell_handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(
-    logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-)
+handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 logger.addHandler(handler)
 logger.addHandler(shell_handler)
 
@@ -113,9 +118,7 @@ def emit_game(game_name: str, game: Game, msg: str):
         },
         room=game_name,
     )
-    logger.info(
-        f"{request.sid} has successfully rendered their game with messagee {msg}"
-    )
+    logger.info(f"{request.sid} has successfully rendered their game with message {msg}")
 
 
 @socketio.on("load_game")
@@ -186,9 +189,7 @@ def player_join(data: Dict[Any, Any]):
         try:
             game = all_games[game_name]
         except KeyError:
-            logger.warning(
-                f"Could not find the game named {game_name}. from player_join"
-            )
+            logger.warning(f"Could not find the game named {game_name}. from player_join")
             emit_error(
                 game_name,
                 f"Could not find the game named {game_name}. from player_join",
@@ -326,9 +327,7 @@ def swap(data: Dict[Any, Any]):
 
         try:
             game.swap(data["letter"], data["player_id"])
-            emit_game(
-                game_name, game, f"Performed swap for player {data['player_id']}."
-            )
+            emit_game(game_name, game, f"Performed swap for player {data['player_id']}.")
         except GameException as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
@@ -445,9 +444,7 @@ def reset(data: Dict[Any, Any]):
             game = all_games[game_name]
         except KeyError:
             logger.warning(f"Could not find the game named {game_name}. from reset")
-            emit_error(
-                game_name, f"Could not find the game named {game_name}. from reset"
-            )
+            emit_error(game_name, f"Could not find the game named {game_name}. from reset")
             return
 
         game.reset()
@@ -508,10 +505,14 @@ def create_test_game(data: Dict[Any, Any]):
 
 # Schedule cleanup
 def _delete_old_games():
-    for game in all_games:
-        age = datetime.datetime.now() - all_games[game].date_created
+    games_to_delete = []
+    for game_name in all_games:
+        age = datetime.datetime.now() - all_games[game_name].date_created
         if age.total_seconds() > 86400:
-            del all_games[game]
+            games_to_delete.append(game_name)
+
+    for game_name in games_to_delete:
+        del all_games[game_name]
 
 
 scheduler = BackgroundScheduler()
@@ -523,5 +524,6 @@ atexit.register(lambda: scheduler.shutdown())
 
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)  # NOQA: S201
-    test = True
+    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+    socketio.run(app, debug=debug_mode)  # NOQA: S201
+    test = debug_mode

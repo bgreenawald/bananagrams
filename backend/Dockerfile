@@ -13,7 +13,7 @@ COPY . /app
 WORKDIR /app
 
 # Install dependencies using uv
-RUN uv pip install -e .
+RUN uv pip install --system -r pyproject.toml
 
 EXPOSE 5000
 

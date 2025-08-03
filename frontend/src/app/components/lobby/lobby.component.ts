@@ -1,124 +1,80 @@
-import { Component, OnInit } from '@angular/core';
-
-import { ActionReducerMap, createFeatureSelector, createSelector, Store, select } from '@ngrx/store';
-import { Actions, ofType } from '@ngrx/effects';
-
-import { take, takeUntil } from 'rxjs/operators';
-import { Observable, of, fromEvent, throwError, Subject } from 'rxjs';
-import { catchError, map, tap, first } from 'rxjs/operators';
-
-import { Socket } from 'ngx-socket-io';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
-
-import { SocketService } from '../../services/socket.service';
-import { ErrorService } from '../../services/error.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import * as Selectors from '../../store/selectors';
-
-
-import * as Models from './../../models';
-
-import * as fromStore from './../../store';
-import { GameActionTypes } from './../../store';
-import * as GameActions from './../../store/actions/game.actions';
+import * as GameActions from '../../store/actions/game.actions';
+import * as UserActions from '../../store/actions/user.actions';
 
 @Component({
   selector: 'app-lobby',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './lobby.component.html',
   styleUrls: ['./lobby.component.scss']
 })
-export class LobbyComponent implements OnInit {
-  public gameID: string; // numerical game id formatted as a string
-  public playerID: string;
-  public playersInLobby: string[] = [];
-  public error: string;
-  public ngDestroyed$ = new Subject();
-  public isEditingName = false;
-  public faEdit = faEdit;
-  public startButtonEnabled = false;
+export class LobbyComponent implements OnInit, OnDestroy {
+  public gameID: string = '';
+  public playerID: string = '';
+  public players: any[] = [];
+  public gameData: any = null;
+  private ngDestroyed$ = new Subject<void>();
 
   constructor(
-    private errorService: ErrorService,
-    private socketService: SocketService,
-    private _store: Store<Models.GameState>,
-    private action$: Actions<GameActions.GameActionTypes>
+    private route: ActivatedRoute,
+    private router: Router,
+    private _store: Store
   ) { }
 
-  public ngOnInit(): void {
-    this.getPlayersInLobby();
-    this.getGameID();
-    this._listenErrors();
-  }
-
-  public ngOnDestroy(): void {
-    this.ngDestroyed$.next();
-  }
-
-  public getGameID = (): void => {
-    this._store.pipe(
-      takeUntil(this.ngDestroyed$))
-      .pipe(select(fromStore.selectGameID)).subscribe(gameID => {
-        this.gameID = gameID;
-        this.joinRoom();
-      });
-  }
-
-  public joinRoom = (): void => {
-    this.action$.pipe(
-      ofType(GameActions.SUCCESS_JOIN_ROOM),
-      take(1)
-    ).subscribe(() => {
-      this._store.dispatch(new fromStore.LoadOrCreateGame(this.gameID));
-      this.checkCachedPlayerID();
+  ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.gameID = params['id'];
+      this.initializeGame();
     });
-    this._store.dispatch(new fromStore.JoinRoom(this.gameID));
+    
+    this.listenToStore();
   }
 
-  public getPlayersInLobby = (): void => {
-    this._store
-      .pipe(
-        takeUntil(this.ngDestroyed$))
-      .pipe(select(fromStore.getAllPlayers))
-      .subscribe(playersInRoom => {
-        this.playersInLobby = playersInRoom;
-        if (this.playersInLobby.length > 1) { this.startButtonEnabled = true; }
-        console.log(playersInRoom);
+  ngOnDestroy(): void {
+    this.ngDestroyed$.next();
+    this.ngDestroyed$.complete();
+  }
+
+  initializeGame(): void {
+    this._store.dispatch(GameActions.setGameId({ gameID: this.gameID }));
+    this._store.dispatch(GameActions.loadOrCreateGame({ gameID: this.gameID }));
+  }
+
+  listenToStore(): void {
+    this._store.select(Selectors.selectGameData)
+      .pipe(takeUntil(this.ngDestroyed$))
+      .subscribe(data => {
+        this.gameData = data;
+        if (data?.players) {
+          this.players = Object.keys(data.players).map(key => ({
+            id: key,
+            tiles: data.players[key]
+          }));
+        }
       });
   }
 
-  public checkCachedPlayerID = (): void => {
-    this.playerID = localStorage.getItem('player_id');
-    if (this.playerID) { this.playerJoin(this.playerID); }
+  setPlayerName(name: string): void {
+    this.playerID = name;
+    localStorage.setItem('player_id', name);
+    this._store.dispatch(GameActions.setPlayerId({ 
+      gameID: this.gameID, 
+      playerName: name 
+    }));
   }
 
-  public playerJoin = (playerID: string): void => {
-    // TODO: disable join the game button if input is empty
-    this._store.dispatch(new fromStore.SetPlayerId(this.gameID, playerID));
-    this.playerID = playerID;
-    localStorage.setItem('player_id', playerID);
-  }
-
-  public startGame = (): void => {
-    this._store.dispatch(new fromStore.StartGame(this.gameID));
-  }
-
-  public editPlayerName = (): void => {
-    this.isEditingName = true;
-  }
-
-  public updatePlayerID = (newUsername: string): void => {
-    this.isEditingName = false;
-    // make backend call to update userid.
-    // IMPORTANT: will not actually update name until endpoint is available
-  }
-
-  private _listenErrors = () => {
-    this.action$.pipe(
-      ofType(GameActions.LOAD_GAME_FAIL)
-    )
-      .subscribe(resp => {
-        console.log(resp);
-        this.error = resp.errorMessage;
-      });
+  startGame(): void {
+    this._store.dispatch(GameActions.startGame({ gameID: this.gameID }));
+    this.router.navigate(['/game', this.gameID]);
   }
 }

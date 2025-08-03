@@ -1,12 +1,14 @@
-import { Component, OnInit, Input, ElementRef, HostListener, HostBinding, Directive, Host, ChangeDetectorRef } from '@angular/core';
-
+import { Component, OnInit, Input, ElementRef, HostListener, HostBinding, ChangeDetectorRef, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { EventHandleService } from '../../services/event-handle.service';
-
-import { Tile } from './../../models';
+import { Tile } from '../../interfaces';
 import { MessageBusService } from '../../services/message-bus.service';
+import { TileComponent } from '../tile/tile.component';
 
 @Component({
   selector: 'app-cell',
+  standalone: true,
+  imports: [CommonModule, TileComponent],
   templateUrl: './cell.component.html',
   styleUrls: ['./cell.component.scss']
 })
@@ -18,13 +20,14 @@ export class CellComponent implements OnInit {
     private eventHandler: EventHandleService,
     private messageBusService: MessageBusService
   ) { }
+
   @HostBinding('class.filled') get filledClass() { return !!this.childTile; }
   @HostBinding('attr.data-row') @Input() row!: number;
   @HostBinding('attr.data-column') @Input() column!: number;
-  // public childTile: Tile;
-  @Input('tile') childTile: Tile;
-  private _moveCell$ = this.messageBusService.moveChildTile$;
-  private _removeTile$ = this.messageBusService.removeChildTile$;
+  @Input('tile') childTile: Tile | null = null;
+  
+  private _moveCell$ = inject(MessageBusService).moveChildTile$;
+  private _removeTile$ = inject(MessageBusService).removeChildTile$;
 
   @HostBinding('class') class = 'cell';
 
@@ -34,37 +37,37 @@ export class CellComponent implements OnInit {
   }
 
   @HostListener('dragenter', ['$event'])
-  handleDragEnter = ($event) => {
+  handleDragEnter = ($event: DragEvent) => {
     this.eventHandler.handleDragEnter($event);
   }
 
   @HostListener('dragleave', ['$event'])
-  handleDragLeave = ($event) => {
+  handleDragLeave = ($event: DragEvent) => {
     this.eventHandler.handleDragLeave($event);
   }
 
   @HostListener('dragover', ['$event'])
-  handleDragOver = ($event) => {
+  handleDragOver = ($event: DragEvent) => {
     this.eventHandler.handleDragOver($event);
   }
 
   @HostListener('dragend', ['$event'])
-  handleDragEnd = ($event) => {
-    $event.target.classList.remove('over');
+  handleDragEnd = ($event: DragEvent) => {
+    ($event.target as HTMLElement).classList.remove('over');
   }
 
   @HostListener('drop', ['$event'])
-  handleDrop = ($event) => {
+  handleDrop = ($event: DragEvent) => {
     this.eventHandler.handleDrop($event);
   }
 
   @HostListener('click', ['$event'])
-  handleClick = ($event) => {
+  handleClick = ($event: Event) => {
     console.log('cell clicked!');
   }
 
   listenMoveCell = () => {
-    this._moveCell$.subscribe(data => {
+    this._moveCell$.subscribe((data: any) => {
       if ((data.row === this.row) && (data.column == this.column)) {
         this.childTile = {
           id: data.id,
@@ -75,7 +78,7 @@ export class CellComponent implements OnInit {
   }
 
   removeChildTile = () => {
-    this._removeTile$.subscribe(originCell => {
+    this._removeTile$.subscribe((originCell: any) => {
       if ((originCell.row === this.row) && (originCell.column === this.column)) {
         this.childTile = null;
       }

@@ -11,6 +11,8 @@ dependencies = [
     "flask-socketio>=5.5.1",
     "jsonschema>=4.25.0",
     "simplejson>=3.20.1",
+    "gunicorn>=20.1.0",
+    "eventlet>=0.33.0",
 ]
 
 [dependency-groups]

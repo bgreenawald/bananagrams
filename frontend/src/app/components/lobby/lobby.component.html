@@ -1,54 +1,27 @@
-<header class="lobby">
+<div class="lobby">
   <div class="lobby-content">
-    <div class='error-container'>
-      <p class='error-content'>
-        {{error}}
-      </p>
+    <h2>Game Lobby: {{gameID}}</h2>
+    
+    <div *ngIf="!playerID" class="player-setup">
+      <label for="playerName">Enter your name:</label>
+      <input #playerName id="playerName" type="text" placeholder="Your name">
+      <button (click)="setPlayerName(playerName.value)">Join Game</button>
     </div>
 
-    <div id="edit_player_name" *ngIf="isEditingName && playerID">
-      <p>Edit user name</p>
-      <input #playerIDInput id="player_id" type="text" [value]="playerID"
-        (keydown.enter)="playerJoin(playerIDInput.value)">
-      <button (keydown.enter)="updatePlayerID(playerIDInput.value)" (click)="updatePlayerID(playerIDInput.value)">Update
-        username</button>
-    </div>
-
-    <div id=" join_game" *ngIf="!playerID && !isEditingName">
-      <p>First things first, enter your username to join the game.</p>
-      <input #playerID id="player_id" type="text" placeholder="Enter your username"
-        (keydown.enter)="playerJoin(playerID.value)">
-      <button id="player_id_submit" class="btn btn-primary" type="submit" (click)="playerJoin(playerID.value)"
-        (keydown.enter)="playerJoin(playerID.value)">
-        Join the Game
-      </button>
-    </div>
-
-    <div id="options" *ngIf="playerID && !isEditingName">
-      <div id="players-in-lobby">
-        <h2>Players in Lobby:</h2>
-        <p class=" lobby-wait-message">Waiting for other players. Hit "Start" when everyone has joined.</p>
-
-        <ul id="players">
-          <div class="player" *ngFor="let player of playersInLobby">
-            <img src="https://www.svgrepo.com/show/58475/bird-hand-drawn-animal-toy.svg" alt="" class="player-icon">
-            <div class="player-info">
-              <h3>{{player}}</h3>
-              <button class="icon-button edit_player_icon" (keydown.enter)="editPlayerName()"
-                (click)="editPlayerName()">
-                <fa-icon [icon]="faEdit"></fa-icon>
-              </button>
-            </div>
-
-          </div>
-
+    <div *ngIf="playerID" class="game-info">
+      <h3>Welcome, {{playerID}}!</h3>
+      
+      <div class="players-list">
+        <h4>Players in game:</h4>
+        <ul>
+          <li *ngFor="let player of players">
+            {{player.id}} ({{player.tiles?.length || 0}} tiles)
+          </li>
         </ul>
       </div>
-      <button class="btn btn-primary" id="start_game_button" type="submit" (click)="startGame()"
-        [disabled]="!startButtonEnabled">{{startButtonEnabled ? "Start Game" : "Need at least 2 players"}}</button>
+
+      <button *ngIf="players.length > 1" (click)="startGame()">Start Game</button>
+      <p *ngIf="players.length <= 1">Waiting for more players to join...</p>
     </div>
-
-    <!-- <div id="game_info"></div> -->
-
   </div>
-</header>
+</div>

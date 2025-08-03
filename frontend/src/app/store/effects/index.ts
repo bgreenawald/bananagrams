@@ -1,6 +1,7 @@
-import { GameEffects } from './game.effect';
-import { UserEffects } from './user.effect'; // RENAME?: a better name might be - user triggered effects? user events?
+import { GameEffects } from './game.effects';
+import { UserEffects } from './user.effects';
 
-export const effects: any[] = [GameEffects, UserEffects];
+export const effects = [GameEffects, UserEffects];
 
-export * from './game.effect';
+export * from './game.effects';
+export * from './user.effects';

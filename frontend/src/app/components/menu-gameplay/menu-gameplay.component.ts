@@ -1,44 +1,42 @@
 import { Component, OnInit } from '@angular/core';
-
-import { Socket } from 'ngx-socket-io';
+import { CommonModule } from '@angular/common';
 
 import { ErrorService } from '../../services/error.service';
 import { MessageBusService } from '../../services/message-bus.service';
 import { SocketService } from '../../services/socket.service';
 
-import * as Models from './../../models';
-
 import { Store, select } from '@ngrx/store';
-import * as fromStore from './../../store';
+import * as Selectors from '../../store/selectors';
+import * as UserActions from '../../store/actions/user.actions';
 import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-menu-gameplay',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './menu-gameplay.component.html',
   styleUrls: ['./menu-gameplay.component.scss']
 })
 export class MenuGameplayComponent implements OnInit {
-  public gameID: string;
-  public tilesRemaining: number;
-  public playerID: string;
+  public gameID: string = '';
+  public tilesRemaining: number = 0;
+  public playerID: string = '';
 
   constructor(
     private errorService: ErrorService,
     private messageBusService: MessageBusService,
-    private socket: Socket,
     private socketService: SocketService,
-    private _store: Store<Models.GameState>
+    private _store: Store
   ) { }
 
   ngOnInit(): void {
-
     this.listenToStore();
   }
 
   listenToStore = () => {
-    this._store.select(fromStore.getPlayerIDSelector).pipe(take(1)).subscribe(id => this.playerID = id);
-    this._store.select(fromStore.selectGameID).pipe(take(1)).subscribe(id => this.gameID = id);
-    this._store.select(fromStore.getRemainingTiles).subscribe(tilesLeft => this.tilesRemaining = tilesLeft)
+    this._store.select(Selectors.getPlayerIDSelector).pipe(take(1)).subscribe(id => this.playerID = id || '');
+    this._store.select(Selectors.selectGameID).pipe(take(1)).subscribe(id => this.gameID = id || '');
+    this._store.select(Selectors.getRemainingTiles).subscribe(tilesLeft => this.tilesRemaining = tilesLeft);
   }
 
   handleStartNewGame = () => {
@@ -51,13 +49,10 @@ export class MenuGameplayComponent implements OnInit {
 
   peel = () => {
     if (this.isValidBoard()) {
-      this.socket.emit('peel', {
-        name: this.gameID
-      });
+      this.socketService.peel(this.gameID);
     }
-    else this.errorService.displayError('To peel, your bench must be empty and your board must be valid.')
+    else this.errorService.displayError('To peel, your bench must be empty and your board must be valid.');
   }
-
 
   selectAllTiles = () => {
     const tiles: Element[] = Array.from(document.querySelectorAll('#board app-tile'));
@@ -69,26 +64,22 @@ export class MenuGameplayComponent implements OnInit {
   bananagrams = () => {
     if (this.isValidBoard()) {
       const words: string[] = this.getAllWords();
-      this.socket.emit("bananagrams", {
-        "name": this.gameID,
-        "player_id": this.playerID,
-        "words": words
-      })
-      this._store.dispatch(new fromStore.CallBananagrams(this.gameID, this.playerID, words));
+      this.socketService.userCallBananagrams(this.gameID, this.playerID, words);
+      this._store.dispatch(UserActions.callBananagrams({
+        gameID: this.gameID,
+        playerID: this.playerID,
+        words: words
+      }));
     }
-    else this.errorService.displayError('Cannot call bananagrams.  Board is invalid.')
+    else this.errorService.displayError('Cannot call bananagrams. Board is invalid.');
   }
 
   continueGame = () => {
-    this.socket.emit('continue_game', {
-      name: this.gameID
-    });
+    this.socketService.continueGame(this.gameID);
   }
 
   isValidBoard = () => {
     const board = document.querySelector('#board');
-    const bench = document.getElementById('bench');
-
     const benchTiles = Array.from(document.querySelectorAll('#bench app-tile'));
 
     // Make sure the bench is empty
@@ -98,7 +89,7 @@ export class MenuGameplayComponent implements OnInit {
 
     // Using a queue, process each tile and make sure we can get to every tile
     const processTiles = Array.from(document.querySelectorAll('app-tile'));
-    const seenTiles = [];
+    const seenTiles: any[] = [];
 
     while (processTiles.length > 0) {
       const currentTile = processTiles.pop();
@@ -116,14 +107,12 @@ export class MenuGameplayComponent implements OnInit {
     }
     // If we hit every tile, then we have a valid board
 
-    const allTiles = board.querySelectorAll('app-tile');
-    console.log(seenTiles);
-    console.log(allTiles);
-    return seenTiles.length === allTiles.length;
+    const allTiles = board?.querySelectorAll('app-tile');
+    return seenTiles.length === (allTiles?.length || 0);
   }
 
-  getTileNeighbors = (tile): any[] => {
-    const neighbors = [];
+  getTileNeighbors = (tile: any): Element[] => {
+    const neighbors: Element[] = [];
     const parentCell = tile.parentElement;
     const tileRow = parseInt(parentCell.getAttribute('data-row'));
     const tileColumn = parseInt(parentCell.getAttribute('data-column'));
@@ -137,7 +126,7 @@ export class MenuGameplayComponent implements OnInit {
     ];
 
     neighborIndices.forEach(neighbor => {
-      const neighborTile = board.querySelector(`app-cell[data-row="${neighbor.row}"][data-column="${neighbor.column}"] app-tile`);
+      const neighborTile = board?.querySelector(`app-cell[data-row="${neighbor.row}"][data-column="${neighbor.column}"] app-tile`);
       if (neighborTile) { neighbors.push(neighborTile); }
     });
 
@@ -146,7 +135,6 @@ export class MenuGameplayComponent implements OnInit {
 
   getAllWords = (): string[] => {
     const allWords = [];
-
     const [minRow, maxRow, minColumn, maxColumn] = this.findFilledArea();
 
     // Get all words row wise
@@ -171,8 +159,8 @@ export class MenuGameplayComponent implements OnInit {
       let curWord = '';
       for (let r = minRow; r <= maxRow + 1; r++) {
         const curCell = document.querySelectorAll(`#board app-cell[data-row="${r}"][data-column="${c}"]`)[0];
-        if (curCell.children.length > 0) {
-          curWord += curCell.querySelector('.tile').textContent;
+        if (curCell?.children.length > 0) {
+          curWord += curCell.querySelector('.tile')?.textContent;
         } else {
           if (curWord.length > 1) {
             allWords.push(curWord);
@@ -188,7 +176,6 @@ export class MenuGameplayComponent implements OnInit {
     const allTiles: any[] = Array.from(document.querySelectorAll('#board app-tile'));
     const occupiedColumns = allTiles.map((tile: any) => tile.parentElement.dataset.column);
     const occupiedRows = allTiles.map((tile: any) => tile.parentElement.dataset.row);
-
 
     const minRow = Math.min(...occupiedRows);
     const maxRow = Math.max(...occupiedRows);

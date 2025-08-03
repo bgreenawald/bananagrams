@@ -1,14 +1,21 @@
-version: "3"
-
 services:
-
     backend:
         build: ./backend
         container_name: backend
+        networks:
+            - app-network
+        expose:
+            - "5000"
     frontend:
         build: ./frontend
         container_name: frontend
-        links:
-        - backend
+        depends_on:
+            - backend
+        networks:
+            - app-network
         ports:
-        - 8080:80
+            - "8080:80"
+
+networks:
+    app-network:
+        driver: bridge

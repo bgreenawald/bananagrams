@@ -1,55 +1,59 @@
-import { ActivatedRouteSnapshot, RouterStateSnapshot, Params, RouterState } from '@angular/router';
-import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
-import * as coreRouterStore from '@ngrx/router-store';
+import { ActivatedRouteSnapshot, RouterStateSnapshot, Params } from '@angular/router';
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { RouterReducerState, getRouterSelectors, RouterStateSerializer } from '@ngrx/router-store';
 
-import * as fromStore from './../index';
-
-export const selectRouter = createFeatureSelector<coreRouterStore.RouterReducerState>('router');
-
-export const {
-    selectRouteParams,
-    selectRouteParam
-} = coreRouterStore.getSelectors(selectRouter);
-
+// Router state interface
 export interface RouterStateUrl {
-    url: string;
-    queryParams: Params;
-    params: Params;
+  url: string;
+  queryParams: Params;
+  params: Params;
 }
 
+// Router state type
 export interface State {
-    routerReducer: coreRouterStore.RouterReducerState<RouterStateUrl>;
+  router: RouterReducerState<RouterStateUrl>;
 }
 
-export const routerReducers: ActionReducerMap<State> = {
-    routerReducer: coreRouterStore.routerReducer
-};
+// Feature selector for router
+export const selectRouterState = createFeatureSelector<RouterReducerState<RouterStateUrl>>('router');
 
-// selector for getting router state
-export const getRouterState = createFeatureSelector<
-    coreRouterStore.RouterReducerState<RouterStateUrl>
-    >('router');
+// Get router selectors from NgRx
+export const {
+  selectCurrentRoute,
+  selectFragment,
+  selectQueryParams,
+  selectQueryParam,
+  selectRouteParams,
+  selectRouteParam,
+  selectRouteData,
+  selectUrl,
+  selectTitle
+} = getRouterSelectors(selectRouterState);
 
+// Custom game ID selector from route params
 export const selectGameID = createSelector(
-    getRouterState,
-    (routerState: any) => routerState && routerState.state.params.id
+  selectRouteParams,
+  (params) => params?.['id']
 );
 
-export class CustomSerializer
-    implements coreRouterStore.RouterStateSerializer<RouterStateUrl>{
-    serialize(routerState: RouterStateSnapshot): RouterStateUrl {
-        const { url } = routerState;
-        const { queryParams } = routerState.root;
+// Custom router state serializer
+export class CustomRouterStateSerializer implements RouterStateSerializer<RouterStateUrl> {
+  serialize(routerState: RouterStateSnapshot): RouterStateUrl {
+    const { url } = routerState;
+    const { queryParams } = routerState.root;
 
-        let state: ActivatedRouteSnapshot = routerState.root;
-        // gets the last param in the URL
-        while (state.firstChild) {
-            state = state.firstChild;
-        }
-
-        const { params } = state;
-        // equivalent to above line: const params = state.params;
-
-        return { url, queryParams, params };
+    let state: ActivatedRouteSnapshot = routerState.root;
+    // Gets the last param in the URL
+    while (state.firstChild) {
+      state = state.firstChild;
     }
+
+    const { params } = state;
+
+    return { url, queryParams, params };
+  }
 }
+
+// Legacy selectors for backward compatibility
+export const selectRouter = selectRouterState;
+export const getRouterState = selectRouterState;

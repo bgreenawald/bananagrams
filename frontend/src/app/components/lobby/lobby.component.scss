@@ -1,60 +1,70 @@
 @import '../../../styles.scss';
 
-* {
-  text-align: center;
-  margin: 0 auto;
-}
-
-label {
-  font-family: "Gaegu";
-}
-
-input {
-  font-size: 20px;
-}
-
-#join_game {
+.lobby {
   @include flexbox();
   flex-flow: column nowrap;
-}
-
-
-div.player-info {
-  display: flex;
-  flex-flow: row nowrap;
   align-items: center;
   justify-content: center;
+  height: 100vh;
+  color: $off-white;
 
-  >* {
-    margin: 0;
-  }
+  .lobby-content {
+    @include flexbox();
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    max-width: 600px;
+    text-align: center;
 
-  button.edit_player_icon {
-    display: inline-block;
-    padding: 0px 0px 0px 10px;
-  }
-}
-
-// lobby wait
-#options {
-  @include flexbox();
-  justify-content: center;
-  align-items: center;
-  flex-flow: column nowrap;
-
-  #players-in-lobby {
-    width: 100%;
-
-    #players {
-      width: 100%;
+    .player-setup {
       @include flexbox();
-      flex-flow: row wrap;
-      justify-content: flex-start;
-      align-content: space-around;
+      flex-flow: column nowrap;
+      align-items: center;
+      gap: 1rem;
 
-      .player {
-        width: 33%;
-        height: 33%;
+      input {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid $off-white;
+        background-color: transparent;
+        color: $off-white;
+      }
+
+      button {
+        padding: 10px 20px;
+        border-radius: 5px;
+        background-color: $off-white;
+        color: $off-black;
+        cursor: pointer;
+      }
+    }
+
+    .game-info {
+      .players-list {
+        margin: 1rem 0;
+        
+        ul {
+          list-style: none;
+          padding: 0;
+          
+          li {
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+          }
+        }
+      }
+
+      button {
+        padding: 15px 30px;
+        border-radius: 10px;
+        background-color: $off-white;
+        color: $off-black;
+        font-size: 18px;
+        cursor: pointer;
+        margin-top: 1rem;
       }
     }
   }

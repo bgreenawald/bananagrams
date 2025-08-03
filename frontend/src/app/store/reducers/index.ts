@@ -1,12 +1,23 @@
-import * as GameReducers from './game.reducer';
-import * as UserReducers from './user.reducer';
-import * as RouterReducers from './router.reducer';
-
-import * as Models from './../../models';
 import { ActionReducerMap } from '@ngrx/store';
+import { routerReducer } from '@ngrx/router-store';
+import { gameReducer, StoreGameState } from './game.reducer';
+import { userReducer, UserState } from './user.reducer';
 
+// Application state interface
+export interface AppState {
+  game: StoreGameState;
+  user: UserState;
+  router: any;
+}
 
-export const reducers: ActionReducerMap<any> = {
-    gameReducer: GameReducers.gameReducer,
-    userReducer: UserReducers.userReducer,
+// Root reducer map
+export const reducers: ActionReducerMap<AppState> = {
+  game: gameReducer,
+  user: userReducer,
+  router: routerReducer
 };
+
+// Export individual reducers and state types
+export * from './game.reducer';
+export * from './user.reducer';
+export * from './router.reducer';

@@ -1,70 +1,92 @@
-import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
-import * as fromCoreRouter from '@ngrx/router-store';
-import * as Models from './../../models';
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { StoreGameState } from '../reducers/game.reducer';
+import { GameState } from '../../interfaces';
 
-import * as routerSelectors from './router.selectors';
+// Feature selector for game state
+export const selectGameState = createFeatureSelector<StoreGameState>('game');
 
-export const getGameStateSelector = createFeatureSelector<any>('game');
-
-export const getGameDataSelector = createSelector(
-    getGameStateSelector,
-    (state: Models.GameState) => state.gameData
+// Game data selectors
+export const selectGameData = createSelector(
+  selectGameState,
+  (state: StoreGameState) => state.gameData
 );
 
 export const selectLoadedStatus = createSelector(
-    getGameStateSelector,
-    (state: Models.GameState) => state.loaded
+  selectGameState,
+  (state: StoreGameState) => state.loaded
 );
 
 export const selectLoadingStatus = createSelector(
-    getGameStateSelector,
-    (state: Models.GameState) => state.loading
+  selectGameState,
+  (state: StoreGameState) => state.loading
 );
 
-export const getPlayerIDSelector = createSelector(
-    getGameStateSelector,
-    (state: Models.GameState) => {
-        return state.playerID ? state.playerID : localStorage.getItem('player_id');
+export const selectPlayerID = createSelector(
+  selectGameState,
+  (state: StoreGameState) => {
+    return state.playerID ? state.playerID : localStorage.getItem('player_id');
+  }
+);
+
+export const selectReservedGameIDs = createSelector(
+  selectGameState,
+  (state: StoreGameState) => state.unavailableIDs
+);
+
+export const selectAllPlayers = createSelector(
+  selectGameData,
+  (data: any) => data?.players ? Object.keys(data.players) : []
+);
+
+export const selectWinningPlayer = createSelector(
+  selectGameData,
+  (socketData: any) => socketData?.winning_player
+);
+
+export const selectWinningWords = createSelector(
+  selectGameData,
+  (socketData: any) => socketData?.winning_words
+);
+
+export const selectRemainingTiles = createSelector(
+  selectGameData,
+  (socketData: any) => socketData?.tiles_remaining
+);
+
+export const selectPlayerTiles = createSelector(
+  selectGameData,
+  selectPlayerID,
+  (data: any, playerID: string | null) => {
+    if (!data || Object.keys(data).length === 0 || !playerID) { 
+      return [];
     }
-);
 
-export const getReservedGameIDs = createSelector(
-    getGameStateSelector,
-    (state: Models.GameState) => state.unavailableIDs
-);
+    const playersToTiles: any = data.players;
+    const allPlayerIDs = Object.keys(playersToTiles);
 
-export const getAllPlayers = createSelector(
-    getGameDataSelector,
-    (data: Models.GameData) => data.players ? Object.keys(data.players) : []
-);
-
-export const getWinningPlayer = createSelector(
-    getGameDataSelector,
-    (socketData: Models.GameData) => socketData.winning_player
-);
-
-export const getWinningWords = createSelector(
-    getGameDataSelector,
-    (socketData: Models.GameData) => socketData.winning_words
-);
-
-export const getRemainingTiles = createSelector(
-    getGameDataSelector,
-    (socketData: Models.GameData) => socketData.tiles_remaining
-)
-
-export const getPlayerTiles = createSelector(
-    getGameDataSelector,
-    getPlayerIDSelector,
-    (data: Models.GameData, playerID: string) => {
-        if (Object.keys(data).length === 0) { return; }
-
-        const playersToTiles: any = data.players;
-        const allPlayerIDs = Object.keys(playersToTiles);
-
-        for (let i = 0; i < allPlayerIDs.length; i++) {
-            const player = allPlayerIDs[i];
-            if (player === playerID) { return playersToTiles[playerID]; }
-        }
+    for (let i = 0; i < allPlayerIDs.length; i++) {
+      const player = allPlayerIDs[i];
+      if (player === playerID) { 
+        return playersToTiles[playerID]; 
+      }
     }
+    
+    return [];
+  }
 );
+
+export const selectGameError = createSelector(
+  selectGameState,
+  (state: StoreGameState) => state.error
+);
+
+// Legacy selectors for backward compatibility
+export const getGameStateSelector = selectGameState;
+export const getGameDataSelector = selectGameData;
+export const getPlayerIDSelector = selectPlayerID;
+export const getReservedGameIDs = selectReservedGameIDs;
+export const getAllPlayers = selectAllPlayers;
+export const getWinningPlayer = selectWinningPlayer;
+export const getWinningWords = selectWinningWords;
+export const getRemainingTiles = selectRemainingTiles;
+export const getPlayerTiles = selectPlayerTiles;

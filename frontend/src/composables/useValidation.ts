@@ -17,37 +17,35 @@ export function useValidation() {
   const rules = {
     required: (message = 'This field is required'): ValidationRule => ({
       test: (value: any) => value !== null && value !== undefined && String(value).trim() !== '',
-      message
+      message,
     }),
 
     minLength: (min: number, message?: string): ValidationRule => ({
       test: (value: any) => String(value).length >= min,
-      message: message || `Must be at least ${min} characters`
+      message: message || `Must be at least ${min} characters`,
     }),
 
     maxLength: (max: number, message?: string): ValidationRule => ({
       test: (value: any) => String(value).length <= max,
-      message: message || `Must be no more than ${max} characters`
+      message: message || `Must be no more than ${max} characters`,
     }),
 
     pattern: (regex: RegExp, message: string): ValidationRule => ({
       test: (value: any) => regex.test(String(value)),
-      message
+      message,
     }),
 
     gameId: (): ValidationRule => ({
       test: (value: any) => /^\d{4}$/.test(String(value)),
-      message: 'Game ID must be exactly 4 digits'
+      message: 'Game ID must be exactly 4 digits',
     }),
 
     playerName: (): ValidationRule => ({
       test: (value: any) => {
         const name = String(value).trim()
-        return name.length >= 2 && 
-               name.length <= 20 && 
-               /^[a-zA-Z0-9_-]+$/.test(name)
+        return name.length >= 2 && name.length <= 20 && /^[a-zA-Z0-9_-]+$/.test(name)
       },
-      message: 'Player name must be 2-20 characters, letters, numbers, _ and - only'
+      message: 'Player name must be 2-20 characters, letters, numbers, _ and - only',
     }),
 
     noHtml: (): ValidationRule => ({
@@ -55,8 +53,8 @@ export function useValidation() {
         const str = String(value)
         return !/<[^>]*>/g.test(str)
       },
-      message: 'HTML tags are not allowed'
-    })
+      message: 'HTML tags are not allowed',
+    }),
   }
 
   function validate(value: any, validationRules: ValidationRule[]): ValidationResult {
@@ -68,45 +66,45 @@ export function useValidation() {
     return { valid: true }
   }
 
-  function validateField(fieldName: string, value: any, validationRules: ValidationRule[]): boolean {
+  function validateField(
+    fieldName: string,
+    value: any,
+    validationRules: ValidationRule[]
+  ): boolean {
     const result = validate(value, validationRules)
-    
+
     if (result.valid) {
       delete errors.value[fieldName]
     } else {
       errors.value[fieldName] = result.error!
     }
-    
+
     return result.valid
   }
 
   function validateGameId(value: string): ValidationResult {
-    return validate(value, [
-      rules.required('Game ID is required'),
-      rules.gameId(),
-      rules.noHtml()
-    ])
+    return validate(value, [rules.required('Game ID is required'), rules.gameId(), rules.noHtml()])
   }
 
   function validatePlayerName(value: string): ValidationResult {
     return validate(value, [
       rules.required('Player name is required'),
       rules.playerName(),
-      rules.noHtml()
+      rules.noHtml(),
     ])
   }
 
   function sanitizeInput(value: string): string {
     return value
       .trim()
-      .replace(/[<>&'"]/g, (match) => {
+      .replace(/[<>&'"]/g, match => {
         // HTML escape dangerous characters
         const escapeMap: Record<string, string> = {
           '<': '&lt;',
           '>': '&gt;',
           '&': '&amp;',
           "'": '&#39;',
-          '"': '&quot;'
+          '"': '&quot;',
         }
         return escapeMap[match] || match
       })
@@ -135,6 +133,6 @@ export function useValidation() {
     sanitizeInput,
     hasErrors,
     clearErrors,
-    getError
+    getError,
   }
 }

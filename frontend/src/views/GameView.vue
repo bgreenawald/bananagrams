@@ -31,9 +31,9 @@ onMounted(() => {
     router.push({ name: 'landing' })
     return
   }
-  
+
   gameStore.setGameId(gameId)
-  
+
   // Create and store the event handler reference
   beforeUnloadHandler.value = handleBeforeUnload
   window.addEventListener('beforeunload', beforeUnloadHandler.value)
@@ -49,13 +49,16 @@ onBeforeRouteLeave(() => {
   return true
 })
 
-watch(() => gameStore.gameState?.state, (newState) => {
-  if (newState === 'OVER') {
-    router.push({ name: 'gameover', params: { id: gameId } })
-  } else if (newState === 'IDLE') {
-    router.push({ name: 'lobby', params: { id: gameId } })
+watch(
+  () => gameStore.gameState?.state,
+  newState => {
+    if (newState === 'OVER') {
+      router.push({ name: 'gameover', params: { id: gameId } })
+    } else if (newState === 'IDLE') {
+      router.push({ name: 'lobby', params: { id: gameId } })
+    }
   }
-})
+)
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
   if (gameStore.isActive) {

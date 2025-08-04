@@ -1,110 +1,162 @@
 name: Build and Deploy
 
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the master branch
   push:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
-  build_and_deploy:
+  test:
     runs-on: ubuntu-latest
-    env:
-      backend-directory: ./backend
-      frontend-directory: ./frontend
+    strategy:
+      matrix:
+        component: [backend, frontend]
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.component }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
-    # Test the backend
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v2
+    # Backend testing
+    - name: Set up Python (Backend)
+      if: matrix.component == 'backend'
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.7
-    - name: Install dependencies
-      run: |
-        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-        source $HOME/.poetry/env
-        poetry export -f requirements.txt --dev > requirements.txt
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      working-directory: ${{ env.backend-directory }}
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 .
-      working-directory: ${{ env.backend-directory }}
-    - name: Test with pytest
-      run: |
-        pytest
-      working-directory: ${{ env.backend-directory }}
+        python-version: '3.9'
 
-    # Configure AWS credentials and login to the ECR
+    - name: Install Poetry (Backend)
+      if: matrix.component == 'backend'
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Install backend dependencies
+      if: matrix.component == 'backend'
+      run: poetry install --no-interaction
+
+    - name: Run backend tests
+      if: matrix.component == 'backend'
+      run: |
+        poetry run black --check .
+        poetry run flake8 .
+        poetry run coverage run -m pytest tests/ -v
+        poetry run coverage report
+
+    # Frontend testing
+    - name: Setup Node.js (Frontend)
+      if: matrix.component == 'frontend'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install frontend dependencies
+      if: matrix.component == 'frontend'
+      run: npm ci
+
+    - name: Run frontend tests
+      if: matrix.component == 'frontend'
+      run: |
+        npm run lint
+        npm run type-check
+        npm run test:unit
+        npm run build
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Configure AWS credentials (if deploying to AWS)
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      if: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
 
     - name: Login to Amazon ECR
+      if: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
-    # Build and deploy the frontend docker images
-    - name: Frontend build and deploy to ECR
+    # Build frontend
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+
+    # Build and push frontend Docker image
+    - name: Build and push frontend Docker image
+      if: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: chalkful_frontend
-        IMAGE_NAME: chalkful_frontend
+        ECR_REPOSITORY: ${{ vars.FRONTEND_ECR_REPOSITORY || 'bananagrams-frontend' }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker build \
-          -t $IMAGE_NAME \
-          --cache-from $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-          --build-arg BUILDKIT_INLINE_CACHE=1 .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        cd frontend
+        docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+        docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      working-directory: ${{ env.frontend-directory }}
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-    # Build and deploy the backend docker image
-    - name: Backend build and deploy to ECR
+    # Build and push backend Docker image
+    - name: Build and push backend Docker image
+      if: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: chalkful_backend
-        IMAGE_NAME: chalkful_backend
+        ECR_REPOSITORY: ${{ vars.BACKEND_ECR_REPOSITORY || 'bananagrams-backend' }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker build \
-          -t $IMAGE_NAME \
-          --cache-from $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-          --build-arg BUILDKIT_INLINE_CACHE=1 .
-        docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker tag $IMAGE_NAME $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        cd backend
+        docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+        docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      working-directory: ${{ env.backend-directory }}
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-    # Generate deployment package for Elastic beanstalk and deploy
+    # Deploy to Elastic Beanstalk (if configured)
     - name: Generate deployment package
-      run: zip -g deploy.zip Dockerrun.aws.json
+      if: ${{ vars.EB_APPLICATION_NAME != '' }}
+      run: |
+        if [ -f Dockerrun.aws.json ]; then
+          zip -g deploy.zip Dockerrun.aws.json
+        else
+          echo "Dockerrun.aws.json not found, skipping EB deployment"
+        fi
 
-    - name: Beanstalk Deploy my app
-      uses: einaregilsson/beanstalk-deploy@v16
+    - name: Deploy to Elastic Beanstalk
+      if: ${{ vars.EB_APPLICATION_NAME != '' && hashFiles('deploy.zip') != '' }}
+      uses: einaregilsson/beanstalk-deploy@v22
       with:
         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: chalkful
-        environment_name: chalkful-env
-        region: us-east-1
-        version_label: chalkful-${{ github.sha }}
+        application_name: ${{ vars.EB_APPLICATION_NAME }}
+        environment_name: ${{ vars.EB_ENVIRONMENT_NAME }}
+        region: ${{ vars.AWS_REGION || 'us-east-1' }}
+        version_label: bananagrams-${{ github.sha }}
         deployment_package: deploy.zip
 
-    # Log out of ECR
-    - name: Logout of Amazon ECR
-      if: always()
-      run: docker logout ${{ steps.login-ecr.outputs.registry }}
+    # Alternative: Deploy to other platforms
+    - name: Deploy notification
+      if: ${{ secrets.AWS_ACCESS_KEY_ID == '' }}
+      run: |
+        echo "::notice::No AWS credentials found. Skipping deployment to AWS."
+        echo "::notice::Images built successfully. Configure AWS secrets and variables for deployment."

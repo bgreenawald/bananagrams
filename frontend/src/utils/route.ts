@@ -19,7 +19,10 @@ export function getRouteQuery(route: RouteLocationNormalizedLoaded, queryName: s
 /**
  * Safely extracts a boolean query parameter from route query
  */
-export function getRouteQueryBoolean(route: RouteLocationNormalizedLoaded, queryName: string): boolean {
+export function getRouteQueryBoolean(
+  route: RouteLocationNormalizedLoaded,
+  queryName: string
+): boolean {
   const query = route.query[queryName]
   return query === 'true'
 }
@@ -27,16 +30,19 @@ export function getRouteQueryBoolean(route: RouteLocationNormalizedLoaded, query
 /**
  * Validates that a route parameter exists and is not empty
  */
-export function validateRouteParam(route: RouteLocationNormalizedLoaded, paramName: string): { valid: boolean; value: string; error?: string } {
+export function validateRouteParam(
+  route: RouteLocationNormalizedLoaded,
+  paramName: string
+): { valid: boolean; value: string; error?: string } {
   const value = getRouteParam(route, paramName)
-  
+
   if (!value) {
     return {
       valid: false,
       value,
-      error: `Missing required route parameter: ${paramName}`
+      error: `Missing required route parameter: ${paramName}`,
     }
   }
-  
+
   return { valid: true, value }
 }

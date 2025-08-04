@@ -52,6 +52,6 @@ export const useUIStore = defineStore('ui', () => {
     setDragData,
     setIsDragging,
     setHoveredCell,
-    reset
+    reset,
   }
 })

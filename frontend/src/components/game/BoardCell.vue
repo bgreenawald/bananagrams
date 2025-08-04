@@ -3,7 +3,7 @@
     class="board-cell"
     :class="{
       'has-tile': hasTile,
-      'drag-over': isDragOver
+      'drag-over': isDragOver,
     }"
     :data-row="row"
     :data-col="col"
@@ -12,12 +12,7 @@
     @dragover="handleDragOver"
     @drop="handleDrop"
   >
-    <GameTile
-      v-if="tile"
-      :tile="tile"
-      :source-row="row"
-      :source-col="col"
-    />
+    <GameTile v-if="tile" :tile="tile" :source-row="row" :source-col="col" />
   </div>
 </template>
 
@@ -63,9 +58,11 @@ function handleDragOver(e: DragEvent) {
 function handleDrop(e: DragEvent) {
   e.preventDefault()
   isDragOver.value = false
-  
-  if (!uiStore.dragData || hasTile.value) return
-  
+
+  if (!uiStore.dragData || hasTile.value) {
+    return
+  }
+
   handleCellDrop(props.row, props.col)
 }
 </script>
@@ -85,8 +82,8 @@ function handleDrop(e: DragEvent) {
 
   &.drag-over {
     background-color: #e8f5e9;
-    border-color: #4CAF50;
-    box-shadow: inset 0 0 0 2px #4CAF50;
+    border-color: #4caf50;
+    box-shadow: inset 0 0 0 2px #4caf50;
   }
 }
 </style>

@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
   },
   server: {
     port: 8080,
@@ -15,8 +15,8 @@ export default defineConfig({
       '/socket.io': {
         target: 'http://localhost:5000',
         ws: true,
-        changeOrigin: true
-      }
-    }
-  }
+        changeOrigin: true,
+      },
+    },
+  },
 })

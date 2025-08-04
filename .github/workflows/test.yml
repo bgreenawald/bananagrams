@@ -4,35 +4,86 @@ on:
   push:
     branches-ignore:
       - master
+  pull_request:
+    branches: [master]
 
 jobs:
-  test:
+  backend-test:
     runs-on: ubuntu-latest
-    env:
-      backend-directory: ./backend
+    defaults:
+      run:
+        working-directory: backend
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
-    # Test the backend
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v2
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.7
+        python-version: '3.9'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: backend/.venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
     - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+
+    - name: Install project
+      run: poetry install --no-interaction
+
+    - name: Run black
+      run: poetry run black --check .
+
+    - name: Run flake8
+      run: poetry run flake8 .
+
+    - name: Run mypy
+      run: poetry run mypy .
+
+    - name: Run tests with coverage
       run: |
-        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-        source $HOME/.poetry/env
-        poetry export -f requirements.txt --dev > requirements.txt
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      working-directory: ${{ env.backend-directory }}
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 .
-      working-directory: ${{ env.backend-directory }}
-    - name: Test with pytest
-      run: |
-        pytest
-      working-directory: ${{ env.backend-directory }}
+        poetry run coverage run -m pytest tests/ -v
+        poetry run coverage report
+
+  frontend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Run type check
+      run: npm run type-check
+
+    - name: Run tests
+      run: npm run test:unit
+
+    - name: Build
+      run: npm run build

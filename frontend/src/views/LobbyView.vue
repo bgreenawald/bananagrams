@@ -14,9 +14,7 @@
             @keyup.enter="joinGame"
             maxlength="20"
           />
-          <button @click="joinGame" :disabled="!nameInput.trim()">
-            Join Game
-          </button>
+          <button @click="joinGame" :disabled="!nameInput.trim()">Join Game</button>
         </div>
         <p v-if="nameError" class="error-message">{{ nameError }}</p>
       </div>
@@ -42,13 +40,15 @@
             :disabled="players.length < (isTestMode ? 1 : 2)"
             class="start-btn"
           >
-            {{ players.length < (isTestMode ? 1 : 2) ? 
-              (isTestMode ? 'Ready to start!' : 'Waiting for players...') : 
-              'Start Game' }}
+            {{
+              players.length < (isTestMode ? 1 : 2)
+                ? isTestMode
+                  ? 'Ready to start!'
+                  : 'Waiting for players...'
+                : 'Start Game'
+            }}
           </button>
-          <p v-else-if="gameState === 'ACTIVE'" class="status">
-            Game in progress...
-          </p>
+          <p v-else-if="gameState === 'ACTIVE'" class="status">Game in progress...</p>
         </div>
       </div>
     </div>
@@ -89,9 +89,9 @@ onMounted(async () => {
       router.push({ name: 'landing' })
       return
     }
-    
+
     gameStore.setGameId(currentGameId)
-    
+
     const savedName = localStorage.getItem('playerName')
     if (savedName) {
       playerStore.setPlayerName(savedName)
@@ -105,26 +105,29 @@ onMounted(async () => {
   }
 })
 
-watch(() => gameStore.gameState?.state, (newState) => {
-  if (newState === 'ACTIVE') {
-    router.push({ name: 'game', params: { id: gameId.value } })
-  } else if (newState === 'OVER') {
-    router.push({ name: 'gameover', params: { id: gameId.value } })
+watch(
+  () => gameStore.gameState?.state,
+  newState => {
+    if (newState === 'ACTIVE') {
+      router.push({ name: 'game', params: { id: gameId.value } })
+    } else if (newState === 'OVER') {
+      router.push({ name: 'gameover', params: { id: gameId.value } })
+    }
   }
-})
+)
 
 const joinGame = () => {
   const rawName = nameInput.value.trim()
   const validation = validatePlayerName(rawName)
-  
+
   if (!validation.valid) {
-    nameError.value = validation.error
+    nameError.value = validation.error || 'Invalid player name'
     return
   }
-  
+
   // Clear any previous error when validation passes
   nameError.value = ''
-  
+
   const sanitizedName = sanitizeInput(rawName)
   playerStore.setPlayerName(sanitizedName)
   localStorage.setItem('playerName', sanitizedName)
@@ -133,10 +136,7 @@ const joinGame = () => {
 
 const joinGameWithName = async (name: string) => {
   try {
-    await handleAsyncError(
-      socketStore.connect(),
-      'Socket connection for join'
-    )
+    await handleAsyncError(socketStore.connect(), 'Socket connection for join')
     socketStore.joinGame(gameId.value, name, isTestMode.value)
   } catch (error) {
     console.error('Failed to join game:', error)
@@ -207,13 +207,13 @@ const startGame = () => {
 
     &:focus {
       outline: none;
-      border-color: #4CAF50;
+      border-color: #4caf50;
     }
   }
 
   button {
     padding: 0.75rem 1.5rem;
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
     border: none;
     border-radius: 8px;
@@ -287,7 +287,7 @@ const startGame = () => {
 .start-btn {
   width: 100%;
   padding: 1rem;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 8px;
@@ -308,18 +308,18 @@ const startGame = () => {
 
 .status {
   font-size: 1.1rem;
-  color: #2196F3;
+  color: #2196f3;
   font-weight: 600;
 }
 
 .test-mode-indicator {
-  background-color: #FFF3E0;
-  color: #FF9800;
+  background-color: #fff3e0;
+  color: #ff9800;
   padding: 0.75rem;
   border-radius: 8px;
   margin-bottom: 1rem;
   font-weight: 600;
   text-align: center;
-  border: 2px solid #FFE0B2;
+  border: 2px solid #ffe0b2;
 }
 </style>

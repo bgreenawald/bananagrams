@@ -2,10 +2,10 @@
   <div class="gameover-container">
     <div class="gameover-content">
       <h1 class="title">Game Over!</h1>
-      
+
       <div v-if="winner" class="winner-section">
         <h2>Winner: {{ winner }}</h2>
-        
+
         <div v-if="winningWords.length > 0" class="words-section">
           <h3>Winning Words:</h3>
           <div class="words-grid">
@@ -17,12 +17,8 @@
       </div>
 
       <div class="actions">
-        <button @click="newGame" class="btn btn-primary">
-          New Game
-        </button>
-        <button @click="returnToLobby" class="btn btn-secondary">
-          Return to Lobby
-        </button>
+        <button @click="newGame" class="btn btn-primary">New Game</button>
+        <button @click="returnToLobby" class="btn btn-secondary">Return to Lobby</button>
       </div>
     </div>
   </div>
@@ -84,7 +80,7 @@ function returnToLobby() {
 
   h2 {
     font-size: 2rem;
-    color: #4CAF50;
+    color: #4caf50;
     margin-bottom: 1.5rem;
   }
 }

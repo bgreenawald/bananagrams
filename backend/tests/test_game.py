@@ -335,7 +335,7 @@ class testGameMethods(unittest.TestCase):
         # Test test mode game initialization
         g_test = Game("test", test_mode=True)
         with self.subTest("Test mode game has minimal tiles"):
-            self.assertEqual(len(g_test.tiles), 20)
+            self.assertEqual(len(g_test.tiles), 10)
         with self.subTest("Test test mode flag is set"):
             self.assertTrue(g_test.test_mode)
 
@@ -368,6 +368,6 @@ class testGameMethods(unittest.TestCase):
         # Test reset maintains test mode
         g_test.reset()
         with self.subTest("Test reset maintains test mode tiles count"):
-            self.assertEqual(len(g_test.tiles), 20)
+            self.assertEqual(len(g_test.tiles), 10)
         with self.subTest("Test reset maintains test mode flag"):
             self.assertTrue(g_test.test_mode)

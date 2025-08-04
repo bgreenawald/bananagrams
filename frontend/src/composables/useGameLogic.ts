@@ -28,7 +28,9 @@ export function useGameLogic() {
   function extractWords(): string[] {
     const words: string[] = []
     const bounds = boardStore.getBoardBounds()
-    if (!bounds) return words
+    if (!bounds) {
+      return words
+    }
 
     const { minRow, maxRow, minCol, maxCol } = bounds
 
@@ -69,6 +71,6 @@ export function useGameLogic() {
 
   return {
     validateBoard,
-    extractWords
+    extractWords,
   }
 }

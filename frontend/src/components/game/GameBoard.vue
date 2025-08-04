@@ -31,13 +31,15 @@ onMounted(async () => {
 })
 
 function centerBoard() {
-  if (!boardScroll.value) return
-  
+  if (!boardScroll.value) {
+    return
+  }
+
   const containerWidth = boardScroll.value.clientWidth
   const containerHeight = boardScroll.value.clientHeight
   const boardWidth = BOARD_SIZE * CELL_SIZE
   const boardHeight = BOARD_SIZE * CELL_SIZE
-  
+
   boardScroll.value.scrollLeft = (boardWidth - containerWidth) / 2
   boardScroll.value.scrollTop = (boardHeight - containerHeight) / 2
 }

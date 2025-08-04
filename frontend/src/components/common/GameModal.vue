@@ -7,11 +7,13 @@
             <h3 class="modal-title">{{ modalTitle }}</h3>
             <button @click="close" class="close-btn">&times;</button>
           </div>
-          
+
           <div class="modal-body">
             <!-- Reset Confirmation -->
             <div v-if="modalType === 'reset'">
-              <p>Are you sure you want to reset the board? All tiles will be returned to your bench.</p>
+              <p>
+                Are you sure you want to reset the board? All tiles will be returned to your bench.
+              </p>
               <div class="modal-actions">
                 <button @click="handleReset" class="btn btn-danger">Reset</button>
                 <button @click="close" class="btn btn-secondary">Cancel</button>
@@ -33,7 +35,11 @@
               <div class="words-review">
                 <div v-for="(word, index) in modalData?.words" :key="index" class="word-item">
                   <span class="word">{{ word }}</span>
-                  <button @click="toggleWord(index)" class="word-btn" :class="{ invalid: invalidWords.has(index) }">
+                  <button
+                    @click="toggleWord(index)"
+                    class="word-btn"
+                    :class="{ invalid: invalidWords.has(index) }"
+                  >
                     {{ invalidWords.has(index) ? '✗' : '✓' }}
                   </button>
                 </div>
@@ -85,11 +91,16 @@ const invalidWords = ref(new Set<number>())
 
 const modalTitle = computed(() => {
   switch (modalType.value) {
-    case 'reset': return 'Reset Board'
-    case 'newGame': return 'Start New Game'
-    case 'wordReview': return 'Word Review'
-    case 'error': return 'Notice'
-    default: return ''
+    case 'reset':
+      return 'Reset Board'
+    case 'newGame':
+      return 'Start New Game'
+    case 'wordReview':
+      return 'Word Review'
+    case 'error':
+      return 'Notice'
+    default:
+      return ''
   }
 })
 
@@ -132,7 +143,9 @@ function toggleWord(index: number) {
 }
 
 function submitReview() {
-  const validWords = modalData.value?.words.filter((_: string, index: number) => !invalidWords.value.has(index)) || []
+  const validWords =
+    modalData.value?.words.filter((_: string, index: number) => !invalidWords.value.has(index)) ||
+    []
   socketStore.validateWords(gameStore.gameId, modalData.value?.playerId, validWords)
   close()
 }
@@ -189,7 +202,7 @@ function submitReview() {
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &:hover {
     color: #333;
   }
@@ -239,11 +252,11 @@ function submitReview() {
   color: white;
   cursor: pointer;
   font-weight: bold;
-  
+
   &.invalid {
     background-color: #dc3545;
   }
-  
+
   &:hover {
     opacity: 0.8;
   }
@@ -260,7 +273,7 @@ function submitReview() {
     cursor: pointer;
     font-weight: 500;
     color: #6c757d;
-    
+
     &:hover {
       color: #495057;
     }
@@ -283,7 +296,7 @@ function submitReview() {
 .modal-enter-active,
 .modal-leave-active {
   transition: opacity 0.3s;
-  
+
   .modal-content {
     transition: transform 0.3s;
   }
@@ -292,7 +305,7 @@ function submitReview() {
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
-  
+
   .modal-content {
     transform: scale(0.9);
   }

@@ -27,10 +27,10 @@ export const usePlayerStore = defineStore('player', () => {
   }
 
   function setTiles(newTiles: Tile[]) {
-    logger.tileUpdate(
-      `Setting ${newTiles.length} tiles (was ${tiles.value.length})`,
-      { newCount: newTiles.length, oldCount: tiles.value.length }
-    )
+    logger.tileUpdate(`Setting ${newTiles.length} tiles (was ${tiles.value.length})`, {
+      newCount: newTiles.length,
+      oldCount: tiles.value.length,
+    })
     tiles.value = newTiles
   }
 
@@ -52,17 +52,14 @@ export const usePlayerStore = defineStore('player', () => {
   function updateTiles(newTiles: Tile[]) {
     const existingIds = new Set(tiles.value.map(t => t.id))
     const newTilesToAdd = newTiles.filter(t => !existingIds.has(t.id))
-    
-    logger.tileUpdate(
-      `Updating tiles: adding ${newTilesToAdd.length} new tiles`,
-      {
-        receivedTiles: newTiles.length,
-        currentTiles: tiles.value.length,
-        newTiles: newTilesToAdd.length,
-        finalCount: tiles.value.length + newTilesToAdd.length
-      }
-    )
-    
+
+    logger.tileUpdate(`Updating tiles: adding ${newTilesToAdd.length} new tiles`, {
+      receivedTiles: newTiles.length,
+      currentTiles: tiles.value.length,
+      newTiles: newTilesToAdd.length,
+      finalCount: tiles.value.length + newTilesToAdd.length,
+    })
+
     tiles.value = [...tiles.value, ...newTilesToAdd]
   }
 
@@ -125,6 +122,6 @@ export const usePlayerStore = defineStore('player', () => {
     clearSelection,
     selectAll,
     isSelected,
-    reset
+    reset,
   }
 })

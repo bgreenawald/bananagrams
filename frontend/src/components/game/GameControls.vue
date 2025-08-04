@@ -7,46 +7,21 @@
         <span class="player-count">Players: {{ players.length }}</span>
       </div>
     </div>
-    
+
     <div class="controls-center">
-      <button
-        @click="handlePeel"
-        :disabled="!canPeel"
-        class="btn btn-primary"
-      >
-        Peel
-      </button>
-      
-      <button
-        @click="handleBananagrams"
-        :disabled="!canCallBananagrams"
-        class="btn btn-success"
-      >
+      <button @click="handlePeel" :disabled="!canPeel" class="btn btn-primary">Peel</button>
+
+      <button @click="handleBananagrams" :disabled="!canCallBananagrams" class="btn btn-success">
         Bananagrams!
       </button>
-      
-      <button
-        @click="handleSelectAll"
-        class="btn btn-secondary"
-      >
-        Select All
-      </button>
+
+      <button @click="handleSelectAll" class="btn btn-secondary">Select All</button>
     </div>
-    
+
     <div class="controls-right">
-      <button
-        @click="confirmReset"
-        class="btn btn-danger"
-      >
-        Reset Board
-      </button>
-      
-      <button
-        @click="confirmNewGame"
-        class="btn btn-secondary"
-      >
-        New Game
-      </button>
+      <button @click="confirmReset" class="btn btn-danger">Reset Board</button>
+
+      <button @click="confirmNewGame" class="btn btn-secondary">New Game</button>
     </div>
   </div>
 </template>
@@ -74,20 +49,26 @@ const tilesRemaining = computed(() => gameStore.tilesRemaining)
 const players = computed(() => gameStore.players)
 
 const canPeel = computed(() => {
-  return gameStore.isActive && 
-         playerStore.benchTiles.length === 0 && 
-         boardStore.getOccupiedCells().length > 0
+  return (
+    gameStore.isActive &&
+    playerStore.benchTiles.length === 0 &&
+    boardStore.getOccupiedCells().length > 0
+  )
 })
 
 const canCallBananagrams = computed(() => {
-  return gameStore.isEndgame && 
-         playerStore.benchTiles.length === 0 && 
-         boardStore.getOccupiedCells().length > 0
+  return (
+    gameStore.isEndgame &&
+    playerStore.benchTiles.length === 0 &&
+    boardStore.getOccupiedCells().length > 0
+  )
 })
 
 function handlePeel() {
   try {
-    if (!canPeel.value) return
+    if (!canPeel.value) {
+      return
+    }
 
     const validation = validateBoard()
     if (!validation.valid) {
@@ -103,7 +84,9 @@ function handlePeel() {
 
 function handleBananagrams() {
   try {
-    if (!canCallBananagrams.value) return
+    if (!canCallBananagrams.value) {
+      return
+    }
 
     const validation = validateBoard()
     if (!validation.valid) {
@@ -183,7 +166,7 @@ function confirmNewGame() {
 .btn-success {
   background-color: #28a745;
   color: white;
-  
+
   &:hover:not(:disabled) {
     background-color: #218838;
   }

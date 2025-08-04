@@ -19,7 +19,7 @@ class Logger {
       message,
       timestamp: new Date(),
       context,
-      data
+      data,
     }
 
     // Add to internal log storage
@@ -32,7 +32,7 @@ class Logger {
     if (this.isDevelopment || level === 'error' || level === 'warn') {
       const prefix = context ? `[${context}]` : ''
       const timestamp = entry.timestamp.toISOString()
-      
+
       switch (level) {
         case 'debug':
           if (this.isDevelopment) {
@@ -107,14 +107,14 @@ class Logger {
 export const logger = new Logger()
 
 // Convenience functions for direct import
-export const logDebug = (message: string, context?: string, data?: any) => 
+export const logDebug = (message: string, context?: string, data?: any) =>
   logger.debug(message, context, data)
 
-export const logInfo = (message: string, context?: string, data?: any) => 
+export const logInfo = (message: string, context?: string, data?: any) =>
   logger.info(message, context, data)
 
-export const logWarn = (message: string, context?: string, data?: any) => 
+export const logWarn = (message: string, context?: string, data?: any) =>
   logger.warn(message, context, data)
 
-export const logError = (message: string, context?: string, data?: any) => 
+export const logError = (message: string, context?: string, data?: any) =>
   logger.error(message, context, data)

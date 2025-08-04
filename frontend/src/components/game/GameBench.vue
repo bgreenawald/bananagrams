@@ -9,10 +9,7 @@
         @dragover="handleDragOver"
         @drop="handleDrop"
       >
-        <GameTile
-          :tile="tile"
-          :source-bench="true"
-        />
+        <GameTile :tile="tile" :source-bench="true" />
       </div>
       <div
         v-for="empty in emptySlots"
@@ -36,14 +33,11 @@ const playerStore = usePlayerStore()
 const { handleBenchDrop } = useDragDrop()
 
 const tiles = computed(() => {
-  logger.tileUpdate(
-    `Bench tiles computed: ${playerStore.benchTiles.length} tiles`,
-    {
-      totalTiles: playerStore.tiles.length,
-      benchTiles: playerStore.benchTiles.length,
-      tileLetters: playerStore.benchTiles.map(t => t.letter)
-    }
-  )
+  logger.tileUpdate(`Bench tiles computed: ${playerStore.benchTiles.length} tiles`, {
+    totalTiles: playerStore.tiles.length,
+    benchTiles: playerStore.benchTiles.length,
+    tileLetters: playerStore.benchTiles.map(t => t.letter),
+  })
   return playerStore.benchTiles
 })
 const minSlots = 20

@@ -36,7 +36,7 @@ export const useBoardStore = defineStore('board', () => {
     if (!tile || getTileAt(toRow, toCol)) {
       return false
     }
-    
+
     removeTile(fromRow, fromCol)
     placeTile(tile, toRow, toCol)
     return true
@@ -64,9 +64,16 @@ export const useBoardStore = defineStore('board', () => {
     board.value = {}
   }
 
-  function getBoardBounds(): { minRow: number; maxRow: number; minCol: number; maxCol: number } | null {
+  function getBoardBounds(): {
+    minRow: number
+    maxRow: number
+    minCol: number
+    maxCol: number
+  } | null {
     const positions = getOccupiedCells()
-    if (positions.length === 0) return null
+    if (positions.length === 0) {
+      return null
+    }
 
     let minRow = positions[0].row
     let maxRow = positions[0].row
@@ -85,25 +92,32 @@ export const useBoardStore = defineStore('board', () => {
 
   function isConnected(): boolean {
     const occupied = getOccupiedCells()
-    if (occupied.length === 0) return true
-    if (occupied.length === 1) return true
+    if (occupied.length === 0) {
+      return true
+    }
+    if (occupied.length === 1) {
+      return true
+    }
 
     const visited = new Set<string>()
     const queue = [occupied[0]]
     visited.add(getCellKey(occupied[0].row, occupied[0].col))
 
     const directions = [
-      [-1, 0], [1, 0], [0, -1], [0, 1]
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+      [0, 1],
     ]
 
     while (queue.length > 0) {
       const current = queue.shift()!
-      
+
       for (const [dr, dc] of directions) {
         const newRow = current.row + dr
         const newCol = current.col + dc
         const key = getCellKey(newRow, newCol)
-        
+
         if (!visited.has(key) && getTileAt(newRow, newCol)) {
           visited.add(key)
           queue.push({ row: newRow, col: newCol })
@@ -126,6 +140,6 @@ export const useBoardStore = defineStore('board', () => {
     getAllTiles,
     clearBoard,
     getBoardBounds,
-    isConnected
+    isConnected,
   }
 })

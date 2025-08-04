@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from app import app, all_games, socketio
+from app import all_games, app, socketio
 from game import Game
 
 
@@ -96,10 +96,7 @@ def test_player_join_fail(socket_client):
     assert resp[0]["name"] == "render_game"
     assert len(resp[0]["args"][0]) == 3
     assert resp[0]["args"][0]["status_code"] == 400
-    assert (
-        resp[0]["args"][0]["message"].split("\n")[0]
-        == "'player_id' is a required property"
-    )
+    assert resp[0]["args"][0]["message"].split("\n")[0] == "'player_id' is a required property"
     assert resp[0]["args"][0]["payload"] == {}
 
 
@@ -171,18 +168,13 @@ def test_swap_fail(socket_client_init):
     assert resp[0]["name"] == "render_game"
     assert len(resp[0]["args"][0]) == 3
     assert resp[0]["args"][0]["status_code"] == 400
-    assert (
-        resp[0]["args"][0]["message"].split("\n")[0]
-        == "'letter' is a required property"
-    )
+    assert resp[0]["args"][0]["message"].split("\n")[0] == "'letter' is a required property"
     assert resp[0]["args"][0]["payload"] == {}
 
 
 def test_swap(socket_client_init):
     letter = all_games["TEST_GAME"].players["p1"][0]
-    socket_client_init.emit(
-        "swap", {"name": "TEST_GAME", "player_id": "p1", "letter": letter}
-    )
+    socket_client_init.emit("swap", {"name": "TEST_GAME", "player_id": "p1", "letter": letter})
     resp = socket_client_init.get_received()
     assert resp[0]["name"] == "render_game"
     assert len(resp[0]["args"][0]) == 3
@@ -206,16 +198,12 @@ def test_bananagrams_fail(socket_client_end):
     assert resp[0]["name"] == "render_game"
     assert len(resp[0]["args"][0]) == 3
     assert resp[0]["args"][0]["status_code"] == 400
-    assert (
-        resp[0]["args"][0]["message"].split("\n")[0] == "'words' is a required property"
-    )
+    assert resp[0]["args"][0]["message"].split("\n")[0] == "'words' is a required property"
     assert resp[0]["args"][0]["payload"] == {}
 
 
 def test_bananagrams(socket_client_end):
-    socket_client_end.emit(
-        "bananagrams", {"name": "TEST_GAME", "player_id": "p1", "words": []}
-    )
+    socket_client_end.emit("bananagrams", {"name": "TEST_GAME", "player_id": "p1", "words": []})
     resp = socket_client_end.get_received()
     assert resp[0]["name"] == "render_game"
     assert len(resp[0]["args"][0]) == 3
@@ -234,9 +222,7 @@ def test_bananagrams(socket_client_end):
 
 
 def test_continue_game(socket_client_end):
-    socket_client_end.emit(
-        "bananagrams", {"name": "TEST_GAME", "player_id": "p1", "words": []}
-    )
+    socket_client_end.emit("bananagrams", {"name": "TEST_GAME", "player_id": "p1", "words": []})
     _ = socket_client_end.get_received()
     socket_client_end.emit("continue_game", {"name": "TEST_GAME"})
     resp = socket_client_end.get_received()
@@ -257,9 +243,7 @@ def test_continue_game(socket_client_end):
 
 
 def test_reset_game(socket_client_end):
-    socket_client_end.emit(
-        "bananagrams", {"name": "TEST_GAME", "player_id": "p1", "words": []}
-    )
+    socket_client_end.emit("bananagrams", {"name": "TEST_GAME", "player_id": "p1", "words": []})
     _ = socket_client_end.get_received()
     socket_client_end.emit("reset", {"name": "TEST_GAME"})
     resp = socket_client_end.get_received()

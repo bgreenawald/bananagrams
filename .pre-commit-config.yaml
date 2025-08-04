@@ -1,0 +1,47 @@
+# Pre-commit hooks for code quality
+# Install with: pip install pre-commit && pre-commit install
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-json
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # Local system hooks (more reliable)
+  - repo: local
+    hooks:
+      # Backend hooks
+      - id: backend-black
+        name: Backend - Black formatting
+        entry: bash -c 'cd backend && uv run black .'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+
+      - id: backend-ruff
+        name: Backend - Ruff linting
+        entry: bash -c 'cd backend && uv run ruff check .'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+
+      # Frontend hooks
+      - id: frontend-eslint
+        name: Frontend - ESLint
+        entry: bash -c 'cd frontend && npm run lint:check'
+        language: system
+        files: ^frontend/.*\.(js|jsx|ts|tsx|vue)$
+        pass_filenames: false
+
+      - id: frontend-prettier
+        name: Frontend - Prettier
+        entry: bash -c 'cd frontend && npm run format:check'
+        language: system
+        files: ^frontend/.*\.(js|jsx|ts|tsx|vue|css|scss|json)$
+        pass_filenames: false

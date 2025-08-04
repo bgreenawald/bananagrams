@@ -3,22 +3,30 @@ import datetime
 import logging
 import os
 import sys
-from typing import Any, Dict
+from typing import Any
 
 import simplejson
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, Response, json, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room
-from game import Game, GameException
 from jsonschema import ValidationError, validate
+
+from game import Game, GameException
 
 # Initialize the application
 app = Flask(__name__, static_url_path="", static_folder="static")
-app.debug = True
-app.config["SECRET_KEY"] = "secret!"  # NOQA: S105
+app.debug = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY", "dev-secret-key-change-in-production"
+)  # NOQA: S105
 socketio = SocketIO(app)
-socketio.init_app(app, cors_allowed_origins="*")
+socketio.init_app(
+    app,
+    cors_allowed_origins=os.environ.get(
+        "ALLOWED_ORIGINS", "http://localhost:8080,http://localhost:3000"
+    ).split(","),
+)
 
 # Initialize CORS
 CORS(app)
@@ -30,14 +38,12 @@ logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 handler = logging.FileHandler("logs/app.log")
 shell_handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(
-    logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-)
+handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 logger.addHandler(handler)
 logger.addHandler(shell_handler)
 
 # Dictionary to hold all games
-all_games: Dict[str, Game] = {}
+all_games: dict[str, Game] = {}
 
 # Boolean to determine if game is being run locally. Used for testing
 test = False
@@ -49,8 +55,15 @@ test = False
 
 @app.route("/api/get_names")
 def get_names() -> Response:
-    ids = [x for x in all_games]
+    ids = list(all_games)
     return json.jsonify({"ids": ids})
+
+
+@app.route("/api/games/reserved")
+def get_reserved_games() -> Response:
+    """Returns list of currently active game IDs that cannot be used for new games."""
+    reserved_ids = list(all_games)
+    return json.jsonify({"reserved_ids": reserved_ids})
 
 
 # ---------------------------------------
@@ -59,7 +72,7 @@ def get_names() -> Response:
 
 
 @socketio.on("join")
-def on_join(data: Dict[str, Any]):
+def on_join(data: dict[str, Any]):
     """Joins the connection to the provided room
     Args:
         data (dict): Name of the room.
@@ -113,13 +126,11 @@ def emit_game(game_name: str, game: Game, msg: str):
         },
         room=game_name,
     )
-    logger.info(
-        f"{request.sid} has successfully rendered their game with messagee {msg}"
-    )
+    logger.info(f"{request.sid} has successfully rendered their game with message {msg}")
 
 
 @socketio.on("load_game")
-def load_game(data: Dict[Any, Any]):
+def load_game(data: dict[Any, Any]):
     """Loads the current game game, or creates on if none exists.
     Args:
         data (Dict[Any, Any]): {
@@ -157,7 +168,7 @@ def load_game(data: Dict[Any, Any]):
 
 
 @socketio.on("player_join")
-def player_join(data: Dict[Any, Any]):
+def player_join(data: dict[Any, Any]):
     """Adds a player to the game.
 
     Args:
@@ -186,9 +197,7 @@ def player_join(data: Dict[Any, Any]):
         try:
             game = all_games[game_name]
         except KeyError:
-            logger.warning(
-                f"Could not find the game named {game_name}. from player_join"
-            )
+            logger.warning(f"Could not find the game named {game_name}. from player_join")
             emit_error(
                 game_name,
                 f"Could not find the game named {game_name}. from player_join",
@@ -212,7 +221,7 @@ def player_join(data: Dict[Any, Any]):
 
 
 @socketio.on("start_game")
-def start_game(data: Dict[Any, Any]):
+def start_game(data: dict[Any, Any]):
     """Starts the game.
 
     Args:
@@ -250,7 +259,7 @@ def start_game(data: Dict[Any, Any]):
 
 
 @socketio.on("peel")
-def peel(data: Dict[Any, Any]):
+def peel(data: dict[Any, Any]):
     """Gives every player a new tile.
 
     Args:
@@ -288,7 +297,7 @@ def peel(data: Dict[Any, Any]):
 
 
 @socketio.on("swap")
-def swap(data: Dict[Any, Any]):
+def swap(data: dict[Any, Any]):
     """
     Swaps a letter for a given player.
 
@@ -326,16 +335,14 @@ def swap(data: Dict[Any, Any]):
 
         try:
             game.swap(data["letter"], data["player_id"])
-            emit_game(
-                game_name, game, f"Performed swap for player {data['player_id']}."
-            )
+            emit_game(game_name, game, f"Performed swap for player {data['player_id']}.")
         except GameException as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
 
 
 @socketio.on("bananagrams")
-def bananagrams(data: Dict[Any, Any]):
+def bananagrams(data: dict[Any, Any]):
     """
     When someone gets bananagrams.
 
@@ -380,7 +387,7 @@ def bananagrams(data: Dict[Any, Any]):
 
 
 @socketio.on("continue_game")
-def continue_game(data: Dict[Any, Any]):
+def continue_game(data: dict[Any, Any]):
     """
     Continues the game on false alarm banagrams.
 
@@ -419,7 +426,7 @@ def continue_game(data: Dict[Any, Any]):
 
 
 @socketio.on("reset")
-def reset(data: Dict[Any, Any]):
+def reset(data: dict[Any, Any]):
     """Resets the given game.
 
     Args:
@@ -445,9 +452,7 @@ def reset(data: Dict[Any, Any]):
             game = all_games[game_name]
         except KeyError:
             logger.warning(f"Could not find the game named {game_name}. from reset")
-            emit_error(
-                game_name, f"Could not find the game named {game_name}. from reset"
-            )
+            emit_error(game_name, f"Could not find the game named {game_name}. from reset")
             return
 
         game.reset()
@@ -455,7 +460,7 @@ def reset(data: Dict[Any, Any]):
 
 
 @socketio.on("create_test_game")
-def create_test_game(data: Dict[Any, Any]):
+def create_test_game(data: dict[Any, Any]):
     """Creates a new test game with minimal tiles and allows single player.
 
     Args:
@@ -508,10 +513,14 @@ def create_test_game(data: Dict[Any, Any]):
 
 # Schedule cleanup
 def _delete_old_games():
-    for game in all_games:
-        age = datetime.datetime.now() - all_games[game].date_created
+    games_to_delete = []
+    for game_name in all_games:
+        age = datetime.datetime.now() - all_games[game_name].date_created
         if age.total_seconds() > 86400:
-            del all_games[game]
+            games_to_delete.append(game_name)
+
+    for game_name in games_to_delete:
+        del all_games[game_name]
 
 
 scheduler = BackgroundScheduler()
@@ -523,5 +532,6 @@ atexit.register(lambda: scheduler.shutdown())
 
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)  # NOQA: S201
-    test = True
+    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
+    socketio.run(app, debug=debug_mode)  # NOQA: S201
+    test = debug_mode

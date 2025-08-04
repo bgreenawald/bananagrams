@@ -212,6 +212,54 @@ def player_join(data: Dict[Any, Any]):
             emit_error(game_name, str(e))
 
 
+@socketio.on("change_player_id")
+def change_player_id(data: Dict[Any, Any]):
+    """Adds a player to the game.
+
+    Args:
+        data (Dict[Any, Any]): {
+            "name": (Any) The name of the game.
+            "old_player_id": (Any) The old player ID.
+            "new_player_id": (Any) The new player ID.
+        }
+    """
+    schema = {
+        "type": "object",
+        "properties": {
+            "name": {"type": ["string", "number"]},
+            "old_player_id": {"type": ["string", "number"]},
+            "new_player_id": {"type": ["string", "number"]},
+        },
+        "required": ["name", "old_player_id", "new_player_id"],
+    }
+    try:
+        validate(data, schema=schema)
+    except ValidationError as e:
+        if "name" in data:
+            emit_error(data["name"], str(e))
+        else:
+            logger.error("No game specified in input.")
+    else:
+        game_name = data["name"]
+        try:
+            game = all_games[game_name]
+        except KeyError:
+            logger.warning(f"Could not find the game named {game_name}.")
+            emit_error(game_name, f"Could not find the game named {game_name}.")
+            return
+
+        try:
+            game.change_player_id(data["old_player_id"], data["new_player_id"])
+            emit_game(
+                game_name,
+                game,
+                f"Updated player ID {data['old_player_id']} to {data['new_player_id']}.",
+            )
+        except GameException as e:
+            logging.error("Exception occurred", exc_info=True)
+            emit_error(game_name, str(e))
+
+
 @socketio.on("start_game")
 def start_game(data: Dict[Any, Any]):
     """Starts the game.

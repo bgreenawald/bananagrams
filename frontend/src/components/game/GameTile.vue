@@ -59,19 +59,19 @@ function handleDoubleClick() {
 function handleDragStart(e: DragEvent) {
   isDragging.value = true
   uiStore.setIsDragging(true)
-  
+
   uiStore.setDragData({
     tileId: props.tile.id,
     sourceRow: props.sourceRow,
     sourceCol: props.sourceCol,
     sourceBench: props.sourceBench
   })
-  
+
   // Set drag data
   if (e.dataTransfer) {
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.setData('text/plain', props.tile.id)
-    
+
     // Create custom drag image
     const target = e.target as HTMLElement
     if (target) {
@@ -155,7 +155,7 @@ function handleSwap() {
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  
+
   &:hover {
     background-color: #0056b3;
   }

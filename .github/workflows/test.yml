@@ -6,33 +6,84 @@ on:
       - master
 
 jobs:
-  test:
+  test-backend:
     runs-on: ubuntu-latest
     env:
       backend-directory: ./backend
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
-    # Test the backend
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v2
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.7
+        python-version: '3.12'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
     - name: Install dependencies
       run: |
-        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-        source $HOME/.poetry/env
-        poetry export -f requirements.txt --dev > requirements.txt
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        uv sync --dev
       working-directory: ${{ env.backend-directory }}
-    - name: Lint with flake8
+
+    - name: Lint with ruff
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 .
+        uv run ruff check .
       working-directory: ${{ env.backend-directory }}
+
+    - name: Format check with ruff
+      run: |
+        uv run ruff format --check .
+      working-directory: ${{ env.backend-directory }}
+
+    - name: Type check with mypy
+      run: |
+        uv run mypy .
+      working-directory: ${{ env.backend-directory }}
+
     - name: Test with pytest
       run: |
-        pytest
+        uv run pytest tests/ -v
       working-directory: ${{ env.backend-directory }}
+
+    - name: Test coverage
+      run: |
+        uv run coverage run -m pytest tests/
+        uv run coverage report
+      working-directory: ${{ env.backend-directory }}
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    env:
+      frontend-directory: ./frontend
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        npm ci
+      working-directory: ${{ env.frontend-directory }}
+
+    - name: Type check
+      run: |
+        npm run build
+      working-directory: ${{ env.frontend-directory }}
+
+    - name: Lint
+      run: |
+        npm run lint
+      working-directory: ${{ env.frontend-directory }}
+
+    - name: Run tests
+      run: |
+        npm run test -- --run
+      working-directory: ${{ env.frontend-directory }}

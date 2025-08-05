@@ -63,9 +63,9 @@ function handleDragOver(e: DragEvent) {
 function handleDrop(e: DragEvent) {
   e.preventDefault()
   isDragOver.value = false
-  
+
   if (!uiStore.dragData || hasTile.value) return
-  
+
   handleCellDrop(props.row, props.col)
 }
 </script>

@@ -1,10 +1,10 @@
 import time
 import unittest
 
-from game import Game, GameException, State
+from game import Game, GameError, State
 
 
-class testGameMethods(unittest.TestCase):
+class TestGameMethods(unittest.TestCase):
     def test_init(self):
         g = Game("")
 
@@ -23,7 +23,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Check players can't join before reset."):
             try:
                 g.join_game("id_2")
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -65,7 +65,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test exception joining after game has started"):
             try:
                 g.join_game("id_3")
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -77,7 +77,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test adding after maximum player."):
             try:
                 g.join_game("id_8")
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -88,7 +88,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test start with too few players."):
             try:
                 g.start_game()
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -140,7 +140,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test cannot start game twice."):
             try:
                 g.start_game()
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -153,7 +153,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test peel invalid state 'IDLE'"):
             try:
                 g.peel(test=True)
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -170,7 +170,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test peel too frequently."):
             try:
                 g.peel()
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -184,7 +184,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test peel with insufficient tiles."):
             try:
                 g.peel(test=True)
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -201,7 +201,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Try peel with too many players."):
             try:
                 g.peel(test=True)
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -214,7 +214,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test swap from invalid state 'IDLE'"):
             try:
                 g.swap("A", "id_0")
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -224,7 +224,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Remove an invalid letter."):
             try:
                 g.swap("D", "id_0")
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -260,7 +260,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test swap in state 'ENDGAME'"):
             try:
                 g.swap(g.players["id_0"][0], "id_0")
-            except GameException:
+            except GameError:
                 self.fail()
 
     def test_bananagrams(self):
@@ -275,7 +275,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test bananagrams from invalid state 'Active'"):
             try:
                 g.bananagrams("winning_player", ["winning", "words"])
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -309,7 +309,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test continue from invalid state 'ENDGAME'"):
             try:
                 g.continue_game()
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail()
@@ -344,7 +344,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test single player can start in test mode"):
             try:
                 g_test.start_game()
-            except GameException:
+            except GameError:
                 self.fail("Should allow single player start in test mode")
             else:
                 pass
@@ -360,7 +360,7 @@ class testGameMethods(unittest.TestCase):
         with self.subTest("Test regular game still requires 2+ players"):
             try:
                 g_regular.start_game()
-            except GameException:
+            except GameError:
                 pass
             else:
                 self.fail("Regular game should require at least 2 players")

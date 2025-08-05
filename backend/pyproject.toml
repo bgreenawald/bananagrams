@@ -3,7 +3,7 @@ name = "backend"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 dependencies = [
     "apscheduler>=3.11.0",
     "flask>=3.1.1",
@@ -23,7 +23,82 @@ dev = [
     "pytest>=8.4.1",
     "pytest-xdist>=3.3.1",
     "coverage>=7.3.0",
-    "black>=23.0.0",
     "mypy>=1.5.0",
     "ruff>=0.12.7",
+    "pre-commit>=4.2.0",
+    "types-simplejson>=3.19.0",
+    "types-Flask-Cors>=4.0.0",
+    "types-Flask-SocketIO>=5.3.0",
+    "types-jsonschema>=4.23.0",
 ]
+
+[tool.ruff]
+# Match Black's line length
+line-length = 100
+
+# Python version
+target-version = "py39"
+
+# Include and exclude patterns
+include = ["*.py", "*.pyi", "**/pyproject.toml"]
+
+[tool.ruff.lint]
+# Enable rules that were previously checked by flake8
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "DTZ",  # flake8-datetimez
+    "T10",  # flake8-debugger
+    "EM",   # flake8-errmsg
+    "ISC",  # flake8-implicit-str-concat
+    "ICN",  # flake8-import-conventions
+    "PIE",  # flake8-pie
+    "Q",    # flake8-quotes
+    "RSE",  # flake8-raise
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "TCH",  # flake8-type-checking
+    "RUF",  # Ruff-specific rules
+]
+
+# Ignore rules that conflict with Black or are too strict
+ignore = [
+    "E203",  # Whitespace before ':' (conflicts with Black)
+    "E501",  # Line too long (handled by formatter)
+    "ISC001", # Conflicts with formatter
+    "EM101", # Exception must not use a string literal
+    "EM102", # Exception must not use an f-string literal
+    "DTZ005", # datetime.now() without tz - existing code pattern
+]
+
+[tool.ruff.format]
+# Use Black-compatible formatting
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+disallow_untyped_decorators = false
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "apscheduler.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "flask_socketio.*"
+ignore_errors = true

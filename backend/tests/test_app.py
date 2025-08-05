@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from app import app, all_games, socketio
+from app import all_games, app, socketio
 from game import Game
 
 

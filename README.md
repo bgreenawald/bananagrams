@@ -53,14 +53,14 @@ coverage report
 
 ## Test - Frontend
 
-For node management, we will use nvm. 
+For node management, we will use nvm.
 
 ### One time setup:
 
 Install nvm (node version manager) via these instructions (https://github.com/nvm-sh/nvm)[here]
 
-Then, in the cli, in the frontend directory, run 
-`nvm install 12.0.0` to install version 12.0.0.  Finally, install the necessary packages using 
+Then, in the cli, in the frontend directory, run
+`nvm install 12.0.0` to install version 12.0.0.  Finally, install the necessary packages using
 `npm i`
 
 Everytime you start the frontend locally, run

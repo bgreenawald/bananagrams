@@ -31,9 +31,9 @@ onMounted(() => {
     router.push({ name: 'landing' })
     return
   }
-  
+
   gameStore.setGameId(gameId)
-  
+
   // Create and store the event handler reference
   beforeUnloadHandler.value = handleBeforeUnload
   window.addEventListener('beforeunload', beforeUnloadHandler.value)

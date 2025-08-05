@@ -1,19 +1,15 @@
 repos:
   # Python hooks
-  - repo: https://github.com/psf/black
-    rev: 24.8.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
     hooks:
-      - id: black
-        language_version: python3
-        args: [--line-length=100]
+      # Run the linter
+      - id: ruff
         files: ^backend/
-
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.1
-    hooks:
-      - id: flake8
+        args: [--fix]
+      # Run the formatter
+      - id: ruff-format
         files: ^backend/
-        args: [--max-line-length=100, --extend-ignore=E203]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.11.2
@@ -23,7 +19,19 @@ repos:
         additional_dependencies: [
           types-Flask,
           types-requests,
+          types-simplejson
         ]
+
+  # Backend tests
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: bash -c 'cd backend && pytest tests/ -v --tb=short'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+        stages: [pre-commit]
 
   # JavaScript/TypeScript hooks
   - repo: local
@@ -34,6 +42,14 @@ repos:
         language: system
         files: ^frontend/.*\.(js|jsx|ts|tsx|vue)$
         pass_filenames: false
+
+      - id: vitest
+        name: vitest
+        entry: bash -c 'cd frontend && npm run test -- --run --passWithNoTests'
+        language: system
+        files: ^frontend/.*\.(js|jsx|ts|tsx|vue|spec\.ts|test\.ts)$
+        pass_filenames: false
+        stages: [pre-commit]
 
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks

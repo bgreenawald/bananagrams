@@ -29,7 +29,7 @@ export function getRouteQueryBoolean(route: RouteLocationNormalizedLoaded, query
  */
 export function validateRouteParam(route: RouteLocationNormalizedLoaded, paramName: string): { valid: boolean; value: string; error?: string } {
   const value = getRouteParam(route, paramName)
-  
+
   if (!value) {
     return {
       valid: false,
@@ -37,6 +37,6 @@ export function validateRouteParam(route: RouteLocationNormalizedLoaded, paramNa
       error: `Missing required route parameter: ${paramName}`
     }
   }
-  
+
   return { valid: true, value }
 }

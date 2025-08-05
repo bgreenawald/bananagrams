@@ -3,22 +3,21 @@ import datetime
 import logging
 import os
 import sys
-from typing import Any, Dict
+from typing import Any
 
 import simplejson
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask, Response, json, request
+from flask import Flask, Response, json
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room
-from game import Game, GameException
 from jsonschema import ValidationError, validate
+
+from game import Game, GameError
 
 # Initialize the application
 app = Flask(__name__, static_url_path="", static_folder="static")
 app.debug = True
-app.config["SECRET_KEY"] = os.environ.get(
-    "SECRET_KEY", "dev-secret-key-change-in-production"
-)  # NOQA: S105
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 socketio = SocketIO(app)
 socketio.init_app(
     app,
@@ -42,7 +41,7 @@ logger.addHandler(handler)
 logger.addHandler(shell_handler)
 
 # Dictionary to hold all games
-all_games: Dict[str, Game] = {}
+all_games: dict[str, Game] = {}
 
 # Boolean to determine if game is being run locally. Used for testing
 test = False
@@ -54,7 +53,7 @@ test = False
 
 @app.route("/api/get_names")
 def get_names() -> Response:
-    ids = [x for x in all_games]
+    ids = list(all_games)
     return json.jsonify({"ids": ids})
 
 
@@ -64,7 +63,7 @@ def get_names() -> Response:
 
 
 @socketio.on("join")
-def on_join(data: Dict[str, Any]):
+def on_join(data: dict[str, Any]):
     """Joins the connection to the provided room
     Args:
         data (dict): Name of the room.
@@ -84,19 +83,19 @@ def on_join(data: Dict[str, Any]):
     else:
         room_name = data["name"]
         join_room(room_name)
-        logger.info(f"{request.sid} has entered the room {room_name}")
+        logger.info(f"{'[session]'} has entered the room {room_name}")
 
 
 @socketio.on("connect")
 def on_connect():
     """Called on client connect."""
-    logger.info(f"{request.sid} has connected.")
+    logger.info(f"{'[session]'} has connected.")
 
 
 @socketio.on("disconnect")
 def on_disconnect():
     """Called on client disconnect."""
-    logger.info(f"{request.sid} has disconnected.")
+    logger.info(f"{'[session]'} has disconnected.")
 
 
 def emit_error(game_name: str, msg: str):
@@ -118,11 +117,11 @@ def emit_game(game_name: str, game: Game, msg: str):
         },
         room=game_name,
     )
-    logger.info(f"{request.sid} has successfully rendered their game with message {msg}")
+    logger.info(f"{'[session]'} has successfully rendered their game with message {msg}")
 
 
 @socketio.on("load_game")
-def load_game(data: Dict[Any, Any]):
+def load_game(data: dict[Any, Any]):
     """Loads the current game game, or creates on if none exists.
     Args:
         data (Dict[Any, Any]): {
@@ -160,7 +159,7 @@ def load_game(data: Dict[Any, Any]):
 
 
 @socketio.on("player_join")
-def player_join(data: Dict[Any, Any]):
+def player_join(data: dict[Any, Any]):
     """Adds a player to the game.
 
     Args:
@@ -207,13 +206,13 @@ def player_join(data: Dict[Any, Any]):
         try:
             game.join_game(data["player_id"])
             emit_game(game_name, game, f"Added player {data['player_id']} to game.")
-        except GameException as e:
+        except GameError as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
 
 
 @socketio.on("start_game")
-def start_game(data: Dict[Any, Any]):
+def start_game(data: dict[Any, Any]):
     """Starts the game.
 
     Args:
@@ -245,13 +244,13 @@ def start_game(data: Dict[Any, Any]):
         try:
             game.start_game()
             emit_game(game_name, game, "Game started.")
-        except GameException as e:
+        except GameError as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
 
 
 @socketio.on("peel")
-def peel(data: Dict[Any, Any]):
+def peel(data: dict[Any, Any]):
     """Gives every player a new tile.
 
     Args:
@@ -283,13 +282,13 @@ def peel(data: Dict[Any, Any]):
         try:
             game.peel(test=test)
             emit_game(game_name, game, "New tile given out.")
-        except GameException as e:
+        except GameError as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
 
 
 @socketio.on("swap")
-def swap(data: Dict[Any, Any]):
+def swap(data: dict[Any, Any]):
     """
     Swaps a letter for a given player.
 
@@ -328,13 +327,13 @@ def swap(data: Dict[Any, Any]):
         try:
             game.swap(data["letter"], data["player_id"])
             emit_game(game_name, game, f"Performed swap for player {data['player_id']}.")
-        except GameException as e:
+        except GameError as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
 
 
 @socketio.on("bananagrams")
-def bananagrams(data: Dict[Any, Any]):
+def bananagrams(data: dict[Any, Any]):
     """
     When someone gets bananagrams.
 
@@ -373,13 +372,13 @@ def bananagrams(data: Dict[Any, Any]):
         try:
             game.bananagrams(data["player_id"], data["words"])
             emit_game(game_name, game, "Bananagrams.")
-        except GameException as e:
+        except GameError as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
 
 
 @socketio.on("continue_game")
-def continue_game(data: Dict[Any, Any]):
+def continue_game(data: dict[Any, Any]):
     """
     Continues the game on false alarm banagrams.
 
@@ -412,13 +411,13 @@ def continue_game(data: Dict[Any, Any]):
         try:
             game.continue_game()
             emit_game(game_name, game, f"Game '{game_name}' continued.")
-        except GameException as e:
+        except GameError as e:
             logging.error("Exception occurred", exc_info=True)
             emit_error(game_name, str(e))
 
 
 @socketio.on("reset")
-def reset(data: Dict[Any, Any]):
+def reset(data: dict[Any, Any]):
     """Resets the given game.
 
     Args:
@@ -452,7 +451,7 @@ def reset(data: Dict[Any, Any]):
 
 
 @socketio.on("create_test_game")
-def create_test_game(data: Dict[Any, Any]):
+def create_test_game(data: dict[Any, Any]):
     """Creates a new test game with minimal tiles and allows single player.
 
     Args:
@@ -493,7 +492,7 @@ def create_test_game(data: Dict[Any, Any]):
                 test_game,
                 f"Test game created, player {player_id} joined, and game started!",
             )
-        except GameException as e:
+        except GameError as e:
             logger.error("Exception occurred while creating test game", exc_info=True)
             emit_error(game_name, str(e))
 
@@ -525,5 +524,5 @@ atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == "__main__":
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
-    socketio.run(app, debug=debug_mode)  # NOQA: S201
+    socketio.run(app, debug=debug_mode)
     test = debug_mode

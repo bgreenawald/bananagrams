@@ -2,10 +2,10 @@
   <div class="gameover-container">
     <div class="gameover-content">
       <h1 class="title">Game Over!</h1>
-      
+
       <div v-if="winner" class="winner-section">
         <h2>Winner: {{ winner }}</h2>
-        
+
         <div v-if="winningWords.length > 0" class="words-section">
           <h3>Winning Words:</h3>
           <div class="words-grid">
@@ -33,10 +33,12 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '@/stores/game'
 import { usePlayerStore } from '@/stores/player'
+import { useBoardStore } from '@/stores/board'
 
 const router = useRouter()
 const gameStore = useGameStore()
 const playerStore = usePlayerStore()
+const boardStore = useBoardStore()
 
 const winner = computed(() => gameStore.winner)
 const winningWords = computed(() => gameStore.winningWords)
@@ -44,12 +46,14 @@ const winningWords = computed(() => gameStore.winningWords)
 function newGame() {
   gameStore.reset()
   playerStore.reset()
+  boardStore.clearBoard()
   router.push({ name: 'landing' })
 }
 
 function returnToLobby() {
   playerStore.tiles = []
   playerStore.clearSelection()
+  boardStore.clearBoard()
   router.push({ name: 'lobby', params: { id: gameStore.gameId } })
 }
 </script>

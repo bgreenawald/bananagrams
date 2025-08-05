@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { io, Socket } from "socket.io-client";
 import { useGameStore } from "./game";
 import { usePlayerStore } from "./player";
+import { useBoardStore } from "./board";
 import { useErrorHandler } from "@/composables/useErrorHandler";
 import { logger } from "@/utils/logger";
 import type { GameState, Tile } from "@/types";
@@ -14,6 +15,7 @@ export const useSocketStore = defineStore("socket", () => {
   const connectionError = ref<string | null>(null);
   const gameStore = useGameStore();
   const playerStore = usePlayerStore();
+  const boardStore = useBoardStore();
   const { handleError, handleSocketError } = useErrorHandler('WebSocket');
 
   // Helper function to update player tiles while preserving existing tile IDs and board state
@@ -22,16 +24,16 @@ export const useSocketStore = defineStore("socket", () => {
       const existingTiles = [...playerStore.tiles]; // Create a copy to avoid mutations
       const boardTiles = existingTiles.filter(t => t.onBoard);
       const benchTiles = existingTiles.filter(t => !t.onBoard);
-      
+
       // Board tiles should be preserved as-is
       const newTiles: Tile[] = [...boardTiles];
-      
+
       // Create a frequency map of letters we need to fulfill
       const neededLetters = new Map<string, number>();
       playerTileLetters.forEach(letter => {
         neededLetters.set(letter, (neededLetters.get(letter) || 0) + 1);
       });
-      
+
       // Subtract board tiles from needed letters (they're already placed)
       boardTiles.forEach(tile => {
         const current = neededLetters.get(tile.letter) || 0;
@@ -39,10 +41,10 @@ export const useSocketStore = defineStore("socket", () => {
           neededLetters.set(tile.letter, current - 1);
         }
       });
-      
+
       // Create bench tiles to fulfill remaining needs
       const availableBenchTiles = [...benchTiles];
-      
+
       neededLetters.forEach((count, letter) => {
         for (let i = 0; i < count; i++) {
           // Try to reuse existing bench tile with same letter
@@ -61,7 +63,7 @@ export const useSocketStore = defineStore("socket", () => {
           }
         }
       });
-      
+
       // Validate tile count consistency
       if (newTiles.length !== playerTileLetters.length) {
         logger.warn(
@@ -70,7 +72,7 @@ export const useSocketStore = defineStore("socket", () => {
           { expected: playerTileLetters.length, actual: newTiles.length, boardTiles: boardTiles.length }
         );
       }
-      
+
       playerStore.setTiles(newTiles);
     } catch (error) {
       handleError(error, 'Tile state update');
@@ -104,7 +106,7 @@ export const useSocketStore = defineStore("socket", () => {
           setTimeout(checkConnection, 100);
         }
       };
-      
+
       checkConnection();
     });
   }
@@ -113,7 +115,7 @@ export const useSocketStore = defineStore("socket", () => {
     if (socket.value?.connected) {
       return Promise.resolve();
     }
-    
+
     if (connecting.value) {
       // Return existing connection promise
       return waitForConnection();
@@ -184,6 +186,15 @@ export const useSocketStore = defineStore("socket", () => {
 
     socket.value.on("game_state", (data: GameState) => {
       logger.socketEvent("game_state", data);
+
+      // Clear the board when a new game starts (transitions to ACTIVE) or when returning to lobby
+      const previousState = gameStore.gameState?.state;
+      if ((previousState === 'IDLE' && data.state === 'ACTIVE') ||
+          (previousState === 'OVER' && data.state === 'IDLE')) {
+        logger.gameEvent("Game state transition, clearing board");
+        boardStore.clearBoard();
+      }
+
       gameStore.updateGameState(data);
 
       // Extract current player's tiles and convert to Tile objects

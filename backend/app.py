@@ -83,19 +83,19 @@ def on_join(data: dict[str, Any]):
     else:
         room_name = data["name"]
         join_room(room_name)
-        logger.info(f"{"[session]"} has entered the room {room_name}")
+        logger.info(f"{'[session]'} has entered the room {room_name}")
 
 
 @socketio.on("connect")
 def on_connect():
     """Called on client connect."""
-    logger.info(f"{"[session]"} has connected.")
+    logger.info(f"{'[session]'} has connected.")
 
 
 @socketio.on("disconnect")
 def on_disconnect():
     """Called on client disconnect."""
-    logger.info(f"{"[session]"} has disconnected.")
+    logger.info(f"{'[session]'} has disconnected.")
 
 
 def emit_error(game_name: str, msg: str):
@@ -117,7 +117,7 @@ def emit_game(game_name: str, game: Game, msg: str):
         },
         room=game_name,
     )
-    logger.info(f"{"[session]"} has successfully rendered their game with message {msg}")
+    logger.info(f"{'[session]'} has successfully rendered their game with message {msg}")
 
 
 @socketio.on("load_game")

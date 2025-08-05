@@ -32,9 +32,9 @@ jobs:
         uv run ruff check .
       working-directory: ${{ env.backend-directory }}
 
-    - name: Format check with black
+    - name: Format check with ruff
       run: |
-        uv run black --check .
+        uv run ruff format --check .
       working-directory: ${{ env.backend-directory }}
 
     - name: Type check with mypy

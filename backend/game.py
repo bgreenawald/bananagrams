@@ -2,7 +2,7 @@ import datetime
 import random
 from enum import Enum
 from threading import Lock
-from typing import Any, Dict, List
+from typing import Any
 
 TILE_FREQUENCIES = {
     2: ["J", "K", "Q", "X", "Z"],
@@ -19,8 +19,8 @@ TILE_FREQUENCIES = {
 }
 
 # Read in the word list
-with open("words/words.txt", "r") as file:
-    WORDS = set([x.strip() for x in file.readlines()])
+with open("words/words.txt") as file:
+    WORDS = {x.strip() for x in file.readlines()}
 
 
 class State(Enum):
@@ -39,11 +39,11 @@ class State(Enum):
     OVER = "OVER"
 
 
-class GameException(Exception):
+class GameError(Exception):
     pass
 
 
-class Game(object):
+class Game:
     """
     A class representing an entire game.
 
@@ -70,7 +70,7 @@ class Game(object):
 
         # General game fields
         self.state = State.IDLE
-        self.num_players = None
+        self.num_players: int | None = None
         self.tiles_remaining = len(self.tiles)
         self.last_peel = datetime.datetime.now()
 
@@ -78,16 +78,16 @@ class Game(object):
         self.date_created = datetime.datetime.now()
 
         # Player tile tracking
-        self.players = {}
+        self.players: dict[str, list[str]] = {}
 
         # Data for the end of the game
-        self.winning_words = None
-        self.winning_player = None
+        self.winning_words: list[tuple[str, bool]] | None = None
+        self.winning_player: str | None = None
 
         # Lock for synchronization
         self.lock = Lock()
 
-    def _generate_tiles(self) -> List[str]:
+    def _generate_tiles(self) -> list[str]:
         """Generate the initial set of tiles for the game.
 
         Returns:
@@ -142,13 +142,13 @@ class Game(object):
     def __str__(self) -> str:  # pragma: no cover
         return (
             f"ID: {self.id}\n"
-            f"Players: {[player for player in self.players]}\n"
+            f"Players: {list(self.players)}\n"
             f"Number of Players: {self.num_players}\n"
             f"Tiles Remaining: {self.tiles_remaining}\n"
             f"State: {self.state}"
         )
 
-    def __json__(self) -> Dict[str, Any]:  # pragma: no cover
+    def __json__(self) -> dict[str, Any]:  # pragma: no cover
         return {
             "id": self.id,
             # General game configuration
@@ -171,16 +171,14 @@ class Game(object):
             player_id (str): The ID of the player to add.
         """
         if not self.lock.acquire(timeout=2):
-            raise GameException("Could not acquire game lock - operation timed out")
+            raise GameError("Could not acquire game lock - operation timed out")
         try:
             num_players = len(self.players)
             if num_players == 8:
-                raise GameException("Maximum number of player reached.")
+                raise GameError("Maximum number of player reached.")
 
             if self.state != State.IDLE:
-                raise GameException(
-                    f"Cannot add players, game state is {self.state}. Should be 'IDLE'"
-                )
+                raise GameError(f"Cannot add players, game state is {self.state}. Should be 'IDLE'")
             if player_id not in self.players:
                 self.players[player_id] = []
         finally:
@@ -189,19 +187,16 @@ class Game(object):
     def start_game(self):
         """Starts the game by setting the number of players and divvying out tiles."""
         if not self.lock.acquire(timeout=2):
-            raise GameException("Could not acquire game lock - operation timed out")
+            raise GameError("Could not acquire game lock - operation timed out")
         try:
             if self.state != State.IDLE:
-                raise GameException(
-                    f"Cannot start game, game state is {self.state}. Should be 'IDLE'"
-                )
-            else:
-                self.num_players = len(self.players)
-                # In test mode, allow single player games
-                if not self.test_mode and self.num_players < 2:
-                    raise GameException("Need at least 2 players to start a game")
-                self._divy_out_tiles()
-                self.state = State.ACTIVE
+                raise GameError(f"Cannot start game, game state is {self.state}. Should be 'IDLE'")
+            self.num_players = len(self.players)
+            # In test mode, allow single player games
+            if not self.test_mode and self.num_players < 2:
+                raise GameError("Need at least 2 players to start a game")
+            self._divy_out_tiles()
+            self.state = State.ACTIVE
         finally:
             self.lock.release()
 
@@ -209,7 +204,7 @@ class Game(object):
         """Divy out the correct number of tiles to each player.
 
         Raises:
-            GameException: Invalid number of players.
+            GameError: Invalid number of players.
         """
         # In test mode, give fewer tiles for quick testing
         if self.test_mode:
@@ -223,12 +218,12 @@ class Game(object):
             elif 7 <= self.num_players <= 8:
                 num_tiles = 11
             else:
-                raise GameException("Invalid number of players.")
+                raise GameError("Invalid number of players.")
 
         for player in self.players:
             for _ in range(num_tiles):
                 if len(self.tiles) == 0:
-                    raise GameException("Not enough tiles available to distribute to all players")
+                    raise GameError("Not enough tiles available to distribute to all players")
                 self.players[player].append(self.tiles.pop())
 
         self.tiles_remaining = len(self.tiles)
@@ -241,33 +236,35 @@ class Game(object):
             test (bool): Bypasses the time restriction for testing, defaults to False.
         """
         if not self.lock.acquire(timeout=2):
-            raise GameException("Could not acquire game lock - operation timed out")
+            raise GameError("Could not acquire game lock - operation timed out")
         try:
             if self.state != State.ACTIVE:
-                raise GameException(f"Cannot peel, game state is {self.state}. Should be 'ACTIVE'")
-            else:
-                # Make sure a peel hasn't happened within a fraction of a second to prevent overlap
-                if (datetime.datetime.now() - self.last_peel).total_seconds() <= 0.75 and not test:
-                    raise GameException("Peel occuring too frequently.")
+                raise GameError(f"Cannot peel, game state is {self.state}. Should be 'ACTIVE'")
+            # Make sure a peel hasn't happened within a fraction of a second to prevent overlap
+            if (datetime.datetime.now() - self.last_peel).total_seconds() <= 0.75 and not test:
+                raise GameError("Peel occuring too frequently.")
 
-                # Update the time of the last peel
-                self.last_peel = datetime.datetime.now()
+            # Update the time of the last peel
+            self.last_peel = datetime.datetime.now()
 
-                # Make sure there are enough tiles to make a peel.
-                if self.num_players > self.tiles_remaining:
-                    raise GameException("Not enough tiles to deal.")
+            # Make sure there are enough tiles to make a peel.
+            if self.num_players is not None and self.num_players > self.tiles_remaining:
+                raise GameError("Not enough tiles to deal.")
 
-                # Check if this peel will transition to endgame
-                will_be_endgame = (self.tiles_remaining - self.num_players) < self.num_players
+            # Check if this peel will transition to endgame
+            will_be_endgame = (
+                self.num_players is not None
+                and (self.tiles_remaining - self.num_players) < self.num_players
+            )
 
-                # Give a new tile to each player.
-                for player in self.players:
-                    self.players[player].append(self.tiles.pop())
-                self.tiles_remaining = len(self.tiles)
+            # Give a new tile to each player.
+            for player in self.players:
+                self.players[player].append(self.tiles.pop())
+            self.tiles_remaining = len(self.tiles)
 
-                # Update state if necessary
-                if will_be_endgame:
-                    self.state = State.ENDGAME
+            # Update state if necessary
+            if will_be_endgame:
+                self.state = State.ENDGAME
 
         finally:
             self.lock.release()
@@ -280,44 +277,46 @@ class Game(object):
             player (str): The ID of the player to perform the swap.
 
         Raises:
-            GameException: The player does not have an instance of that tile.
+            GameError: The player does not have an instance of that tile.
         """
         if not self.lock.acquire(timeout=2):
-            raise GameException("Could not acquire game lock - operation timed out")
+            raise GameError("Could not acquire game lock - operation timed out")
         try:
             if self.state not in [State.ACTIVE, State.ENDGAME]:
-                raise GameException(
+                raise GameError(
                     f"Cannot swap, game state is {self.state}. Should be 'ACTIVE' or 'ENDGAME'"
                 )
-            else:
-                if letter not in self.players[player]:
-                    raise GameException("Player does not have this letter to remove.")
+            if letter not in self.players[player]:
+                raise GameError("Player does not have this letter to remove.")
 
-                # Check if this swap will transition to endgame
-                tiles_to_give = min(3, self.tiles_remaining)
-                will_be_endgame = (self.tiles_remaining - tiles_to_give + 1) < self.num_players
+            # Check if this swap will transition to endgame
+            tiles_to_give = min(3, self.tiles_remaining)
+            will_be_endgame = (
+                self.num_players is not None
+                and (self.tiles_remaining - tiles_to_give + 1) < self.num_players
+            )
 
-                # Add new tiles to the player
-                for _ in range(tiles_to_give):
-                    self.players[player].append(self.tiles.pop())
+            # Add new tiles to the player
+            for _ in range(tiles_to_give):
+                self.players[player].append(self.tiles.pop())
 
-                # Remove one instance of the given letter from the player
-                self.players[player].remove(letter)
+            # Remove one instance of the given letter from the player
+            self.players[player].remove(letter)
 
-                # Add the letter back to the tile pile and shuffle
-                self.tiles.append(letter)
-                random.shuffle(self.tiles)
+            # Add the letter back to the tile pile and shuffle
+            self.tiles.append(letter)
+            random.shuffle(self.tiles)
 
-                # Update number of tiles
-                self.tiles_remaining = len(self.tiles)
+            # Update number of tiles
+            self.tiles_remaining = len(self.tiles)
 
-                # Update state if necessary
-                if will_be_endgame:
-                    self.state = State.ENDGAME
+            # Update state if necessary
+            if will_be_endgame:
+                self.state = State.ENDGAME
         finally:
             self.lock.release()
 
-    def bananagrams(self, player_id: str, word_list: List[str]):
+    def bananagrams(self, player_id: str, word_list: list[str]):
         """
         End the game (someone has bananagrams)
 
@@ -326,15 +325,14 @@ class Game(object):
             word_list (List[str]): The list of the winning words.
         """
         if not self.lock.acquire(timeout=2):
-            raise GameException("Could not acquire game lock - operation timed out")
+            raise GameError("Could not acquire game lock - operation timed out")
         try:
             winning_words = []
             if self.state != State.ENDGAME:
-                raise GameException(
+                raise GameError(
                     f"Cannot call bananagrams, game state is {self.state}. Should be 'ENDGAME'"
                 )
-            else:
-                self.state = State.OVER
+            self.state = State.OVER
             self.winning_player = player_id
 
             # Iterate over the winning words and check each against the dictionary
@@ -347,15 +345,14 @@ class Game(object):
     def continue_game(self):
         """Continue the game (false alarm on banagrams)"""
         if not self.lock.acquire(timeout=2):
-            raise GameException("Could not acquire game lock - operation timed out")
+            raise GameError("Could not acquire game lock - operation timed out")
         try:
             if self.state != State.OVER:
-                raise GameException(
+                raise GameError(
                     f"Cannot continue game, game state is {self.state}. Should be 'OVER'"
                 )
-            else:
-                self.state = State.ENDGAME
-                self.winning_player = None
-                self.winning_words = None
+            self.state = State.ENDGAME
+            self.winning_player = None
+            self.winning_words = None
         finally:
             self.lock.release()

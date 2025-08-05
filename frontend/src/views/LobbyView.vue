@@ -118,7 +118,7 @@ const joinGame = () => {
   const validation = validatePlayerName(rawName)
 
   if (!validation.valid) {
-    nameError.value = validation.error
+    nameError.value = validation.error || ''
     return
   }
 

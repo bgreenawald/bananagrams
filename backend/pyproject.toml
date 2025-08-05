@@ -27,6 +27,9 @@ dev = [
     "ruff>=0.12.7",
     "pre-commit>=4.2.0",
     "types-simplejson>=3.19.0",
+    "types-Flask-Cors>=4.0.0",
+    "types-Flask-SocketIO>=5.3.0",
+    "types-jsonschema>=4.23.0",
 ]
 
 [tool.ruff]
@@ -81,3 +84,21 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+disallow_untyped_decorators = false
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "apscheduler.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "flask_socketio.*"
+ignore_errors = true

@@ -36,7 +36,7 @@ export const useBoardStore = defineStore('board', () => {
     if (!tile || getTileAt(toRow, toCol)) {
       return false
     }
-    
+
     removeTile(fromRow, fromCol)
     placeTile(tile, toRow, toCol)
     return true
@@ -98,12 +98,12 @@ export const useBoardStore = defineStore('board', () => {
 
     while (queue.length > 0) {
       const current = queue.shift()!
-      
+
       for (const [dr, dc] of directions) {
         const newRow = current.row + dr
         const newCol = current.col + dc
         const key = getCellKey(newRow, newCol)
-        
+
         if (!visited.has(key) && getTileAt(newRow, newCol)) {
           visited.add(key)
           queue.push({ row: newRow, col: newCol })

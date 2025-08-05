@@ -20,9 +20,9 @@ This is an online multiplayer Bananagrams game with a Python Flask backend and V
 - **Build Tool**: Vite for fast development and building
 - **State Management**: Pinia stores with composables pattern
 - **Real-time Communication**: Socket.io-client for WebSocket connections to backend
-- **Key Components**: 
+- **Key Components**:
   - Game board with drag-and-drop tile placement using Vue composables
-  - Player bench for tile management  
+  - Player bench for tile management
   - Lobby system for multiplayer matchmaking
   - Modal system for game notifications
 - **Styling**: SCSS with component-scoped styles

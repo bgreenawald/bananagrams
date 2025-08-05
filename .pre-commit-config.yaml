@@ -25,6 +25,17 @@ repos:
           types-requests,
         ]
 
+  # Backend tests
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: bash -c 'cd backend && pytest tests/ -v --tb=short'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+        stages: [pre-commit]
+
   # JavaScript/TypeScript hooks
   - repo: local
     hooks:
@@ -34,6 +45,14 @@ repos:
         language: system
         files: ^frontend/.*\.(js|jsx|ts|tsx|vue)$
         pass_filenames: false
+
+      - id: vitest
+        name: vitest
+        entry: bash -c 'cd frontend && npm run test -- --run --passWithNoTests'
+        language: system
+        files: ^frontend/.*\.(js|jsx|ts|tsx|vue|spec\.ts|test\.ts)$
+        pass_filenames: false
+        stages: [pre-commit]
 
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks

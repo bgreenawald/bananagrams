@@ -42,8 +42,8 @@
             :disabled="players.length < (isTestMode ? 1 : 2)"
             class="start-btn"
           >
-            {{ players.length < (isTestMode ? 1 : 2) ? 
-              (isTestMode ? 'Ready to start!' : 'Waiting for players...') : 
+            {{ players.length < (isTestMode ? 1 : 2) ?
+              (isTestMode ? 'Ready to start!' : 'Waiting for players...') :
               'Start Game' }}
           </button>
           <p v-else-if="gameState === 'ACTIVE'" class="status">
@@ -89,9 +89,9 @@ onMounted(async () => {
       router.push({ name: 'landing' })
       return
     }
-    
+
     gameStore.setGameId(currentGameId)
-    
+
     const savedName = localStorage.getItem('playerName')
     if (savedName) {
       playerStore.setPlayerName(savedName)
@@ -116,15 +116,15 @@ watch(() => gameStore.gameState?.state, (newState) => {
 const joinGame = () => {
   const rawName = nameInput.value.trim()
   const validation = validatePlayerName(rawName)
-  
+
   if (!validation.valid) {
     nameError.value = validation.error
     return
   }
-  
+
   // Clear any previous error when validation passes
   nameError.value = ''
-  
+
   const sanitizedName = sanitizeInput(rawName)
   playerStore.setPlayerName(sanitizedName)
   localStorage.setItem('playerName', sanitizedName)

@@ -7,7 +7,7 @@
         <span class="player-count">Players: {{ players.length }}</span>
       </div>
     </div>
-    
+
     <div class="controls-center">
       <button
         @click="handlePeel"
@@ -16,7 +16,7 @@
       >
         Peel
       </button>
-      
+
       <button
         @click="handleBananagrams"
         :disabled="!canCallBananagrams"
@@ -24,7 +24,7 @@
       >
         Bananagrams!
       </button>
-      
+
       <button
         @click="handleSelectAll"
         class="btn btn-secondary"
@@ -32,7 +32,7 @@
         Select All
       </button>
     </div>
-    
+
     <div class="controls-right">
       <button
         @click="confirmReset"
@@ -40,7 +40,7 @@
       >
         Reset Board
       </button>
-      
+
       <button
         @click="confirmNewGame"
         class="btn btn-secondary"
@@ -74,14 +74,14 @@ const tilesRemaining = computed(() => gameStore.tilesRemaining)
 const players = computed(() => gameStore.players)
 
 const canPeel = computed(() => {
-  return gameStore.isActive && 
-         playerStore.benchTiles.length === 0 && 
+  return gameStore.isActive &&
+         playerStore.benchTiles.length === 0 &&
          boardStore.getOccupiedCells().length > 0
 })
 
 const canCallBananagrams = computed(() => {
-  return gameStore.isEndgame && 
-         playerStore.benchTiles.length === 0 && 
+  return gameStore.isEndgame &&
+         playerStore.benchTiles.length === 0 &&
          boardStore.getOccupiedCells().length > 0
 })
 
@@ -183,7 +183,7 @@ function confirmNewGame() {
 .btn-success {
   background-color: #28a745;
   color: white;
-  
+
   &:hover:not(:disabled) {
     background-color: #218838;
   }

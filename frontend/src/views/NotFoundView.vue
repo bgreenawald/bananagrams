@@ -14,19 +14,19 @@
   justify-content: center;
   min-height: 100vh;
   text-align: center;
-  
+
   h1 {
     font-size: 6rem;
     color: #333;
     margin-bottom: 1rem;
   }
-  
+
   p {
     font-size: 1.5rem;
     color: #666;
     margin-bottom: 2rem;
   }
-  
+
   .home-link {
     padding: 0.75rem 2rem;
     background-color: #4CAF50;
@@ -35,7 +35,7 @@
     border-radius: 8px;
     font-weight: 600;
     transition: background-color 0.2s;
-    
+
     &:hover {
       background-color: #45a049;
     }

@@ -52,7 +52,7 @@ export const usePlayerStore = defineStore('player', () => {
   function updateTiles(newTiles: Tile[]) {
     const existingIds = new Set(tiles.value.map(t => t.id))
     const newTilesToAdd = newTiles.filter(t => !existingIds.has(t.id))
-    
+
     logger.tileUpdate(
       `Updating tiles: adding ${newTilesToAdd.length} new tiles`,
       {
@@ -62,7 +62,7 @@ export const usePlayerStore = defineStore('player', () => {
         finalCount: tiles.value.length + newTilesToAdd.length
       }
     )
-    
+
     tiles.value = [...tiles.value, ...newTilesToAdd]
   }
 

@@ -12,7 +12,7 @@ export function useDragDrop() {
   const boardStore = useBoardStore()
   const uiStore = useUIStore()
   const socketStore = useSocketStore()
-  
+
   // Validation helper to ensure tile state consistency
   function validateTileOperation(tileId: string, operation: string): boolean {
     const tile = findTileById(tileId)
@@ -39,7 +39,7 @@ export function useDragDrop() {
     // Calculate offset for multi-tile move
     let rowOffset = 0
     let colOffset = 0
-    
+
     if (dragData.sourceRow !== undefined && dragData.sourceCol !== undefined) {
       rowOffset = targetRow - dragData.sourceRow
       colOffset = targetCol - dragData.sourceCol
@@ -47,25 +47,25 @@ export function useDragDrop() {
 
     // Check if all target positions are valid
     const moves: Array<{ tile: Tile, fromRow?: number, fromCol?: number, toRow: number, toCol: number }> = []
-    
+
     for (const tile of tilesToMove) {
       const tilePos = findTilePosition(tile.id)
-      
+
       if (tilePos) {
         const newRow = tilePos.row + rowOffset
         const newCol = tilePos.col + colOffset
-        
+
         // Check bounds and availability
-        if (newRow < 0 || newRow >= boardStore.boardSize || 
+        if (newRow < 0 || newRow >= boardStore.boardSize ||
             newCol < 0 || newCol >= boardStore.boardSize) {
           return // Cancel if any tile would go out of bounds
         }
-        
+
         const targetTile = boardStore.getTileAt(newRow, newCol)
         if (targetTile && targetTile.id !== tile.id) {
           return // Cancel if any target cell is occupied by another tile
         }
-        
+
         moves.push({
           tile,
           fromRow: tilePos.row,
@@ -76,7 +76,7 @@ export function useDragDrop() {
       } else if (dragData.sourceBench) {
         // Moving from bench - only allow single tile
         if (tilesToMove.length > 1) return
-        
+
         moves.push({
           tile,
           toRow: targetRow,
@@ -111,7 +111,7 @@ export function useDragDrop() {
             )
             continue
           }
-          
+
           playerStore.markTileOnBoard(move.tile.id, true)
           boardStore.placeTile(move.tile, move.toRow, move.toCol)
           socketStore.placeTile(gameStore.gameId, move.tile.id, move.toRow, move.toCol)

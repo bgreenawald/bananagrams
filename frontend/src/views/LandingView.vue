@@ -3,7 +3,7 @@
     <div class="landing-content">
       <h1 class="title">Bananagrams</h1>
       <p class="subtitle">Create or join a game</p>
-      
+
       <div class="game-form">
         <div class="input-group">
           <label for="game-id">Game ID</label>
@@ -42,7 +42,7 @@
           >
             Create New Game
           </button>
-          
+
           <button
             v-if="testMode"
             @click="createTestGame"
@@ -84,7 +84,7 @@ const validateGameIdInput = () => {
   // Sanitize and format input
   const cleaned = gameId.value.replace(/\D/g, '').slice(0, 4)
   gameId.value = sanitizeInput(cleaned)
-  
+
   // Validate
   const validation = validateGameId(gameId.value)
   error.value = validation.valid ? '' : validation.error || ''
@@ -93,12 +93,12 @@ const validateGameIdInput = () => {
 const generateGameId = async () => {
   await gameStore.loadReservedGameIds()
   const reservedIds = gameStore.unavailableIds || []
-  
+
   let newId: string
   do {
     newId = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
   } while (reservedIds.includes(newId))
-  
+
   gameId.value = newId
   error.value = ''
 }
@@ -109,11 +109,11 @@ const createGame = () => {
     error.value = validation.error || 'Invalid game ID'
     return
   }
-  
+
   const sanitizedId = sanitizeInput(gameId.value)
   gameStore.setGameId(sanitizedId)
-  router.push({ 
-    name: 'lobby', 
+  router.push({
+    name: 'lobby',
     params: { id: sanitizedId },
     query: testMode.value ? { testMode: 'true' } : {}
   })
@@ -125,46 +125,46 @@ const createTestGame = async () => {
     error.value = validation.error || 'Invalid game ID'
     return
   }
-  
+
   try {
     // For test mode, we can auto-generate a player name or prompt for one
     const testPlayerName = `TestPlayer-${Math.floor(Math.random() * 1000)}`
     playerStore.setPlayerName(testPlayerName)
-    
+
     gameStore.setGameId(gameId.value)
-    
+
     // Connect socket with proper error handling
     await socketStore.connect()
-    
+
     // Create test game - this will auto-start the game
     socketStore.createTestGame(gameId.value, testPlayerName)
-    
+
     // Watch for game state changes to navigate when game becomes active
     let hasNavigated = false
     const unwatch = watch(() => gameStore.isActive, (isActive) => {
       if (isActive && !hasNavigated) {
         hasNavigated = true
         unwatch() // Stop watching once we navigate
-        router.push({ 
-          name: 'game', 
+        router.push({
+          name: 'game',
           params: { id: gameId.value }
         })
       }
     }, { immediate: true })
-    
+
     // Fallback timeout in case game state doesn't update properly
     const timeoutId = setTimeout(() => {
       if (!hasNavigated) {
         hasNavigated = true
         unwatch()
         console.warn('Game state update timeout, navigating anyway')
-        router.push({ 
-          name: 'game', 
+        router.push({
+          name: 'game',
           params: { id: gameId.value }
         })
       }
     }, 3000) // 3 second fallback
-    
+
     // Clean up timeout if navigation happens before timeout
     watch(() => hasNavigated, (navigated) => {
       if (navigated) {

@@ -27,7 +27,7 @@ html, body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -37,7 +37,7 @@ html, body {
 .btn-primary {
   background-color: #4CAF50;
   color: white;
-  
+
   &:hover:not(:disabled) {
     background-color: #45a049;
   }
@@ -46,7 +46,7 @@ html, body {
 .btn-secondary {
   background-color: #2196F3;
   color: white;
-  
+
   &:hover:not(:disabled) {
     background-color: #1976D2;
   }
@@ -55,7 +55,7 @@ html, body {
 .btn-danger {
   background-color: #f44336;
   color: white;
-  
+
   &:hover:not(:disabled) {
     background-color: #d32f2f;
   }
@@ -74,7 +74,7 @@ html, body {
 ::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 4px;
-  
+
   &:hover {
     background: #555;
   }

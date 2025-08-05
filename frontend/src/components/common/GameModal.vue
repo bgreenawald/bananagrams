@@ -7,7 +7,7 @@
             <h3 class="modal-title">{{ modalTitle }}</h3>
             <button @click="close" class="close-btn">&times;</button>
           </div>
-          
+
           <div class="modal-body">
             <!-- Reset Confirmation -->
             <div v-if="modalType === 'reset'">
@@ -189,7 +189,7 @@ function submitReview() {
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &:hover {
     color: #333;
   }
@@ -239,11 +239,11 @@ function submitReview() {
   color: white;
   cursor: pointer;
   font-weight: bold;
-  
+
   &.invalid {
     background-color: #dc3545;
   }
-  
+
   &:hover {
     opacity: 0.8;
   }
@@ -260,7 +260,7 @@ function submitReview() {
     cursor: pointer;
     font-weight: 500;
     color: #6c757d;
-    
+
     &:hover {
       color: #495057;
     }
@@ -283,7 +283,7 @@ function submitReview() {
 .modal-enter-active,
 .modal-leave-active {
   transition: opacity 0.3s;
-  
+
   .modal-content {
     transition: transform 0.3s;
   }
@@ -292,7 +292,7 @@ function submitReview() {
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
-  
+
   .modal-content {
     transform: scale(0.9);
   }

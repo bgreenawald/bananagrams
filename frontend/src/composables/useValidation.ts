@@ -43,8 +43,8 @@ export function useValidation() {
     playerName: (): ValidationRule => ({
       test: (value: any) => {
         const name = String(value).trim()
-        return name.length >= 2 && 
-               name.length <= 20 && 
+        return name.length >= 2 &&
+               name.length <= 20 &&
                /^[a-zA-Z0-9_-]+$/.test(name)
       },
       message: 'Player name must be 2-20 characters, letters, numbers, _ and - only'
@@ -70,13 +70,13 @@ export function useValidation() {
 
   function validateField(fieldName: string, value: any, validationRules: ValidationRule[]): boolean {
     const result = validate(value, validationRules)
-    
+
     if (result.valid) {
       delete errors.value[fieldName]
     } else {
       errors.value[fieldName] = result.error!
     }
-    
+
     return result.valid
   }
 

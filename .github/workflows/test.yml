@@ -87,3 +87,9 @@ jobs:
       run: |
         npm run test -- --run
       working-directory: ${{ env.frontend-directory }}
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    steps:
+      - run: echo "All tests passed"

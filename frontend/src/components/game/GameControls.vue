@@ -63,14 +63,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { useErrorHandler } from '@/composables/useErrorHandler'
+import { useGameLogic } from '@/composables/useGameLogic'
+import { useBoardStore } from '@/stores/board'
 import { useGameStore } from '@/stores/game'
 import { usePlayerStore } from '@/stores/player'
-import { useBoardStore } from '@/stores/board'
-import { useUIStore } from '@/stores/ui'
 import { useSocketStore } from '@/stores/socket'
-import { useGameLogic } from '@/composables/useGameLogic'
-import { useErrorHandler } from '@/composables/useErrorHandler'
+import { useUIStore } from '@/stores/ui'
+import { computed, onMounted, onUnmounted } from 'vue'
 
 const gameStore = useGameStore()
 const playerStore = usePlayerStore()
@@ -156,8 +156,10 @@ function confirmNewGame() {
 }
 
 function handleKeyDown(event: KeyboardEvent) {
-  // Ignore if user is typing in an input field
-  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+  // Ignore if user is typing in an input field or if modal is shown
+  if (event.target instanceof HTMLInputElement ||
+      event.target instanceof HTMLTextAreaElement ||
+      uiStore.modalType !== null) {
     return
   }
 

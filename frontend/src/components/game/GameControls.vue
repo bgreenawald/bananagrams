@@ -13,23 +13,34 @@
         @click="handlePeel"
         :disabled="!canPeel"
         class="btn btn-primary"
+        title="Keyboard shortcut: P"
       >
-        Peel
+        Peel (P)
       </button>
 
       <button
         @click="handleBananagrams"
         :disabled="!canCallBananagrams"
         class="btn btn-success"
+        title="Keyboard shortcut: B"
       >
-        Bananagrams!
+        Bananagrams! (B)
       </button>
 
       <button
         @click="handleSelectAll"
         class="btn btn-secondary"
+        title="Keyboard shortcut: S"
       >
-        Select All
+        Select All (S)
+      </button>
+
+      <button
+        @click="handleDeselectAll"
+        class="btn btn-secondary"
+        title="Keyboard shortcut: Esc"
+      >
+        Deselect (Esc)
       </button>
     </div>
 
@@ -52,14 +63,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { useErrorHandler } from '@/composables/useErrorHandler'
+import { useGameLogic } from '@/composables/useGameLogic'
+import { useBoardStore } from '@/stores/board'
 import { useGameStore } from '@/stores/game'
 import { usePlayerStore } from '@/stores/player'
-import { useBoardStore } from '@/stores/board'
-import { useUIStore } from '@/stores/ui'
 import { useSocketStore } from '@/stores/socket'
-import { useGameLogic } from '@/composables/useGameLogic'
-import { useErrorHandler } from '@/composables/useErrorHandler'
+import { useUIStore } from '@/stores/ui'
+import { computed, onMounted, onUnmounted } from 'vue'
 
 const gameStore = useGameStore()
 const playerStore = usePlayerStore()
@@ -131,6 +142,11 @@ function handleSelectAll() {
   })
 }
 
+function handleDeselectAll() {
+  // Clear all tile selections
+  playerStore.clearSelection()
+}
+
 function confirmReset() {
   uiStore.showModal('reset')
 }
@@ -138,6 +154,42 @@ function confirmReset() {
 function confirmNewGame() {
   uiStore.showModal('newGame')
 }
+
+function handleKeyDown(event: KeyboardEvent) {
+  // Ignore if user is typing in an input field or if modal is shown
+  if (event.target instanceof HTMLInputElement ||
+      event.target instanceof HTMLTextAreaElement ||
+      uiStore.modalType !== null) {
+    return
+  }
+
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    handleDeselectAll()
+    return
+  }
+
+  const key = event.key.toUpperCase()
+
+  if (key === 'P' && canPeel.value) {
+    event.preventDefault()
+    handlePeel()
+  } else if (key === 'B' && canCallBananagrams.value) {
+    event.preventDefault()
+    handleBananagrams()
+  } else if (key === 'S') {
+    event.preventDefault()
+    handleSelectAll()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <style scoped lang="scss">

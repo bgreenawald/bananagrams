@@ -44,7 +44,7 @@ const hasTile = computed(() => !!tile.value)
 
 function handleDragEnter(e: DragEvent) {
   e.preventDefault()
-  if (uiStore.isDragging && !hasTile.value) {
+  if (uiStore.isDragging) {
     isDragOver.value = true
   }
 }
@@ -55,7 +55,7 @@ function handleDragLeave() {
 
 function handleDragOver(e: DragEvent) {
   e.preventDefault()
-  if (uiStore.isDragging && !hasTile.value && e.dataTransfer) {
+  if (uiStore.isDragging && e.dataTransfer) {
     e.dataTransfer.dropEffect = 'move'
   }
 }
@@ -64,7 +64,7 @@ function handleDrop(e: DragEvent) {
   e.preventDefault()
   isDragOver.value = false
 
-  if (!uiStore.dragData || hasTile.value) return
+  if (!uiStore.dragData) return
 
   handleCellDrop(props.row, props.col)
 }
@@ -87,6 +87,12 @@ function handleDrop(e: DragEvent) {
     background-color: #e8f5e9;
     border-color: #4CAF50;
     box-shadow: inset 0 0 0 2px #4CAF50;
+
+    &.has-tile {
+      background-color: #fff3e0;
+      border-color: #ff9800;
+      box-shadow: inset 0 0 0 2px #ff9800;
+    }
   }
 }
 </style>

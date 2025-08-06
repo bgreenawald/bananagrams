@@ -36,6 +36,12 @@ export function useDragDrop() {
       ? Array.from(playerStore.selectedTiles).map(id => findTileById(id)).filter(Boolean) as Tile[]
       : [draggedTile]
 
+    // Only allow multi-tile drag from board positions
+    if (tilesToMove.length > 1 && dragData.sourceBench) {
+      // Can't drag multiple tiles from bench
+      return
+    }
+
     // Calculate offset for multi-tile move
     let rowOffset = 0
     let colOffset = 0
@@ -48,6 +54,9 @@ export function useDragDrop() {
     // Check if all target positions are valid
     const moves: Array<{ tile: Tile, fromRow?: number, fromCol?: number, toRow: number, toCol: number }> = []
 
+    // First, collect all moves and their target positions
+    const targetPositions = new Map<string, string>() // targetKey -> tileId
+
     for (const tile of tilesToMove) {
       const tilePos = findTilePosition(tile.id)
 
@@ -55,16 +64,20 @@ export function useDragDrop() {
         const newRow = tilePos.row + rowOffset
         const newCol = tilePos.col + colOffset
 
-        // Check bounds and availability
+        // Check bounds
         if (newRow < 0 || newRow >= boardStore.boardSize ||
             newCol < 0 || newCol >= boardStore.boardSize) {
           return // Cancel if any tile would go out of bounds
         }
 
-        const targetTile = boardStore.getTileAt(newRow, newCol)
-        if (targetTile && targetTile.id !== tile.id) {
-          return // Cancel if any target cell is occupied by another tile
+        const targetKey = `${newRow},${newCol}`
+
+        // Check if another tile being moved wants the same target position
+        if (targetPositions.has(targetKey)) {
+          return // Two tiles want the same position
         }
+
+        targetPositions.set(targetKey, tile.id)
 
         moves.push({
           tile,
@@ -85,37 +98,63 @@ export function useDragDrop() {
       }
     }
 
-    // Execute all moves with validation
+    // Now check if any target position is blocked by a non-moving tile
     for (const move of moves) {
-      try {
-        if (move.fromRow !== undefined && move.fromCol !== undefined) {
-          // Move from board to board
-          const success = boardStore.moveTile(move.fromRow, move.fromCol, move.toRow, move.toCol)
-          if (success) {
-            socketStore.moveTile(gameStore.gameId, move.fromRow, move.fromCol, move.toRow, move.toCol)
-          } else {
-            logger.error(
-              `Failed to move tile from (${move.fromRow}, ${move.fromCol}) to (${move.toRow}, ${move.toCol})`,
-              'Drag Drop',
-              { tile: move.tile, fromRow: move.fromRow, fromCol: move.fromCol, toRow: move.toRow, toCol: move.toCol }
-            )
-          }
-        } else {
-          // Move from bench to board
-          // Check if target cell is actually empty
-          if (boardStore.getTileAt(move.toRow, move.toCol)) {
-            logger.error(
-              `Target cell (${move.toRow}, ${move.toCol}) is occupied`,
-              'Drag Drop',
-              { targetRow: move.toRow, targetCol: move.toCol }
-            )
-            continue
-          }
-
-          playerStore.markTileOnBoard(move.tile.id, true)
-          boardStore.placeTile(move.tile, move.toRow, move.toCol)
-          socketStore.placeTile(gameStore.gameId, move.tile.id, move.toRow, move.toCol)
+      const targetTile = boardStore.getTileAt(move.toRow, move.toCol)
+      if (targetTile) {
+        // Check if this tile is one of the tiles being moved
+        const isMovingTile = tilesToMove.some(t => t.id === targetTile.id)
+        if (!isMovingTile) {
+          return // Blocked by a tile that's not moving
         }
+      }
+    }
+
+    // Execute all moves - remove all tiles first, then place them
+    // This ensures tiles don't block each other during multi-tile moves
+    const boardMoves = moves.filter(m => m.fromRow !== undefined && m.fromCol !== undefined)
+    const benchMoves = moves.filter(m => m.fromRow === undefined || m.fromCol === undefined)
+
+    // Step 1: Remove all tiles from their current positions
+    const removedTiles: Array<{ tile: Tile, move: typeof moves[0] }> = []
+    for (const move of boardMoves) {
+      const tile = boardStore.removeTile(move.fromRow!, move.fromCol!)
+      if (tile) {
+        removedTiles.push({ tile, move })
+      }
+    }
+
+    // Step 2: Place all tiles in their new positions
+    try {
+      for (const { tile, move } of removedTiles) {
+        boardStore.placeTile(tile, move.toRow, move.toCol)
+        socketStore.moveTile(gameStore.gameId, move.fromRow!, move.fromCol!, move.toRow, move.toCol)
+      }
+    } catch (error) {
+      // Rollback on error - place tiles back in original positions
+      logger.error('Failed to complete multi-tile move, rolling back', 'Drag Drop', { error })
+      for (const { tile, move } of removedTiles) {
+        boardStore.placeTile(tile, move.fromRow!, move.fromCol!)
+      }
+      return
+    }
+
+    // Handle bench to board moves (these don't conflict)
+    for (const move of benchMoves) {
+      try {
+        // Check if target cell is actually empty
+        if (boardStore.getTileAt(move.toRow, move.toCol)) {
+          logger.error(
+            `Target cell (${move.toRow}, ${move.toCol}) is occupied`,
+            'Drag Drop',
+            { targetRow: move.toRow, targetCol: move.toCol }
+          )
+          continue
+        }
+
+        playerStore.markTileOnBoard(move.tile.id, true)
+        boardStore.placeTile(move.tile, move.toRow, move.toCol)
+        socketStore.placeTile(gameStore.gameId, move.tile.id, move.toRow, move.toCol)
       } catch (error) {
         logger.error(
           `Error executing move for tile ${move.tile.id}`,
